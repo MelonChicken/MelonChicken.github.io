@@ -1,0 +1,60 @@
+@import url("https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Ms+Madi&display=swap");
+
+body {
+    width: 100%;
+    height: 100vh;
+    margin: 0;
+    font-family: "Montserrat", sans-serif;
+}
+header{
+    width: 100%;
+    height: 5vh;
+    background-color: rgb(1, 1, 37);
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+.linear-gradient{
+    background: linear-gradient(to right, rgb(55, 55, 228) 10%, rgb(134, 79, 216) 44%, rgb(66, 245, 224) 100%);
+    color: transparent;
+    -webkit-background-clip: text;
+}
+.leftHeader{
+    height: 5vh;
+    padding-left: 1vw;
+    grid-column-start: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: start;
+    color: white;
+    .fa-code{
+        padding-right: 1vw;
+        font-weight: bold;
+        color: rgb(55, 55, 228);
+    }
+    .largeText{
+        font-weight: bold;
+    }
+    .navTabs{
+        width: 20%;
+        padding-left: 2vw;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        p{
+            padding-left: 1vw;
+            font-weight: bold;
+        }
+        p:hover{
+            background: linear-gradient(to right top, rgb(238, 238, 251) 10%, rgb(159, 127, 207) 44%, rgb(111, 35, 204) 100%);
+            color: transparent;
+            -webkit-background-clip: text;
+        }
+    }
+}
+section{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+
+}
