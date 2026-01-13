@@ -1,755 +1,272 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>포트폴리오 웹사이트</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Apple SD Gothic Neo', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            overflow-x: hidden;
-            background: #0a0a0a;
-        }
-
-        /* 네비게이션 바 */
-        .navbar {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            background: rgba(10, 10, 10, 0.95);
-            backdrop-filter: blur(20px);
-            z-index: 1000;
-            padding: 1rem 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 2rem;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #fff;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-        }
-
-        .nav-link {
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .nav-link:hover {
-            color: #667eea;
-        }
-
-        .nav-link.active {
-            color: #667eea;
-        }
-
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            transition: width 0.3s ease;
-        }
-
-        .nav-link:hover::after,
-        .nav-link.active::after {
-            width: 100%;
-        }
-
-        /* 섹션 공통 스타일 */
-        section {
-            min-height: 100vh;
-            padding: 5rem 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        /* 히어로 섹션 */
-        .hero {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="3" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="80" r="1" fill="rgba(255,255,255,0.1)"/></svg>');
-            animation: float 20s linear infinite;
-        }
-
-        @keyframes float {
-            0% { transform: translateY(100vh) rotate(0deg); }
-            100% { transform: translateY(-100vh) rotate(360deg); }
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 2;
-        }
-
-        .hero h1 {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            opacity: 0;
-            animation: slideUp 1s ease 0.5s forwards;
-        }
-
-        .hero p {
-            font-size: 1.3rem;
-            margin-bottom: 2rem;
-            opacity: 0;
-            animation: slideUp 1s ease 0.7s forwards;
-        }
-
-        .cta-button {
-            display: inline-block;
-            padding: 1rem 2rem;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            text-decoration: none;
-            border-radius: 50px;
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            transition: all 0.3s ease;
-            font-weight: 600;
-            opacity: 0;
-            animation: slideUp 1s ease 0.9s forwards;
-        }
-
-        .cta-button:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* About 섹션 */
-        .about {
-            background: #111;
-            color: white;
-        }
-
-        .about-content {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 4rem;
-            align-items: center;
-        }
-
-        .about-text h2 {
-            font-size: 3rem;
-            margin-bottom: 2rem;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .about-text p {
-            font-size: 1.1rem;
-            margin-bottom: 1.5rem;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        .profile-section {
-            position: relative;
-        }
-
-        .profile-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 2rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .profile-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
-        }
-
-        .profile-image {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            margin: 0 auto 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            border: 4px solid rgba(255, 255, 255, 0.3);
-        }
-
-        /* Skills 섹션 */
-        .skills {
-            background: #0a0a0a;
-            color: white;
-        }
-
-        .skills h2 {
-            text-align: center;
-            font-size: 3rem;
-            margin-bottom: 3rem;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .skills-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-        }
-
-        .skill-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 2rem;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .skill-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.2), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .skill-card:hover::before {
-            left: 100%;
-        }
-
-        .skill-card:hover {
-            transform: translateY(-10px);
-            background: rgba(255, 255, 255, 0.1);
-            border-color: #667eea;
-        }
-
-        .skill-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-
-        /* Projects 섹션 */
-        .projects {
-            background: #111;
-            color: white;
-        }
-
-        .projects h2 {
-            text-align: center;
-            font-size: 3rem;
-            margin-bottom: 3rem;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .projects-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 2rem;
-        }
-
-        .project-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .project-card:hover {
-            transform: translateY(-15px) scale(1.02);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-        }
-
-        .project-image {
-            height: 200px;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 4rem;
-            color: white;
-        }
-
-        .project-content {
-            padding: 2rem;
-        }
-
-        .project-content h3 {
-            margin-bottom: 1rem;
-            color: #667eea;
-        }
-
-        .project-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-
-        .tag {
-            background: rgba(102, 126, 234, 0.2);
-            color: #667eea;
-            padding: 0.3rem 0.8rem;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            border: 1px solid rgba(102, 126, 234, 0.3);
-        }
-
-        /* Contact 섹션 */
-        .contact {
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
-            color: white;
-            text-align: center;
-        }
-
-        .contact h2 {
-            font-size: 3rem;
-            margin-bottom: 2rem;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .contact-links {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-
-        .contact-link {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-decoration: none;
-            color: rgba(255, 255, 255, 0.8);
-            transition: all 0.3s ease;
-            padding: 2rem;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .contact-link:hover {
-            color: #667eea;
-            transform: translateY(-10px);
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .contact-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-
-        /* 스크롤 인디케이터 */
-        .scroll-indicator {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.1);
-            z-index: 1001;
-        }
-
-        .scroll-progress {
-            height: 100%;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            width: 0%;
-            transition: width 0.1s ease;
-        }
-
-        /* 반응형 */
-        @media (max-width: 768px) {
-            .nav-menu {
-                display: none;
-            }
-
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-
-            .about-content {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
-
-            .skills-grid,
-            .projects-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .contact-links {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            section {
-                padding: 3rem 1rem;
-            }
-        }
-
-        /* 부드러운 스크롤 */
-        html {
-            scroll-behavior: smooth;
-        }
-
-        /* 커스텀 스크롤바 */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #0a0a0a;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(45deg, #764ba2, #667eea);
-        }
-    </style>
+    <title>김준우 (Junu Kim) - Computer Vision & ML Researcher</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
-<!-- 스크롤 인디케이터 -->
-<div class="scroll-indicator">
-    <div class="scroll-progress" id="scrollProgress"></div>
-</div>
 
-<!-- 네비게이션 -->
-<nav class="navbar">
-    <div class="nav-container">
-        <div class="logo">JUNU KIM</div>
-        <ul class="nav-menu">
-            <li><a href="#home" class="nav-link active">홈</a></li>
-            <li><a href="#about" class="nav-link">소개</a></li>
-            <li><a href="#skills" class="nav-link">스킬</a></li>
-            <li><a href="#projects" class="nav-link">프로젝트</a></li>
-            <li><a href="#contact" class="nav-link">연락처</a></li>
-        </ul>
+    <!-- Scroll Progress -->
+    <div class="scroll-progress-container">
+        <div class="scroll-progress-bar" id="scrollProgress"></div>
     </div>
-</nav>
 
-<!-- 히어로 섹션 -->
-<section id="home" class="hero">
-    <div class="container">
-        <div class="hero-content">
-            <h1>안녕하세요, 김준우입니다</h1>
-            <p>데이터 분석과 앱 개발에 열정적인 ITM 학생</p>
-            <a href="#about" class="cta-button">더 알아보기</a>
-        </div>
-    </div>
-</section>
-
-<!-- 소개 섹션 -->
-<section id="about" class="about">
-    <div class="container">
-        <div class="about-content">
-            <div class="about-text">
-                <h2>About Me</h2>
-                <p>저는 서울과학기술대학교 산업공학과 ITM에 재학 중인 자기주도적 학생입니다. Flutter를 활용한 크로스 플랫폼 서비스 개발과 Python을 활용한 web crawling과 데이터 분석 분야에 관심이 있습니다.</p>
-                <p>멀티모달 데이터에 대한 강한 직관력을 가지고 있으며, 세부적이고 체계적인 접근 방식을 추구합니다.</p>
-                <p>수학 학원 보조강사 경험을 통해 학생들의 통계적·행동적 데이터를 분석하여 개별 맞춤형 학습 방법을 개발하고 있으며, 50명 이상의 학생 진도 기록을 관리한 경험이 있습니다.</p>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">JUNU KIM</a>
+            <div class="nav-right">
+                <ul class="nav-menu">
+                    <li><a href="#hero" class="nav-link active" data-en="Home" data-ko="홈">홈</a></li>
+                    <li><a href="#about" class="nav-link" data-en="About" data-ko="소개">소개</a></li>
+                    <li><a href="#skills" class="nav-link" data-en="Skills" data-ko="기술">기술</a></li>
+                    <li><a href="#projects" class="nav-link" data-en="Projects" data-ko="프로젝트">프로젝트</a></li>
+                    <li><a href="#timeline" class="nav-link" data-en="Experience" data-ko="경력">경력</a></li>
+                    <li><a href="#contact" class="nav-link" data-en="Contact" data-ko="연락처">연락처</a></li>
+                </ul>
+                <button class="lang-toggle" id="langToggle">
+                    <i class="fas fa-globe"></i> <span id="langText">EN</span>
+                </button>
             </div>
-            <div class="profile-section">
-                <div class="profile-card">
-                    <div class="profile-image">🎓</div>
-                    <h3>김준우</h3>
-                    <p>산업공학과 ITM</p>
-                    <p>서울과학기술대학교</p>
-                    <p>2022년 입학 (2028년 2월 졸업 예정)</p>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title" data-en="Junu Kim" data-ko="김준우 (Junu Kim)">김준우 (Junu Kim)</h1>
+                <h2 class="hero-subtitle">Computer Vision & ML Researcher</h2>
+                <p class="hero-tagline"
+                    data-en="Aspiring Graduate Student passionate about Animal Behavior Analysis and Computer Vision"
+                    data-ko="동물 행동 분석과 컴퓨터 비전 연구에 열정을 가진 대학원 지망생">동물 행동 분석과 컴퓨터 비전 연구에 열정을 가진 대학원 지망생</p>
+                <div class="btn-group">
+                    <a href="#projects" class="btn btn-primary" data-en="View Projects" data-ko="프로젝트 보기">프로젝트 보기</a>
+                    <a href="#contact" class="btn btn-outline" data-en="Contact Me" data-ko="연락하기">연락하기</a>
+                </div>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="mailto:junu_kim@outlook.com"><i class="fas fa-envelope"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- 스킬 섹션 -->
-<section id="skills" class="skills">
-    <div class="container">
-        <h2>Skills</h2>
-        <div class="skills-grid">
-            <div class="skill-card">
-                <div class="skill-icon">🐍</div>
-                <h3>Python</h3>
-                <p>데이터 분석, 웹 크롤링, 머신러닝 개발</p>
-            </div>
-            <div class="skill-card">
-                <div class="skill-icon">📱</div>
-                <h3>Flutter & Dart</h3>
-                <p>크로스 플랫폼 모바일 앱 개발</p>
-            </div>
-            <div class="skill-card">
-                <div class="skill-icon">☕</div>
-                <h3>Java</h3>
-                <p>객체지향 프로그래밍 및 애플리케이션 개발</p>
-            </div>
-            <div class="skill-card">
-                <div class="skill-icon">📊</div>
-                <h3>데이터 분석</h3>
-                <p>ADsP 자격증 보유, Access Database 활용 경험, 통계 분석</p>
-            </div>
-            <div class="skill-card">
-                <div class="skill-icon">🤖</div>
-                <h3>딥러닝</h3>
-                <p>머신러닝 모델 개발 및 빅데이터 예측 모델</p>
-            </div>
-            <div class="skill-card">
-                <div class="skill-icon">🕷️</div>
-                <h3>웹 크롤링</h3>
-                <p>데이터 수집 자동화 및 정보 분석</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- 프로젝트 섹션 -->
-<section id="projects" class="projects">
-    <div class="container">
-        <h2>Projects</h2>
-        <div class="projects-grid">
-            <div class="project-card">
-                <div class="project-image">🏆</div>
-                <div class="project-content">
-                    <h3>IT 서비스 아이디어 경진대회 은상</h3>
-                    <p>서울과학기술대학교 IT경영학과 주최 경진대회에서 기획 및 개발 부문 은상을 수상했습니다. 혁신적인 IT 서비스 아이디어를 제안하고 실제 구현했습니다.</p>
-                    <div class="project-tags">
-                        <span class="tag">기획</span>
-                        <span class="tag">개발</span>
-                        <span class="tag">프레젠테이션</span>
-                        <span class="tag">2022.11</span>
+    <!-- About Section -->
+    <section id="about">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-img-container">
+                    <div class="profile-img">
+                        <i class="fas fa-user-graduate"></i>
                     </div>
                 </div>
-            </div>
-            <div class="project-card">
-                <div class="project-image">📊</div>
-                <div class="project-content">
-                    <h3>정보 분석 시스템</h3>
-                    <p>DBA 코드 최적화를 통해 매크로 자동화를 구현했습니다. 작업 시간을 10% 단축하고 200건 이상의 오류 없는 보고서를 작성했습니다.</p>
-                    <div class="project-tags">
-                        <span class="tag">Access Database</span>
-                        <span class="tag">매크로 자동화</span>
-                        <span class="tag">데이터 분석</span>
-                        <span class="tag">2023.02-2024.10</span>
-                    </div>
-                </div>
-            </div>
-            <div class="project-card">
-                <div class="project-image">🧮</div>
-                <div class="project-content">
-                    <h3>맞춤형 수학 학습 관리 시스템</h3>
-                    <p>공부독립수학에서 수학 과외를 하며 학생들의 통계적·행동적 데이터를 분석하여 개별 맞춤형 학습 계획을 수립했습니다. 50명 이상의 학생 진도를 체계적으로 관리하고 있습니다.</p>
-                    <div class="project-tags">
-                        <span class="tag">데이터 분석</span>
-                        <span class="tag">학습 관리</span>
-                        <span class="tag">Python</span>
-                        <span class="tag">2024.11-현재</span>
+                <div class="about-text">
+                    <h2 data-en="About Me" data-ko="About Me">About Me</h2>
+                    <p style="margin-bottom: 1rem;"
+                        data-en="I am majoring in Industrial Technology Management (ITM) at Seoul National University of Science and Technology. I have a deep interest in solving real-world problems through data analysis and computer vision technology."
+                        data-ko="서울과학기술대학교 ITM(Industrial Technology Management) 전공으로, 데이터 분석과 컴퓨터 비전 기술을 통해 실제 문제를 해결하는 것에 깊은 관심을 가지고 있습니다.">
+                        서울과학기술대학교 ITM(Industrial Technology Management) 전공으로,
+                        데이터 분석과 컴퓨터 비전 기술을 통해 실제 문제를 해결하는 것에 깊은 관심을 가지고 있습니다.
+                    </p>
+                    <p style="margin-bottom: 1rem;"
+                        data-en="I am particularly aiming to conduct research applying computer vision to the **Animal Behavior Analysis** field, and I am working towards a goal of pursuing a PhD at KAIST or graduate schools abroad."
+                        data-ko="특히 <strong>동물 행동 분석</strong> 분야에 컴퓨터 비전을 적용하는 연구를 목표로 하고 있으며, KAIST 또는 해외 대학원에서 박사 과정을 밟는 것을 목표로 정진하고 있습니다.">
+                        특히 <strong>동물 행동 분석</strong> 분야에 컴퓨터 비전을 적용하는 연구를 목표로 하고 있으며,
+                        KAIST 또는 해외 대학원에서 박사 과정을 밟는 것을 목표로 정진하고 있습니다.
+                    </p>
+
+                    <div class="info-cards">
+                        <div class="info-card">
+                            <i class="fas fa-university"></i>
+                            <h3>Education</h3>
+                            <p data-en="SeoulTech ITM" data-ko="서울과학기술대학교 ITM">서울과학기술대학교 ITM</p>
+                        </div>
+                        <div class="info-card">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <h3>Location</h3>
+                            <p data-en="Incheon, Korea" data-ko="인천, 대한민국">인천, 대한민국</p>
+                        </div>
+                        <div class="info-card">
+                            <i class="fas fa-bullseye"></i>
+                            <h3>Goal</h3>
+                            <p>PhD in CV/ML</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- 연락처 섹션 -->
-<section id="contact" class="contact">
-    <div class="container">
-        <h2>Contact</h2>
-        <p>새로운 프로젝트나 협업 제안은 언제나 환영입니다.</p>
-        <div class="contact-links">
-            <a href="mailto:junu_kim@outlook.com" class="contact-link">
-                <div class="contact-icon">📧</div>
-                <div>
-                    <strong>이메일</strong>
+    <!-- Skills Section -->
+    <section id="skills">
+        <div class="container">
+            <h2 data-en="Tech Stack" data-ko="Tech Stack">Tech Stack</h2>
+            <div class="skills-container">
+                <div class="skill-group">
+                    <div class="skill-grid">
+                        <!-- Python -->
+                        <div class="skill-item">
+                            <i class="fab fa-python skill-icon"></i>
+                            <p>Python</p>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width: 90%"></div>
+                            </div>
+                        </div>
+                        <!-- PyTorch -->
+                        <div class="skill-item">
+                            <i class="fas fa-fire skill-icon"></i>
+                            <p>PyTorch</p>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width: 80%"></div>
+                            </div>
+                        </div>
+                        <!-- TensorFlow -->
+                        <div class="skill-item">
+                            <i class="fas fa-brain skill-icon"></i>
+                            <p>TensorFlow</p>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width: 75%"></div>
+                            </div>
+                        </div>
+                        <!-- Flutter -->
+                        <div class="skill-item">
+                            <i class="fas fa-mobile-alt skill-icon"></i>
+                            <p>Flutter</p>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width: 85%"></div>
+                            </div>
+                        </div>
+                        <!-- FastAPI -->
+                        <div class="skill-item">
+                            <i class="fas fa-server skill-icon"></i>
+                            <p>FastAPI</p>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width: 70%"></div>
+                            </div>
+                        </div>
+                        <!-- Firebase -->
+                        <div class="skill-item">
+                            <i class="fas fa-cloud skill-icon"></i>
+                            <p>Firebase</p>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width: 75%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects">
+        <div class="container">
+            <h2 data-en="Recent Projects" data-ko="Recent Projects">Recent Projects</h2>
+            <div class="carousel-container">
+                <button class="carousel-btn prev" id="prevBtn"><i class="fas fa-chevron-left"></i></button>
+                <div id="projects-track" class="carousel-track">
+                    <!-- Projects will be rendered here by JS -->
+                </div>
+                <button class="carousel-btn next" id="nextBtn"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Timeline Section -->
+    <section id="timeline">
+        <div class="container">
+            <h2 data-en="Experience" data-ko="Experience">Experience</h2>
+            <div class="timeline" id="timeline-container">
+                <!-- Dynamic Line -->
+                <div class="timeline-line">
+                    <div class="timeline-progress" id="timeline-line-progress"></div>
+                </div>
+
+                <!-- Floating Nodes (Cards) -->
+                <div class="timeline-item left active">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content tilt-card">
+                        <span class="timeline-date" data-en="2024.11 - Present" data-ko="2024.11 - Present">2024.11 -
+                            Present</span>
+                        <h3 data-en="Personalized Math Education Service" data-ko="맞춤형 수학 학습 관리">맞춤형 수학 학습 관리</h3>
+                        <p data-en="Student data analysis & customized curriculum design (Managing <strong>50+</strong> students)"
+                            data-ko="학생 데이터 분석 및 맞춤형 커리큘럼 설계 (<strong>50명+</strong> 관리)">학생 데이터 분석 및 맞춤형 커리큘럼 설계
+                            (<strong>50명+</strong> 관리)</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item right">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content tilt-card">
+                        <span class="timeline-date" data-en="2023.02 - 2024.10" data-ko="2023.02 - 2024.10">2023.02 -
+                            2024.10</span>
+                        <h3 data-en="Info Analysis System Optimization" data-ko="정보 분석 시스템 최적화">정보 분석 시스템 최적화</h3>
+                        <p data-en="Increased efficiency by <strong>10%</strong> via Access DB Macro Automation"
+                            data-ko="Access DB 매크로 자동화로 업무 효율 <strong>10%</strong> 증대">Access DB 매크로 자동화로 업무 효율
+                            <strong>10%</strong> 증대</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item left">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content tilt-card">
+                        <span class="timeline-date" data-en="2022.11" data-ko="2022.11">2022.11</span>
+                        <h3 data-en="IT Service Idea Competition" data-ko="IT 서비스 아이디어 경진대회">IT 서비스 아이디어 경진대회</h3>
+                        <p data-en="SeoulTech IT Management Dept - <strong>Silver Award</strong>"
+                            data-ko="서울과학기술대학교 IT경영학과 주최 - <strong>은상 수상</strong>">
+                            서울과학기술대학교 IT경영학과 주최 - <strong>은상 수상</strong></p>
+                    </div>
+                </div>
+
+                <div class="timeline-item right">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content tilt-card">
+                        <span class="timeline-date" data-en="2022.03" data-ko="2022.03">2022.03</span>
+                        <h3 data-en="Entered SeoulTech" data-ko="서울과학기술대학교 입학">서울과학기술대학교 입학</h3>
+                        <p data-en="Majoring in ITM (Industrial Technology Management)" data-ko="산업공학과 ITM 전공">산업공학과 ITM
+                            전공</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact">
+        <div class="container">
+            <h2 data-en="Get In Touch" data-ko="Get In Touch">Get In Touch</h2>
+            <div class="contact-grid">
+                <a href="mailto:junu_kim@outlook.com" class="contact-card">
+                    <i class="fas fa-envelope contact-icon"></i>
+                    <h3>Email</h3>
                     <p>junu_kim@outlook.com</p>
-                </div>
-            </a>
-            <a href="https://melonchicken.github.io/" class="contact-link" target="_blank">
-                <div class="contact-icon">🌐</div>
-                <div>
-                    <strong>포트폴리오 웹사이트</strong>
-                    <p>melonchicken.github.io</p>
-                </div>
-            </a>
-            <a href="tel:+82-10-0724-4444" class="contact-link">
-                <div class="contact-icon">📱</div>
-                <div>
-                    <strong>전화번호</strong>
-                    <p>+82-10-0724-4444</p>
-                </div>
-            </a>
-            <div class="contact-link">
-                <div class="contact-icon">📍</div>
-                <div>
-                    <strong>위치</strong>
-                    <p>인천, 대한민국</p>
-                </div>
+                </a>
+                <a href="https://github.com/MelonChicken" target="_blank" class="contact-card">
+                    <i class="fab fa-github contact-icon"></i>
+                    <h3>GitHub</h3>
+                    <p>github.com/MelonChicken</p>
+                </a>
+                <a href="#" class="contact-card">
+                    <i class="fab fa-linkedin contact-icon"></i>
+                    <h3>LinkedIn</h3>
+                    <p>Junu Kim</p>
+                </a>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<script>
-    // 스크롤 진행률 표시
-    window.addEventListener('scroll', () => {
-        const scrollTop = document.documentElement.scrollTop;
-        const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-        const scrollPercent = (scrollTop / scrollHeight) * 100;
-        document.getElementById('scrollProgress').style.width = scrollPercent + '%';
-    });
+    <footer>
+        <p>&copy; 2024 Junu Kim. All Rights Reserved.</p>
+    </footer>
 
-    // 네비게이션 활성화
-    const sections = document.querySelectorAll('section');
-    const navLinks = document.querySelectorAll('.nav-link');
-
-    window.addEventListener('scroll', () => {
-        let current = '';
-
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            const sectionHeight = section.clientHeight;
-            if (scrollY >= sectionTop - 200) {
-                current = section.getAttribute('id');
-            }
-        });
-
-        navLinks.forEach(link => {
-            link.classList.remove('active');
-            if (link.getAttribute('href') === '#' + current) {
-                link.classList.add('active');
-            }
-        });
-    });
-
-    // 스크롤 애니메이션
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-            }
-        });
-    }, observerOptions);
-
-    // 애니메이션 대상 요소들 관찰
-    document.querySelectorAll('.skill-card, .project-card, .about-text, .profile-card').forEach(el => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(30px)';
-        el.style.transition = 'all 0.6s ease';
-        observer.observe(el);
-    });
-
-    // 부드러운 스크롤 네비게이션
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href');
-            const targetElement = document.querySelector(targetId);
-
-            if (targetElement) {
-                targetElement.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        });
-    });
-
-    // 프로젝트 카드 호버 효과
-    document.querySelectorAll('.project-card').forEach(card => {
-        card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-15px) scale(1.02)';
-        });
-
-        card.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0) scale(1)';
-        });
-    });
-</script>
+    <script src="js/script.js"></script>
 </body>
+
 </html>
