@@ -31,9 +31,9 @@ const projects = [
         icon: "fas fa-newspaper"
     },
     {
-        name: "HaBi (가제)",
+        name: "HaBi",
         name_en: "HaBi",
-        status: "Planning",
+        status: "Archived",
         description: "파편화된 일정을 한곳에서 모아보는 통합 일정 관리 서비스",
         description_en: "Integrated schedule management service gathering fragmented schedules",
         tags: ["Flutter", "FastAPI"],
@@ -81,22 +81,12 @@ const projects = [
         icon: "fas fa-robot"
     },
     {
-        name: "야생동물 행동 관찰 분석기",
-        name_en: "Wild Animal Behavior Analyzer",
-        status: "Planning",
-        description: "딥러닝 기술을 활용한 야생동물 행동 관찰 및 분석 자동화",
-        description_en: "Automated analysis of wild animal behavior using Deep Learning",
-        tags: ["Python", "PyTorch"],
-        link: "https://www.notion.so/ml-c/2d714b84a0f28023ad2df0215e79aac9",
-        icon: "fas fa-paw"
-    },
-    {
         name: "쇼츠 자동화",
         name_en: "Shorts Automation",
         status: "Planning",
         description: "반려견 정보를 기반으로 쇼츠 영상을 자동 생성 및 업로드",
         description_en: "System to automatically generate and upload shorts videos based on pet info",
-        tags: ["n8n", "Python", "AI"],
+        tags: ["n8n", "Python", "AI", "GPT"],
         link: "https://www.notion.so/ml-c/2d714b84a0f28026b5e6d51694b2805e",
         icon: "fas fa-video"
     }
@@ -312,7 +302,7 @@ const generalObserver = new IntersectionObserver((entries) => {
 }, { threshold: 0.1 });
 
 // Animate other elements
-document.querySelectorAll('.skill-item, .project-card, .info-card, .contact-card').forEach(el => {
+document.querySelectorAll('.skill-item, .tech-card, .project-card, .info-card, .contact-card').forEach(el => {
     el.style.opacity = '0';
     el.style.transform = 'translateY(20px)';
     el.style.transition = 'all 0.6s ease';
