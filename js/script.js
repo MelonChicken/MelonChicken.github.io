@@ -79,7 +79,7 @@ const projects = [
         role_en: "Data Preprocessing & ML Model Training",
         result_ko: "지역별 신고 건수 예측 모델 도출",
         result_en: "Developed regional call volume prediction model",
-        tags: ["Python", "scikit-learn", "TensorFlow"],
+        tags: ["Python", "scikit-learn"],
         link: "https://www.notion.so/ml-c/WeatherCall119-25f14b84a0f280158651dcb937391df5",
         icon: "fas fa-cloud-sun-rain",
         last_used: "2023-11"
@@ -92,11 +92,11 @@ const projects = [
         description_en: "Photo booth pose recommendation service",
         problem_ko: "사진 촬영 시 포즈를 고민하는 사용자의 불편함",
         problem_en: "Users struggle to choose poses for photo booths",
-        role_ko: "풀스택 개발 (Flutter 앱 + Firebase)",
-        role_en: "Full Stack Dev (Flutter + Firebase)",
+        role_ko: "웹페이지 프레임 구축 및 UI 개발",
+        role_en: "Frontend Dev (Vanilla JS + Firebase)",
         result_ko: "다양한 포즈 데이터베이스 구축 및 추천 기능",
         result_en: "Built pose database & recommendation system",
-        tags: ["Vanilla JS", "Firebase", "Flutter"],
+        tags: ["Vanilla JS", "Firebase"],
         link: "https://www.notion.so/ml-c/OPOMO-26314b84a0f280628145f5ce2e296cf3",
         icon: "fas fa-camera",
         last_used: "2024-05"
