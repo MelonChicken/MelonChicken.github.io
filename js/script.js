@@ -151,7 +151,24 @@ const projects = [
         link: "https://www.notion.so/ml-c/2d714b84a0f28026b5e6d51694b2805e",
         icon: "fas fa-video",
         last_used: "2024-12"
-    }
+    },
+    {
+  name: "Research Radar – AI 기반 시장 인텔리전스 대시보드",
+  name_en: "Research Radar – AI Market Intelligence Dashboard",
+  status: "In Progress",
+  description: "컨설팅 리서치를 기회로 전환하는 자동 탐색 시스템",
+  description_en: "Automated exploration system converting consulting research into opportunities",
+  problem_ko: "리서치 데이터를 비즈니스 기회로 연결하기 어려움",
+  problem_en: "Difficult to connect research data to business opportunities",
+  role_ko: "풀스택 개발, 데이터 분석, 프로젝트 관리",
+  role_en: "Full-stack Dev, Data Analysis, Project Management",
+  result_ko: "AI 기반 시장 인사이트 자동화 대시보드 개발 중",
+  result_en: "Developing AI-powered market insight automation dashboard",
+  tags: ["FastAPI", "Python", "OpenAI API", "NLP"],
+  link: "https://www.notion.so/2ec14b84a0f280bdad9fe0c60b3d8441",
+  icon: "fas fa-chart-line",
+  last_used: "2026-01"
+},
 ];
 
 // Language State
