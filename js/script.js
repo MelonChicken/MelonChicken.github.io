@@ -121,8 +121,8 @@ const projects = [
     {
         name: "F1 QNA Bot",
         name_en: "F1 QNA Bot",
-        status: "Developing",
-        description: "복잡한 F1 규정과 데이터를 RAG 기술을 활용해 쉽게 답변해주는 챗봇입니다.",
+        status: "Done",
+        description: "복잡한 F1 규정과 데이터를 RAG 기술을 활용해 쉽게 답변해주는 챗봇",
         description_en: "F1 Q&A Chatbot",
         problem_ko: "F1 규정 및 데이터를 쉽게 검색하기 어려움",
         problem_en: "Difficult to search complex F1 regulations and data",
@@ -138,7 +138,7 @@ const projects = [
     {
         name: "Shorts Automation",
         name_en: "Shorts Automation",
-        status: "Planning",
+        status: "Done",
         description: "반려견 영상을 자동으로 편집하고 업로드해주는 자동화 워크플로우 툴입니다.",
         description_en: "Automated Shorts Generation",
         problem_ko: "반려견 영상 편집 및 업로드의 번거로움",
@@ -153,21 +153,21 @@ const projects = [
         last_used: "2024-12"
     },
     {
-  name: "Research Radar – AI 기반 시장 인텔리전스 대시보드",
-  name_en: "Research Radar – AI Market Intelligence Dashboard",
+  name: "Research Radar,
+  name_en: "Research Radar",
   status: "In Progress",
-  description: "컨설팅 리서치를 기회로 전환하는 자동 탐색 시스템",
-  description_en: "Automated exploration system converting consulting research into opportunities",
+  description: " AI 기반 시장 인텔리전스 대시보드, 컨설팅 리서치를 기회로 전환하는 자동 탐색 시스템",
+  description_en: "AI Market Intelligence Dashboard, Automated exploration system converting consulting research into opportunities",
   problem_ko: "리서치 데이터를 비즈니스 기회로 연결하기 어려움",
   problem_en: "Difficult to connect research data to business opportunities",
   role_ko: "풀스택 개발, 데이터 분석, 프로젝트 관리",
   role_en: "Full-stack Dev, Data Analysis, Project Management",
-  result_ko: "AI 기반 시장 인사이트 자동화 대시보드 개발 중",
-  result_en: "Developing AI-powered market insight automation dashboard",
+  result_ko: "AI 기반 시장 인사이트 자동화 대시보드 프로토타입 개발",
+  result_en: "Developed a prototype of AI-powered market insight automation dashboard",
   tags: ["FastAPI", "Python", "OpenAI API", "NLP"],
   link: "https://www.notion.so/2ec14b84a0f280bdad9fe0c60b3d8441",
   icon: "fas fa-chart-line",
-  last_used: "2026-01"
+  last_used: "2026-02"
 },
 ];
 
