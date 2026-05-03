@@ -1,0 +1,21 @@
+.themeSwitch {
+    position: fixed;
+    height: max-content;
+    aspect-ratio: 1 / 1;
+    font-size: 2rem;
+    right: 1vw;
+    margin: 1rem;
+    z-index: 99;
+
+    font-family: 'Bitcount Grid Double';
+    border: 0.1rem solid var(--color-accent);
+    box-shadow: 0.2rem 0.1rem 0.1rem var(--color-accent);
+    color: var(--color-button-secondary-text);
+    background-color: transparent;
+
+    &:hover {
+        background-color: transparent;
+    }
+
+    i {}
+}
