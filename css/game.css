@@ -280,6 +280,96 @@
     color: var(--color-accent);
 }
 
+/* ── Target animal card ──────────────────────────────── */
+.targetCard .targetDisplay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 0.85rem 1rem;
+    background: var(--color-badge-bg);
+    border-radius: var(--radius-md);
+    border: 1.5px solid var(--color-accent);
+    margin-top: 0.5rem;
+}
+
+.targetEmoji {
+    font-size: 2.6rem;
+    line-height: 1;
+}
+
+.targetName {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: var(--color-accent);
+    letter-spacing: 0.04em;
+}
+
+.targetHint {
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    margin: 0.5rem 0 0;
+    text-align: center;
+}
+
+/* ── Gesture chips ───────────────────────────────────── */
+.gestureRow {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.gestureChip {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.88rem;
+    color: var(--color-text-secondary);
+    padding: 0.35rem 0.6rem;
+    background: var(--color-badge-bg);
+    border-radius: var(--radius-sm);
+}
+
+.gestureChip span {
+    font-size: 1.1rem;
+}
+
+/* ── Intro gesture guide ─────────────────────────────── */
+.gestureGuide {
+    display: flex;
+    gap: 1rem;
+    margin: 1rem 0 0.5rem;
+    justify-content: center;
+}
+
+.gestureItem {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: var(--color-badge-bg);
+    border-radius: var(--radius-md);
+    padding: 0.6rem 0.9rem;
+    text-align: left;
+}
+
+.gestureIcon {
+    font-size: 1.8rem;
+    line-height: 1;
+}
+
+.gestureItem strong {
+    display: block;
+    color: var(--color-accent);
+    font-size: 0.9rem;
+    margin-bottom: 0.15rem;
+}
+
+.gestureItem p {
+    color: var(--color-text-secondary);
+    font-size: 0.78rem;
+    margin: 0 !important;
+}
+
 /* ── Responsive ──────────────────────────────────────── */
 @media (max-width: 900px) {
     .gameLayout {
@@ -315,6 +405,4 @@
     }
 
     .finalScoreValue {
-        font-size: 2.8rem !important;
-    }
-}
+        font-size: 

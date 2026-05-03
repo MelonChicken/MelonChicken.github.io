@@ -4,23 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finger Catch | Junu's Lab</title>
+    <title>Animal Spotter | Junu's Lab</title>
 
-    <!-- Portfolio shared styles -->
     <link rel="stylesheet" href="css/themePalatte.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/button.css">
-    <!-- Game-specific styles -->
     <link rel="stylesheet" href="css/game.css">
 
-    <!-- Icons & Fonts -->
     <script src="https://kit.fontawesome.com/8da0f3b785.js" crossorigin="anonymous"></script>
     <link href="https://cdn.jsdelivr.net/gh/sun-typeface/SUIT@2/fonts/static/woff2/SUIT.css" rel="stylesheet">
-
-    <!-- Theme switch (must be before body renders) -->
     <script src="js/themeSwitch.js"></script>
-
-    <!-- MediaPipe Hands (browser CDN) -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
 </head>
 
@@ -55,11 +48,27 @@
                 <div class="gameOverlay" id="introOverlay">
                     <div class="overlayContent">
                         <div class="cvBadge">
-                            <i class="fa-solid fa-eye"></i> Computer Vision Demo
+                            <i class="fa-solid fa-paw"></i> Animal Behavior CV Demo
                         </div>
-                        <h2>Finger Catch</h2>
-                        <p>Catch the falling bubbles with your <strong>index finger</strong>!</p>
-                        <p class="techNote">Powered by MediaPipe Hand Landmark Detection</p>
+                        <h2>Animal Spotter</h2>
+                        <p>Animal cards fly across the screen — <strong>classify them with your hand</strong>!</p>
+                        <div class="gestureGuide">
+                            <div class="gestureItem">
+                                <span class="gestureIcon">🤏</span>
+                                <div>
+                                    <strong>Pinch</strong>
+                                    <p>Catch the target animal</p>
+                                </div>
+                            </div>
+                            <div class="gestureItem">
+                                <span class="gestureIcon">👋</span>
+                                <div>
+                                    <strong>Swipe</strong>
+                                    <p>Wave away wrong animals</p>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="techNote">MediaPipe Hand Landmark Detection · 21 keypoints · Real-time</p>
                         <button class="startBtn" id="startBtn">
                             <i class="fa-solid fa-camera"></i> Start Game
                         </button>
@@ -71,19 +80,19 @@
                     <div class="overlayContent">
                         <div class="loadingSpinner"></div>
                         <p>Initializing hand tracking model…</p>
-                        <p class="techNote">Loading 21-landmark neural network</p>
+                        <p class="techNote">Loading pinch + gesture detection network</p>
                     </div>
                 </div>
 
                 <!-- Game Over overlay -->
                 <div class="gameOverlay hidden" id="gameOverOverlay">
                     <div class="overlayContent">
-                        <div class="cvBadge"><i class="fa-solid fa-trophy"></i> Game Over</div>
-                        <h2>Nice Catching!</h2>
-                        <p class="finalScoreLabel">Final Score</p>
+                        <div class="cvBadge"><i class="fa-solid fa-trophy"></i> Session Complete</div>
+                        <h2>Nice Spotting!</h2>
+                        <p class="finalScoreLabel">Animals Classified</p>
                         <p class="finalScoreValue" id="finalScore">0</p>
                         <button class="startBtn" id="restartBtn">
-                            <i class="fa-solid fa-rotate-right"></i> Play Again
+                            <i class="fa-solid fa-rotate-right"></i> Try Again
                         </button>
                         <a href="./index.html" class="homeBtn">← Back to Portfolio</a>
                     </div>
@@ -109,32 +118,42 @@
                     </div>
                 </div>
 
+                <!-- Target animal -->
+                <div class="infoCard targetCard">
+                    <h3><i class="fa-solid fa-crosshairs"></i> Catch This!</h3>
+                    <div id="targetPanel" class="targetDisplay">
+                        <span class="targetEmoji">—</span>
+                        <span class="targetName">—</span>
+                    </div>
+                    <p class="targetHint">🤏 Pinch when this animal flies by</p>
+                </div>
+
                 <!-- How to play -->
                 <div class="infoCard">
-                    <h3><i class="fa-solid fa-gamepad"></i> How to Play</h3>
-                    <ol>
-                        <li>Click <strong>Start Game</strong> and allow camera access</li>
-                        <li>Hold up your hand in front of the camera</li>
-                        <li>Point your <strong>index finger</strong> at falling bubbles to catch them</li>
-                        <li>Catch combos in a row for bonus points!</li>
-                        <li>You have <strong>3 lives</strong> — don't let bubbles escape</li>
-                    </ol>
+                    <h3><i class="fa-solid fa-hand-pointer"></i> Gestures</h3>
+                    <div class="gestureRow">
+                        <div class="gestureChip"><span>🤏</span> Pinch = Catch target</div>
+                        <div class="gestureChip"><span>👋</span> Swipe = Wave away others</div>
+                        <div class="gestureChip"><span>❌</span> Pinch wrong = -1 life</div>
+                        <div class="gestureChip"><span>✨</span> Catch combo = bonus pts</div>
+                    </div>
                 </div>
 
                 <!-- Tech info -->
                 <div class="infoCard techInfo">
-                    <h3><i class="fa-solid fa-microchip"></i> Tech Under the Hood</h3>
+                    <h3><i class="fa-solid fa-microchip"></i> Under the Hood</h3>
                     <div class="tagRow">
-                        <span class="techTag">MediaPipe Hands</span>
+                        <span class="techTag">Pinch Detection</span>
+                        <span class="techTag">Swipe Velocity</span>
                         <span class="techTag">21 Landmarks</span>
                         <span class="techTag">Real-time CV</span>
-                        <span class="techTag">TensorFlow.js</span>
                     </div>
                     <p class="techDesc">
-                        This game uses Google's MediaPipe to detect <strong>21 3D hand landmarks</strong>
-                        at ~30 fps entirely in your browser — no server, no data upload.
-                        The same landmark-tracking technique underpins research in
-                        gesture recognition and animal behavior analysis.
+                        <strong>Pinch</strong>: measures distance between thumb tip (LM 4) and
+                        index tip (LM 8) — triggers at &lt;6.5% of canvas width.<br><br>
+                        <strong>Swipe</strong>: tracks wrist (LM 0) x-velocity over 8 frames —
+                        fires when displacement exceeds 15% of canvas width in &lt;350 ms.
+                        The same velocity-estimation technique is used in animal behavior analysis.
                     </p>
                 </div>
             </div>
