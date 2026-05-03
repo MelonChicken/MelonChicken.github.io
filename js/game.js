@@ -30,13 +30,13 @@ const CONNECTIONS = [
     [5,9],[9,13],[13,17],
 ];
 
-/** Animal "enemies" — tied to Animal Behavior research theme */
+/** Enemy types — procedurally drawn sprites (no external assets) */
 const ENEMY_TYPES = [
-    { emoji:'🐱', name:'Cat',   hp:2, spd:1.8, color:'#ff9ff3', r:26 },
-    { emoji:'🐶', name:'Dog',   hp:3, spd:1.4, color:'#ffa502', r:30 },
-    { emoji:'🐻', name:'Bear',  hp:6, spd:0.8, color:'#a29bfe', r:40 },
-    { emoji:'🦁', name:'Lion',  hp:4, spd:1.6, color:'#e17055', r:34 },
-    { emoji:'🐯', name:'Tiger', hp:3, spd:2.2, color:'#fd79a8', r:28 },
+    { name:'Slime',   hp:2, spd:1.8, color:'#00b894', r:26 },
+    { name:'Phantom', hp:3, spd:1.4, color:'#a29bfe', r:30 },
+    { name:'Golem',   hp:6, spd:0.8, color:'#b2bec3', r:40 },
+    { name:'Imp',     hp:4, spd:1.6, color:'#e17055', r:34 },
+    { name:'Specter', hp:3, spd:2.2, color:'#fd79a8', r:28 },
 ];
 
 /**
@@ -56,6 +56,11 @@ const COMMANDS = {
 const HOLD_FRAMES = 28;   // frames to hold before firing (~0.5 s at 60 fps)
 const LANES       = 3;    // number of enemy lanes
 const BASE_X      = 58;   // player base x-position (px)
+
+// MONSTER_DRAW is loaded from js/monsters.js (must be included before this script)
+if (typeof MONSTER_DRAW === 'undefined') {
+    throw new Error('monsters.js must be loaded before game.js');
+}
 
 /* ═══════════════════════════════════════════════
    DOM REFS
@@ -324,25 +329,26 @@ class Enemy {
 
     draw() {
         const y = this.y + Math.sin(this.bob)*3;
-        ctx.save();
-        if (this.flash>0) { ctx.shadowColor='#ff3333'; ctx.shadowBlur=18; }
-        else if (this.frozen) { ctx.shadowColor='#74b9ff'; ctx.shadowBlur=10; }
 
-        // Body
-        ctx.beginPath(); ctx.arc(this.x,y,this.r,0,Math.PI*2);
-        ctx.fillStyle = this.flash>0 ? '#ff4444bb' : this.color+'bb';
-        ctx.fill();
-        ctx.strokeStyle=this.color; ctx.lineWidth=2; ctx.stroke();
+        // Procedural monster sprite
+        const renderer = MONSTER_DRAW[this.type.name];
+        if (renderer) renderer(ctx, this.x, y, this.r, this.bob*2, this.flash, this.frozen);
 
-        // Emoji
-        ctx.shadowBlur=0; ctx.font=`${this.r*0.95}px serif`;
-        ctx.textAlign='center'; ctx.textBaseline='middle';
-        ctx.fillStyle='#fff'; ctx.fillText(this.type.emoji,this.x,y);
+        // Frozen ice overlay
+        if (this.frozen) {
+            ctx.save(); ctx.globalAlpha=0.22;
+            ctx.beginPath(); ctx.arc(this.x,y,this.r*1.08,0,Math.PI*2);
+            ctx.fillStyle='#74b9ff'; ctx.fill();
+            ctx.strokeStyle='#74b9ff'; ctx.lineWidth=1.5;
+            ctx.shadowColor='#74b9ff'; ctx.shadowBlur=10; ctx.stroke();
+            ctx.restore();
+        }
 
         // HP bar
-        const bx=this.x-this.r, by=y+this.r+5, bw=this.r*2, bh=5;
-        ctx.globalAlpha=0.85;
-        ctx.beginPath(); ctx.rect(bx,by,bw,bh); ctx.fillStyle='rgba(0,0,0,.5)'; ctx.fill();
+        ctx.save();
+        const bx=this.x-this.r, by=y+this.r+8, bw=this.r*2, bh=4;
+        ctx.globalAlpha=0.88; ctx.shadowBlur=0;
+        ctx.beginPath(); ctx.rect(bx,by,bw,bh); ctx.fillStyle='rgba(0,0,0,.55)'; ctx.fill();
         ctx.beginPath(); ctx.rect(bx,by,bw*(this.hp/this.maxHp),bh);
         ctx.fillStyle=this.hp/this.maxHp>0.5?'#23f5b2':'#ff6348'; ctx.fill();
         ctx.restore();
