@@ -1,56 +1,61 @@
 /**
- * game.js — Animal Spotter
- * CV Classification Demo using MediaPipe Hands
+ * game.js — Gesture Commander
+ * CV Pose Classification + Wave Survival
  *
- * Gestures:
- *   🤏 PINCH  — thumb tip (LM4) ↔ index tip (LM8) distance < threshold
- *   👋 SWIPE  — wrist (LM0) horizontal velocity > threshold in < 350ms
+ * Pose detection: rule-based landmark geometry
+ *   · Each finger: extended if dist(tip, wrist) > dist(pip, wrist) × 1.05
+ *   · Thumb: tip.y < palm centroid.y − threshold
+ *   · 7 poses → 7 distinct battle commands
  *
- * Game loop:
- *   Animal cards fly right → left.
- *   Pinch the target animal → score.
- *   Swipe to wave away wrong animals → bonus.
- *   Pinch the wrong animal → lose a life.
+ * Mechanic: hold a pose for HOLD_FRAMES (~0.5 s) → command fires
+ *           visual arc around wrist shows hold progress
  */
 
 'use strict';
 
 /* ═══════════════════════════════════════════════
-   ANIMAL DATA
-═══════════════════════════════════════════════ */
-const ANIMALS = [
-    { emoji: '🐱', name: 'Cat'     },
-    { emoji: '🐶', name: 'Dog'     },
-    { emoji: '🐻', name: 'Bear'    },
-    { emoji: '🦊', name: 'Fox'     },
-    { emoji: '🐸', name: 'Frog'    },
-    { emoji: '🐧', name: 'Penguin' },
-    { emoji: '🦁', name: 'Lion'    },
-    { emoji: '🐯', name: 'Tiger'   },
-    { emoji: '🐼', name: 'Panda'   },
-    { emoji: '🐰', name: 'Rabbit'  },
-];
-
-/* ═══════════════════════════════════════════════
    CONSTANTS
 ═══════════════════════════════════════════════ */
 const STATES = Object.freeze({
-    INTRO: 'intro', LOADING: 'loading', PLAYING: 'playing', GAMEOVER: 'gameover',
+    INTRO:'intro', LOADING:'loading', PLAYING:'playing', GAMEOVER:'gameover',
 });
 
-/** MediaPipe 21-landmark hand skeleton connections */
-const HAND_CONNECTIONS = [
-    [0,1],[1,2],[2,3],[3,4],           // thumb
-    [0,5],[5,6],[6,7],[7,8],           // index
-    [0,9],[9,10],[10,11],[11,12],      // middle
-    [0,13],[13,14],[14,15],[15,16],    // ring
-    [0,17],[17,18],[18,19],[19,20],    // pinky
-    [5,9],[9,13],[13,17],              // palm
+/** MediaPipe hand skeleton pairs */
+const CONNECTIONS = [
+    [0,1],[1,2],[2,3],[3,4],
+    [0,5],[5,6],[6,7],[7,8],
+    [0,9],[9,10],[10,11],[11,12],
+    [0,13],[13,14],[14,15],[15,16],
+    [0,17],[17,18],[18,19],[19,20],
+    [5,9],[9,13],[13,17],
 ];
 
-const CARD_W    = 95;   // animal card width (px)
-const CARD_H    = 105;  // animal card height (px)
-const PROX_PX   = 72;   // gesture proximity radius
+/** Animal "enemies" — tied to Animal Behavior research theme */
+const ENEMY_TYPES = [
+    { emoji:'🐱', name:'Cat',   hp:2, spd:1.8, color:'#ff9ff3', r:26 },
+    { emoji:'🐶', name:'Dog',   hp:3, spd:1.4, color:'#ffa502', r:30 },
+    { emoji:'🐻', name:'Bear',  hp:6, spd:0.8, color:'#a29bfe', r:40 },
+    { emoji:'🦁', name:'Lion',  hp:4, spd:1.6, color:'#e17055', r:34 },
+    { emoji:'🐯', name:'Tiger', hp:3, spd:2.2, color:'#fd79a8', r:28 },
+];
+
+/**
+ * Pose → command definition
+ * cooldown: frames before same pose can fire again
+ */
+const COMMANDS = {
+    FIST:      { name:'EXPLOSION', icon:'✊', color:'#e17055', cooldown:90  },
+    OPEN:      { name:'SHIELD',    icon:'🖐️', color:'#74b9ff', cooldown:120 },
+    POINT:     { name:'LASER',     icon:'☝️', color:'#23f5b2', cooldown:20  },
+    PEACE:     { name:'SPREAD',    icon:'✌️', color:'#fd79a8', cooldown:35  },
+    THREE:     { name:'BARRAGE',   icon:'🖖', color:'#fdcb6e', cooldown:50  },
+    ROCK_ON:   { name:'CHAIN',     icon:'🤘', color:'#a29bfe', cooldown:70  },
+    THUMBS_UP: { name:'FREEZE',    icon:'👍', color:'#55efc4', cooldown:100 },
+};
+
+const HOLD_FRAMES = 28;   // frames to hold before firing (~0.5 s at 60 fps)
+const LANES       = 3;    // number of enemy lanes
+const BASE_X      = 58;   // player base x-position (px)
 
 /* ═══════════════════════════════════════════════
    DOM REFS
@@ -63,50 +68,55 @@ const gameOverOverlay = document.getElementById('gameOverOverlay');
 const startBtn        = document.getElementById('startBtn');
 const restartBtn      = document.getElementById('restartBtn');
 const scoreDisplay    = document.getElementById('scoreDisplay');
+const waveDisplay     = document.getElementById('waveDisplay');
 const livesDisplay    = document.getElementById('livesDisplay');
-const comboDisplay    = document.getElementById('comboDisplay');
 const finalScoreEl    = document.getElementById('finalScore');
-const targetPanel     = document.getElementById('targetPanel');
+const finalWaveEl     = document.getElementById('finalWave');
+const poseNameEl      = document.getElementById('poseName');
+const cmdNameEl       = document.getElementById('cmdName');
+const holdBarEl       = document.getElementById('holdBar');
+const cmdItems        = document.querySelectorAll('.cmdItem[data-pose]');
 
 /* ═══════════════════════════════════════════════
    GAME STATE
 ═══════════════════════════════════════════════ */
-let gameState    = STATES.INTRO;
-let score        = 0;
-let lives        = 3;
-let combo        = 1;
-let comboFrames  = 0;
-let targetAnimal = null;
+let gameState      = STATES.INTRO;
+let score          = 0;
+let lives          = 5;
+let wave           = 1;
+let frameCount     = 0;
 
-let animals      = [];  // FlyingAnimal[]
-let particles    = [];  // Particle[]
-let effects      = [];  // floating text objects
+let enemies        = [];
+let projectiles    = [];
+let particles      = [];
+let effects        = [];
+let shields        = [];    // active shield walls [{x, duration, maxDur, color}]
+let freezeFrames   = 0;     // remaining freeze duration
+
+let waveEnemiesLeft = 0;
+let betweenWaves    = false;
+let waveDelay       = 0;
+let spawnTimer      = null;
 
 /* ═══════════════════════════════════════════════
    CV / HAND STATE
 ═══════════════════════════════════════════════ */
-let fingerPos      = null;  // { x, y, landmarks[] }  — index tip
-let thumbPos       = null;  // { x, y }               — thumb tip
-let pinchDist      = Infinity;
-let pinchActive    = false; // currently holding pinch
-let pinchFired     = false; // edge-trigger flag (leading edge of pinch)
-let waveFired      = false; // edge-trigger flag
-let pinchCooldown  = 0;
-let waveCooldown   = 0;
-let wristXHistory  = [];    // [{x, t}] for swipe detection
+let handLandmarks  = null;  // raw MediaPipe landmarks
+let fingerPos      = null;  // {x, y, landmarks[]} — index tip (canvas coords)
+let currentPose    = null;  // pose string | null
+let poseHoldFrames = 0;
+let cmdCooldowns   = {};    // pose → remaining cooldown frames
 
 /* ═══════════════════════════════════════════════
-   CANVAS & VIDEO
+   CANVAS / VIDEO
 ═══════════════════════════════════════════════ */
 let CW = 640, CH = 480;
 let videoEl    = null;
 let handsModel = null;
 let frameId    = null;
-let spawnTimer = null;
 
-/* ───────────────────────────────────────────── */
 function resizeCanvas() {
-    const w = (canvas.parentElement.clientWidth || 640);
+    const w = canvas.parentElement.clientWidth || 640;
     CW = Math.min(w, 900);
     CH = Math.round(CW * 0.75);
     canvas.width  = CW;
@@ -115,34 +125,70 @@ function resizeCanvas() {
 window.addEventListener('resize', resizeCanvas);
 requestAnimationFrame(resizeCanvas);
 
+/** Lane y-positions: evenly distributed across canvas height */
+const laneY = l => CH * (0.22 + l * 0.28);
+
 /* ═══════════════════════════════════════════════
-   HELPER — rounded rect path
+   HELPERS
 ═══════════════════════════════════════════════ */
 function rrect(x, y, w, h, r) {
     ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.lineTo(x + w - r, y);
-    ctx.quadraticCurveTo(x + w, y,     x + w, y + r);
-    ctx.lineTo(x + w, y + h - r);
-    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-    ctx.lineTo(x + r, y + h);
-    ctx.quadraticCurveTo(x, y + h,     x, y + h - r);
-    ctx.lineTo(x, y + r);
-    ctx.quadraticCurveTo(x, y,         x + r, y);
-    ctx.closePath();
+    ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
+    ctx.quadraticCurveTo(x+w,y,   x+w,y+r);   ctx.lineTo(x+w,y+h-r);
+    ctx.quadraticCurveTo(x+w,y+h, x+w-r,y+h); ctx.lineTo(x+r,y+h);
+    ctx.quadraticCurveTo(x,y+h,   x,y+h-r);   ctx.lineTo(x,y+r);
+    ctx.quadraticCurveTo(x,y,     x+r,y);      ctx.closePath();
+}
+
+function floatText(x, y, text, color, size=20) {
+    return {
+        x,y,text,color,size,life:1,
+        update(){ this.y-=1.6; this.life-=0.02; },
+        draw(){
+            ctx.save(); ctx.globalAlpha=Math.max(0,this.life);
+            ctx.font=`bold ${this.size}px "SUIT",sans-serif`;
+            ctx.textAlign='center'; ctx.fillStyle=this.color;
+            ctx.shadowColor=this.color; ctx.shadowBlur=8;
+            ctx.fillText(this.text,this.x,this.y); ctx.restore();
+        },
+        isDead(){ return this.life<=0; },
+    };
 }
 
 /* ═══════════════════════════════════════════════
-   TARGET ANIMAL
+   RULE-BASED POSE DETECTION
+   Finger extension: dist(tip,wrist) > dist(pip,wrist) × 1.05
+   (rotation-invariant; works regardless of hand tilt)
 ═══════════════════════════════════════════════ */
-function pickTarget(excludeName = null) {
-    const pool = excludeName ? ANIMALS.filter(a => a.name !== excludeName) : ANIMALS;
-    targetAnimal = pool[Math.floor(Math.random() * pool.length)];
-    if (targetPanel) {
-        targetPanel.innerHTML = `
-            <span class="targetEmoji">${targetAnimal.emoji}</span>
-            <span class="targetName">${targetAnimal.name}</span>`;
-    }
+function fingerUp(lms, tipIdx, pipIdx) {
+    const w = lms[0], t = lms[tipIdx], q = lms[pipIdx];
+    const dTip = Math.hypot(t.x-w.x, t.y-w.y);
+    const dPip = Math.hypot(q.x-w.x, q.y-w.y);
+    return dTip > dPip * 1.05;
+}
+
+function classifyPose(lms) {
+    if (!lms) return null;
+
+    const idx = fingerUp(lms, 8,  6);
+    const mid = fingerUp(lms, 12, 10);
+    const rng = fingerUp(lms, 16, 14);
+    const pky = fingerUp(lms, 20, 18);
+
+    // Thumb: tip.y < palm centroid.y means pointing upward
+    const palmY = (lms[5].y + lms[9].y + lms[13].y + lms[17].y) / 4;
+    const thm   = lms[4].y < palmY - 0.05;
+
+    const count = [idx,mid,rng,pky].filter(Boolean).length;
+
+    if (count===4)                            return 'OPEN';
+    if (!idx && !mid && !rng && !pky && !thm) return 'FIST';
+    if (!idx && !mid && !rng && !pky &&  thm) return 'THUMBS_UP';
+    if ( idx && !mid && !rng && !pky)         return 'POINT';
+    if ( idx &&  mid && !rng && !pky)         return 'PEACE';
+    if ( idx &&  mid &&  rng && !pky)         return 'THREE';
+    if ( idx && !mid && !rng &&  pky)         return 'ROCK_ON';
+    return null;
 }
 
 /* ═══════════════════════════════════════════════
@@ -154,52 +200,40 @@ async function startGame() {
     loadingOverlay.classList.remove('hidden');
 
     try {
-        // 1. Webcam
         const stream = await navigator.mediaDevices.getUserMedia({
-            video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' },
+            video:{ width:{ideal:640}, height:{ideal:480}, facingMode:'user' },
         });
         videoEl = document.createElement('video');
-        videoEl.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;';
+        videoEl.style.cssText='position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;';
         document.body.appendChild(videoEl);
-        videoEl.srcObject   = stream;
-        videoEl.autoplay    = true;
-        videoEl.playsInline = true;
-        videoEl.muted       = true;
+        Object.assign(videoEl, { srcObject:stream, autoplay:true, playsInline:true, muted:true });
         resizeCanvas();
-        await videoEl.play().catch(() => {});
-        await new Promise(res => {
-            if (videoEl.readyState >= 2) { res(); return; }
-            videoEl.addEventListener('loadeddata', res, { once: true });
+        await videoEl.play().catch(()=>{});
+        await new Promise(res=>{
+            if(videoEl.readyState>=2){res();return;}
+            videoEl.addEventListener('loadeddata',res,{once:true});
         });
 
-        // 2. MediaPipe Hands
-        handsModel = new Hands({
-            locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`,
-        });
-        handsModel.setOptions({
-            maxNumHands: 1, modelComplexity: 1,
-            minDetectionConfidence: 0.7, minTrackingConfidence: 0.5,
-        });
+        handsModel = new Hands({ locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}` });
+        handsModel.setOptions({ maxNumHands:1, modelComplexity:1, minDetectionConfidence:0.7, minTrackingConfidence:0.5 });
         handsModel.onResults(onHandResults);
 
-        // 3. Reset state
-        score = 0; lives = 3; combo = 1; comboFrames = 0;
-        animals = []; particles = []; effects = [];
-        wristXHistory = []; pinchCooldown = 0; waveCooldown = 0;
-        pinchActive = false; pinchFired = false; waveFired = false;
-        pickTarget();
+        // Reset
+        score=0; lives=5; wave=1; frameCount=0;
+        enemies=[]; projectiles=[]; particles=[]; effects=[]; shields=[];
+        cmdCooldowns={}; currentPose=null; poseHoldFrames=0;
+        freezeFrames=0; betweenWaves=false; waveDelay=0;
+
+        startWave(1);
         updateHUD();
 
         loadingOverlay.classList.add('hidden');
         gameState = STATES.PLAYING;
-
-        spawnAnimal();
-        spawnTimer = setInterval(spawnAnimal, 1600);
         gameLoop();
         sendFrames();
 
-    } catch (err) {
-        console.error('[AnimalSpotter]', err);
+    } catch(err) {
+        console.error('[GestureCommander]', err);
         loadingOverlay.classList.add('hidden');
         introOverlay.classList.remove('hidden');
         alert('⚠️  Camera access required. Please allow and try again.');
@@ -210,469 +244,644 @@ async function startGame() {
    MEDIAPIPE FRAME PIPELINE
 ═══════════════════════════════════════════════ */
 async function sendFrames() {
-    if (gameState === STATES.GAMEOVER) return;
-    if (videoEl && handsModel && videoEl.readyState >= 2) {
-        try { await handsModel.send({ image: videoEl }); } catch (_) {}
+    if (gameState===STATES.GAMEOVER) return;
+    if (videoEl && handsModel && videoEl.readyState>=2) {
+        try { await handsModel.send({image:videoEl}); } catch(_){}
     }
     setTimeout(sendFrames, 33);
 }
 
-/* ═══════════════════════════════════════════════
-   HAND RESULTS → GESTURE FLAGS
-═══════════════════════════════════════════════ */
 function onHandResults(results) {
     if (!results.multiHandLandmarks?.length) {
-        fingerPos = null; thumbPos = null;
-        wristXHistory = [];
-        return;
+        handLandmarks=null; fingerPos=null; return;
     }
-
-    const lm   = results.multiHandLandmarks[0];
-    const toXY = i => ({ x: (1 - lm[i].x) * CW, y: lm[i].y * CH });
-
-    const idx   = toXY(8);  // index finger tip
-    const thm   = toXY(4);  // thumb tip
-    const wrist = toXY(0);
-
-    fingerPos = { x: idx.x, y: idx.y, landmarks: lm };
-    thumbPos  = { x: thm.x, y: thm.y };
-
-    /* ── Pinch (LM4 ↔ LM8 distance) ──────── */
-    pinchDist = Math.hypot(idx.x - thm.x, idx.y - thm.y);
-    const pinching = pinchDist < CW * 0.065;
-
-    if (pinching && !pinchActive && pinchCooldown === 0) {
-        pinchActive = true;
-        pinchFired  = true;   // leading-edge trigger
-    } else if (!pinching) {
-        pinchActive = false;
-    }
-
-    /* ── Swipe (wrist x-velocity over 8 frames) ── */
-    wristXHistory.push({ x: wrist.x, t: performance.now() });
-    if (wristXHistory.length > 10) wristXHistory.shift();
-
-    if (waveCooldown === 0 && wristXHistory.length >= 8) {
-        const dx = Math.abs(wristXHistory.at(-1).x - wristXHistory[0].x);
-        const dt = wristXHistory.at(-1).t - wristXHistory[0].t;
-        if (dx > CW * 0.15 && dt < 350) {
-            waveFired     = true;
-            wristXHistory = [];   // reset after detection
-        }
-    }
+    const lm = results.multiHandLandmarks[0];
+    handLandmarks = lm;
+    fingerPos = { x:(1-lm[8].x)*CW, y:lm[8].y*CH, landmarks:lm };
 }
 
 /* ═══════════════════════════════════════════════
-   FLYING ANIMAL CARD
+   WAVE MANAGEMENT
 ═══════════════════════════════════════════════ */
-class FlyingAnimal {
-    constructor(forceTarget = false) {
-        const isT  = forceTarget || Math.random() < 0.35;
-        this.type  = isT ? targetAnimal : ANIMALS[Math.floor(Math.random() * ANIMALS.length)];
-        this.x     = CW + CARD_W;
-        this.y     = CARD_H * 0.9 + Math.random() * (CH - CARD_H * 1.8);
-        this.speed = 1.6 + Math.random() * 1.2 + Math.min(score, 500) / 350;
-        this.bob   = Math.random() * Math.PI * 2;  // phase offset for bobbing
-        this.caught = false;
-        this.passed = false;
-        this.alpha  = 1;
-    }
+function startWave(waveNum) {
+    waveEnemiesLeft = 3 + waveNum * 2;
+    const interval  = Math.max(350, 1100 - waveNum * 70);
+    clearInterval(spawnTimer);
+    spawnTimer = setInterval(()=>{
+        if (gameState!==STATES.PLAYING){ clearInterval(spawnTimer); return; }
+        if (waveEnemiesLeft<=0){ clearInterval(spawnTimer); return; }
+        enemies.push(new Enemy(waveNum));
+        waveEnemiesLeft--;
+    }, interval);
+}
 
-    /** Is this card currently the target animal? (rechecked live) */
-    get isTarget() { return targetAnimal && this.type.name === targetAnimal.name; }
+function checkWaveComplete() {
+    if (waveEnemiesLeft>0 || enemies.length>0 || betweenWaves) return;
+    betweenWaves  = true;
+    waveDelay     = 200;
+    score        += wave * 50;
+    updateHUD();
+    effects.push(floatText(CW/2, CH/2-50, `✅ Wave ${wave} cleared! +${wave*50}`, '#23f5b2', 26));
+}
 
-    /** Is the index finger tip close enough to act on this card? */
-    nearFinger() {
-        if (!fingerPos) return false;
-        return Math.hypot(fingerPos.x - this.x, fingerPos.y - this.y) < PROX_PX;
+/* ═══════════════════════════════════════════════
+   ENEMY
+═══════════════════════════════════════════════ */
+class Enemy {
+    constructor(waveNum) {
+        const pool = ENEMY_TYPES.slice(0, Math.min(2+waveNum, ENEMY_TYPES.length));
+        this.type  = pool[Math.floor(Math.random()*pool.length)];
+        this.lane  = Math.floor(Math.random()*LANES);
+        this.x     = CW + this.type.r + 10;
+        this.y     = laneY(this.lane);
+        this.maxHp = this.type.hp + Math.floor(waveNum/2);
+        this.hp    = this.maxHp;
+        this.spd   = this.type.spd * (1 + waveNum*0.05);
+        this.r     = this.type.r;
+        this.color = this.type.color;
+        this.flash = 0;
+        this.frozen= false;
+        this.bob   = Math.random()*Math.PI*2;
     }
 
     update() {
-        if (this.caught || this.passed) return;
-        this.x   -= this.speed;
-        this.bob += 0.04;
-        if (this.x + CARD_W < 0) this.passed = true;
+        this.bob += 0.05;
+        this.x -= this.frozen ? this.spd*0.18 : this.spd;
+        if (this.flash>0) this.flash--;
+    }
+
+    hit(dmg) {
+        this.hp  -= dmg;
+        this.flash = 8;
+        if (this.hp<=0) {
+            score += this.maxHp*10;
+            for(let i=0;i<14;i++) particles.push(new Particle(this.x,this.y,this.color));
+            effects.push(floatText(this.x,this.y-22,`+${this.maxHp*10}`,this.color,19));
+            return true;
+        }
+        return false;
     }
 
     draw() {
-        if (this.caught || this.passed) return;
-
-        const cy  = this.y + Math.sin(this.bob) * 5;   // gentle bob
-        const cx  = this.x;
-        const lx  = cx - CARD_W / 2;
-        const ty  = cy - CARD_H / 2;
-        const isT = this.isTarget;
-        const nr  = this.nearFinger();
-
+        const y = this.y + Math.sin(this.bob)*3;
         ctx.save();
-        ctx.globalAlpha = this.alpha;
+        if (this.flash>0) { ctx.shadowColor='#ff3333'; ctx.shadowBlur=18; }
+        else if (this.frozen) { ctx.shadowColor='#74b9ff'; ctx.shadowBlur=10; }
 
-        /* Card shadow */
-        ctx.shadowColor   = isT ? '#23f5b240' : 'rgba(0,0,0,0.35)';
-        ctx.shadowBlur    = nr ? 18 : 8;
-        ctx.shadowOffsetY = 4;
-
-        /* Card body */
-        rrect(lx, ty, CARD_W, CARD_H, 14);
-        ctx.fillStyle = 'rgba(10, 20, 28, 0.88)';
+        // Body
+        ctx.beginPath(); ctx.arc(this.x,y,this.r,0,Math.PI*2);
+        ctx.fillStyle = this.flash>0 ? '#ff4444bb' : this.color+'bb';
         ctx.fill();
+        ctx.strokeStyle=this.color; ctx.lineWidth=2; ctx.stroke();
 
-        /* Border */
-        ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
-        rrect(lx, ty, CARD_W, CARD_H, 14);
-        if (isT && nr)       { ctx.strokeStyle = '#23f5b2'; ctx.lineWidth = 3.5; }
-        else if (isT)        { ctx.strokeStyle = '#23f5b270'; ctx.lineWidth = 2; }
-        else                 { ctx.strokeStyle = '#1e3a4a';   ctx.lineWidth = 1.5; }
-        ctx.stroke();
+        // Emoji
+        ctx.shadowBlur=0; ctx.font=`${this.r*0.95}px serif`;
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillStyle='#fff'; ctx.fillText(this.type.emoji,this.x,y);
 
-        /* Emoji */
-        ctx.font         = `${CARD_W * 0.52}px serif`;
-        ctx.textAlign    = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.shadowColor  = isT ? '#23f5b250' : 'transparent';
-        ctx.shadowBlur   = isT ? 8 : 0;
-        ctx.fillStyle    = '#ffffff';
-        ctx.fillText(this.type.emoji, cx, cy - 6);
-
-        /* Name tag */
-        ctx.shadowBlur   = 0;
-        ctx.font         = `bold ${CARD_W * 0.14}px "SUIT", sans-serif`;
-        ctx.textBaseline = 'alphabetic';
-        ctx.fillStyle    = isT ? '#23f5b2' : '#6ba4bc';
-        ctx.fillText(this.type.name.toUpperCase(), cx, cy + CARD_H * 0.37);
-
+        // HP bar
+        const bx=this.x-this.r, by=y+this.r+5, bw=this.r*2, bh=5;
+        ctx.globalAlpha=0.85;
+        ctx.beginPath(); ctx.rect(bx,by,bw,bh); ctx.fillStyle='rgba(0,0,0,.5)'; ctx.fill();
+        ctx.beginPath(); ctx.rect(bx,by,bw*(this.hp/this.maxHp),bh);
+        ctx.fillStyle=this.hp/this.maxHp>0.5?'#23f5b2':'#ff6348'; ctx.fill();
         ctx.restore();
     }
+
+    reachedBase(){ return this.x-this.r < BASE_X+10; }
 }
 
 /* ═══════════════════════════════════════════════
-   PARTICLE  (burst)
+   PROJECTILE
+═══════════════════════════════════════════════ */
+class Projectile {
+    constructor(x,y,vx,vy,dmg,color,size=8){
+        this.x=x; this.y=y; this.vx=vx; this.vy=vy;
+        this.dmg=dmg; this.color=color; this.size=size;
+        this.dead=false;
+    }
+    update(){
+        this.x+=this.vx; this.y+=this.vy;
+        if(this.x>CW+20||this.y<-20||this.y>CH+20) this.dead=true;
+    }
+    checkHits(){
+        if(this.dead) return;
+        for(const e of enemies){
+            if(Math.hypot(this.x-e.x,this.y-e.y)<e.r+this.size){
+                const died=e.hit(this.dmg);
+                if(died){ enemies=enemies.filter(en=>en!==e); updateHUD(); }
+                for(let i=0;i<5;i++) particles.push(new Particle(this.x,this.y,this.color));
+                this.dead=true; return;
+            }
+        }
+    }
+    draw(){
+        ctx.save();
+        const g=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.size*2.5);
+        g.addColorStop(0,this.color+'ff'); g.addColorStop(.5,this.color+'80'); g.addColorStop(1,this.color+'00');
+        ctx.beginPath(); ctx.arc(this.x,this.y,this.size*2.5,0,Math.PI*2);
+        ctx.fillStyle=g; ctx.fill();
+        ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
+        ctx.fillStyle=this.color; ctx.shadowColor=this.color; ctx.shadowBlur=8; ctx.fill();
+        ctx.restore();
+    }
+    isDead(){ return this.dead; }
+}
+
+/* ═══════════════════════════════════════════════
+   PARTICLE
 ═══════════════════════════════════════════════ */
 class Particle {
-    constructor(x, y, color) {
-        this.x = x; this.y = y; this.color = color;
-        this.vx = (Math.random() - 0.5) * 11;
-        this.vy = (Math.random() - 0.5) * 11;
-        this.r  = 3 + Math.random() * 5;
-        this.life = 1;
+    constructor(x,y,color){
+        this.x=x; this.y=y; this.color=color;
+        this.vx=(Math.random()-.5)*11; this.vy=(Math.random()-.5)*11;
+        this.r=2+Math.random()*5; this.life=1;
     }
-    update() {
-        this.x += this.vx; this.y += this.vy;
-        this.vy += 0.3; this.vx *= 0.96;
-        this.life -= 0.028;
+    update(){ this.x+=this.vx; this.y+=this.vy; this.vy+=.3; this.life-=.028; }
+    draw(){
+        ctx.save(); ctx.globalAlpha=Math.max(0,this.life);
+        ctx.beginPath(); ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
+        ctx.fillStyle=this.color; ctx.fill(); ctx.restore();
     }
-    draw() {
-        ctx.save();
-        ctx.globalAlpha = Math.max(0, this.life);
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-        ctx.fillStyle = this.color;
-        ctx.fill();
-        ctx.restore();
-    }
-    isDead() { return this.life <= 0; }
+    isDead(){ return this.life<=0; }
 }
 
-/* floating score / label text */
-function floatText(x, y, text, color, size = 22) {
-    return {
-        x, y, text, color, size, life: 1,
-        update() { this.y -= 1.8; this.life -= 0.02; },
-        draw() {
-            ctx.save();
-            ctx.globalAlpha = Math.max(0, this.life);
-            ctx.font        = `bold ${this.size}px "SUIT", sans-serif`;
-            ctx.textAlign   = 'center';
-            ctx.fillStyle   = this.color;
-            ctx.shadowColor = this.color;
-            ctx.shadowBlur  = 8;
-            ctx.fillText(this.text, this.x, this.y);
-            ctx.restore();
+/* ═══════════════════════════════════════════════
+   FIRE COMMANDS
+═══════════════════════════════════════════════ */
+function fireCommand(pose) {
+    const cmd = COMMANDS[pose];
+    if (!cmd) return;
+
+    // Fullscreen colour flash
+    effects.push({
+        life:1, color:cmd.color,
+        update(){ this.life-=0.10; },
+        draw(){
+            ctx.save(); ctx.globalAlpha=Math.max(0,this.life*0.13);
+            ctx.fillStyle=this.color; ctx.fillRect(0,0,CW,CH); ctx.restore();
         },
-        isDead() { return this.life <= 0; },
-    };
-}
+        isDead(){ return this.life<=0; },
+    });
 
-/* ═══════════════════════════════════════════════
-   SPAWN
-═══════════════════════════════════════════════ */
-function spawnAnimal() {
-    if (gameState !== STATES.PLAYING) return;
-    // Force a target card if none is currently flying
-    const hasTarget = animals.some(a => !a.caught && !a.passed && a.isTarget);
-    animals.push(new FlyingAnimal(!hasTarget && Math.random() < 0.6));
-}
+    const cy = CH/2;
 
-/* ═══════════════════════════════════════════════
-   GESTURE PROCESSING  (runs once per frame)
-═══════════════════════════════════════════════ */
-function processGestures() {
-    if (pinchCooldown > 0) pinchCooldown--;
-    if (waveCooldown  > 0) waveCooldown--;
-
-    /* ── PINCH ─────────────────────────────── */
-    if (pinchFired) {
-        pinchFired    = false;
-        pinchCooldown = 30;  // ~0.5s cooldown at 60fps
-
-        // Find the closest card within reach
-        let nearest = null, minD = Infinity;
-        for (const a of animals) {
-            if (a.caught || a.passed) continue;
-            const d = Math.hypot((fingerPos?.x ?? -999) - a.x, (fingerPos?.y ?? -999) - a.y);
-            if (d < PROX_PX && d < minD) { minD = d; nearest = a; }
+    switch(pose) {
+        case 'FIST': {
+            // Explosion — destroys all enemies within large radius
+            const ex=CW*0.45;
+            const rad=CW*0.38;
+            for(let i=0;i<35;i++){
+                const a=(i/35)*Math.PI*2, d=Math.random()*rad;
+                particles.push(new Particle(ex+Math.cos(a)*d, cy+Math.sin(a)*d, cmd.color));
+            }
+            const n0=enemies.length;
+            enemies=enemies.filter(e=>Math.hypot(e.x-ex,e.y-cy)>=rad);
+            score+=(n0-enemies.length)*20;
+            effects.push(floatText(ex,cy-45,'💥 EXPLOSION!',cmd.color,28));
+            updateHUD(); break;
         }
-
-        if (nearest) {
-            nearest.caught = true;
-
-            if (nearest.isTarget) {
-                // ✅ Correct catch
-                const pts = 20 * combo;
-                score    += pts;
-                combo     = Math.min(combo + 1, 8);
-                comboFrames = 110;
-                for (let i = 0; i < 18; i++)
-                    particles.push(new Particle(nearest.x, nearest.y, '#23f5b2'));
-                effects.push(floatText(nearest.x, nearest.y - 35, `+${pts}  CATCH! 🎯`, '#23f5b2', 24));
-                // Pick a new target after a beat
-                setTimeout(() => pickTarget(targetAnimal?.name), 150);
+        case 'OPEN': {
+            shields.push({x:BASE_X+70, duration:180, maxDur:180, color:cmd.color});
+            effects.push(floatText(BASE_X+90,cy-40,'🛡️ SHIELD UP!',cmd.color,24)); break;
+        }
+        case 'POINT': {
+            const tgt=enemies.reduce((n,e)=>(!n||e.x<n.x)?e:n,null);
+            if(tgt){
+                const a=Math.atan2(tgt.y-cy,tgt.x-BASE_X);
+                projectiles.push(new Projectile(BASE_X+25,cy,Math.cos(a)*13,Math.sin(a)*13,3,cmd.color,6));
             } else {
-                // ❌ Wrong animal
-                lives = Math.max(0, lives - 1);
-                combo = 1;
-                for (let i = 0; i < 12; i++)
-                    particles.push(new Particle(nearest.x, nearest.y, '#ff6348'));
-                effects.push(floatText(nearest.x, nearest.y - 35, `WRONG! -1 ❤️`, '#ff6348', 22));
+                projectiles.push(new Projectile(BASE_X+25,cy,13,0,3,cmd.color,6));
             }
-        } else if (fingerPos) {
-            // Pinch in the air — show small indicator
-            effects.push(floatText(fingerPos.x, fingerPos.y - 20, '🤏', '#ffffff', 28));
+            effects.push(floatText(BASE_X+50,cy-30,'⚡ LASER!',cmd.color,20)); break;
         }
-        updateHUD();
-    }
-
-    /* ── WAVE / SWIPE ──────────────────────── */
-    if (waveFired) {
-        waveFired    = false;
-        waveCooldown = 28;
-
-        let waved = 0;
-        if (fingerPos) {
-            for (const a of animals) {
-                if (a.caught || a.passed) continue;
-                const d = Math.hypot(fingerPos.x - a.x, fingerPos.y - a.y);
-                if (d < PROX_PX * 2.5) {
-                    a.passed = true;
-                    if (a.isTarget) {
-                        effects.push(floatText(a.x, a.y, `Oops — target gone!`, '#fdcb6e', 17));
-                    } else {
-                        waved++;
-                    }
-                }
-            }
+        case 'PEACE': {
+            [-14,14].forEach(deg=>{
+                const rad=(deg*Math.PI)/180;
+                projectiles.push(new Projectile(BASE_X+25,cy,Math.cos(rad)*10,Math.sin(rad)*10,2,cmd.color,7));
+            });
+            effects.push(floatText(BASE_X+50,cy-30,'✌️ SPREAD!',cmd.color,20)); break;
         }
-
-        if (waved > 0) {
-            const bonus = waved * 5;
-            score += bonus;
-            if (fingerPos) effects.push(floatText(fingerPos.x, fingerPos.y - 45, `👋 PASS! +${bonus}`, '#74b9ff', 24));
-            updateHUD();
-        } else if (fingerPos) {
-            effects.push(floatText(fingerPos.x, fingerPos.y - 45, '👋 WAVE!', '#74b9ff', 22));
+        case 'THREE': {
+            [-20,0,20].forEach(deg=>{
+                const rad=(deg*Math.PI)/180;
+                projectiles.push(new Projectile(BASE_X+25,cy,Math.cos(rad)*9,Math.sin(rad)*9,2,cmd.color,7));
+            });
+            effects.push(floatText(BASE_X+50,cy-30,'🖖 BARRAGE!',cmd.color,20)); break;
+        }
+        case 'ROCK_ON': {
+            // Chain: stagger-hit every enemy
+            [...enemies].sort((a,b)=>a.x-b.x).forEach((e,i)=>{
+                setTimeout(()=>{
+                    if(!enemies.includes(e)) return;
+                    const died=e.hit(2);
+                    if(died){ enemies=enemies.filter(en=>en!==e); updateHUD(); }
+                    for(let j=0;j<7;j++) particles.push(new Particle(e.x,e.y,cmd.color));
+                }, i*90);
+            });
+            effects.push(floatText(CW/2,cy-50,'⚡ CHAIN LIGHTNING!',cmd.color,26)); break;
+        }
+        case 'THUMBS_UP': {
+            enemies.forEach(e=>e.frozen=true);
+            freezeFrames=190;
+            effects.push(floatText(CW/2,cy-50,'❄️ FREEZE!',cmd.color,26)); break;
         }
     }
+}
+
+/* ═══════════════════════════════════════════════
+   POSE HOLD MECHANIC  (called every frame)
+═══════════════════════════════════════════════ */
+function processPoseHold() {
+    // Tick cooldowns
+    for(const p of Object.keys(cmdCooldowns))
+        if(cmdCooldowns[p]>0) cmdCooldowns[p]--;
+
+    // Tick freeze
+    if(freezeFrames>0){
+        freezeFrames--;
+        if(freezeFrames===0) enemies.forEach(e=>e.frozen=false);
+    }
+
+    const pose = classifyPose(handLandmarks);
+
+    if(pose && pose===currentPose){
+        poseHoldFrames++;
+        const cd=cmdCooldowns[pose]??0;
+        if(poseHoldFrames>=HOLD_FRAMES && cd===0){
+            fireCommand(pose);
+            cmdCooldowns[pose]=(COMMANDS[pose]?.cooldown??30);
+            poseHoldFrames=0;
+        }
+    } else {
+        currentPose    = pose;
+        poseHoldFrames = 0;
+    }
+
+    /* ── Update HTML HUD ──────────────────── */
+    if(poseNameEl && cmdNameEl && holdBarEl){
+        const cmd = pose ? COMMANDS[pose] : null;
+        const cd  = pose ? (cmdCooldowns[pose]??0) : 0;
+
+        if(cmd){
+            poseNameEl.textContent = `${cmd.icon} ${pose.replace('_',' ')}`;
+            cmdNameEl.textContent  = cd>0 ? `${cmd.name} — cooling down` : cmd.name;
+            const holdPct = Math.min(100,(poseHoldFrames/HOLD_FRAMES)*100);
+            holdBarEl.style.width      = `${cd>0?100-(cd/cmd.cooldown*100):holdPct}%`;
+            holdBarEl.style.background = cd>0 ? '#636e72' : cmd.color;
+            holdBarEl.parentElement.style.opacity = cd>0 ? '0.45' : '1';
+        } else {
+            poseNameEl.textContent = pose ?? '— no hand —';
+            cmdNameEl.textContent  = 'show a known gesture';
+            holdBarEl.style.width  = '0%';
+            holdBarEl.parentElement.style.opacity='1';
+        }
+    }
+
+    // Highlight matching guide card
+    cmdItems.forEach(el=>{
+        el.classList.toggle('active', el.dataset.pose===pose);
+    });
 }
 
 /* ═══════════════════════════════════════════════
    HUD
 ═══════════════════════════════════════════════ */
-function updateHUD() {
+function updateHUD(){
     scoreDisplay.textContent = score;
-    livesDisplay.textContent = '❤️'.repeat(Math.max(0, lives));
-    comboDisplay.textContent = `x${combo}`;
+    livesDisplay.textContent = '❤️'.repeat(Math.max(0,lives));
+    if(waveDisplay) waveDisplay.textContent = wave;
 }
 
 /* ═══════════════════════════════════════════════
-   HAND SKELETON DRAW
+   DRAW: HAND SKELETON + HOLD ARC  (Spell-Caster style)
+   · Bone color tracks current pose command color
+   · Extended fingertips → pulsing magic orbs
+   · Palm sigil (rotating rune) builds up while holding
+   · Hold arc tip emits a spark
 ═══════════════════════════════════════════════ */
-function drawHand(landmarks) {
-    const lp = i => ({ x: (1 - landmarks[i].x) * CW, y: landmarks[i].y * CH });
+function drawHand(lms){
+    const p = i=>({x:(1-lms[i].x)*CW, y:lms[i].y*CH});
 
-    /* Skeleton lines */
+    const cmd       = currentPose && COMMANDS[currentPose] ? COMMANDS[currentPose] : null;
+    const cd        = cmd ? (cmdCooldowns[currentPose]??0) : 0;
+    const onCooldown= cd > 0;
+    const spellColor= onCooldown ? '#636e72' : (cmd?.color ?? '#23f5b2');
+
+    // Which fingertips are extended?
+    const TIP_PIPS = [[4,null],[8,6],[12,10],[16,14],[20,18]];
+    const palmY = (lms[5].y+lms[9].y+lms[13].y+lms[17].y)/4;
+    const extMap = {};
+    for(const [ti, pi] of TIP_PIPS){
+        extMap[ti] = pi===null ? lms[4].y < palmY - 0.05 : fingerUp(lms,ti,pi);
+    }
+
     ctx.save();
-    ctx.strokeStyle = '#23f5b2';
-    ctx.lineWidth   = 1.8;
-    ctx.globalAlpha = 0.55;
-    ctx.shadowColor = '#23f5b2';
-    ctx.shadowBlur  = 4;
-    for (const [a, b] of HAND_CONNECTIONS) {
-        const p1 = lp(a), p2 = lp(b);
-        ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+
+    /* ── 1. Bone connections — gradient glow lines ── */
+    for(const [a,b] of CONNECTIONS){
+        const p1=p(a), p2=p(b);
+        const grad=ctx.createLinearGradient(p1.x,p1.y,p2.x,p2.y);
+        grad.addColorStop(0, spellColor+'77');
+        grad.addColorStop(1, spellColor+'cc');
+        ctx.beginPath(); ctx.moveTo(p1.x,p1.y); ctx.lineTo(p2.x,p2.y);
+        ctx.strokeStyle=grad; ctx.lineWidth=1.8;
+        ctx.shadowColor=spellColor; ctx.shadowBlur=onCooldown?3:9;
+        ctx.globalAlpha=0.65; ctx.stroke();
     }
 
-    /* Landmark dots */
-    ctx.globalAlpha = 0.75;
-    ctx.shadowBlur  = 2;
-    for (let i = 0; i < 21; i++) {
-        if (i === 4 || i === 8) continue;
-        const p = lp(i);
-        ctx.beginPath(); ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
-        ctx.fillStyle = '#ffffff'; ctx.fill();
+    /* ── 2. Knuckle & wrist joints — diamond rune shapes ── */
+    ctx.globalAlpha=0.7;
+    for(let i=0;i<21;i++){
+        if([4,8,12,16,20].includes(i)) continue; // tips drawn separately
+        const pt=p(i);
+        const sz=i===0?4.5:2.5;
+        ctx.beginPath();
+        ctx.moveTo(pt.x,     pt.y-sz);
+        ctx.lineTo(pt.x+sz,  pt.y    );
+        ctx.lineTo(pt.x,     pt.y+sz );
+        ctx.lineTo(pt.x-sz,  pt.y    );
+        ctx.closePath();
+        ctx.fillStyle=spellColor;
+        ctx.shadowColor=spellColor; ctx.shadowBlur=5;
+        ctx.fill();
     }
+
+    /* ── 3. Extended fingertip orbs ── */
+    for(const [tipIdxStr, isUp] of Object.entries(extMap)){
+        const ti=parseInt(tipIdxStr);
+        const tip=p(ti);
+        const orbR = ti===4 ? 7 : 9;
+        const pulse=Math.sin(frameCount*0.15 + ti*1.1)*2.5;
+
+        if(isUp){
+            // outer halo
+            const gOut=ctx.createRadialGradient(tip.x,tip.y,0,tip.x,tip.y,(orbR+pulse)*3.2);
+            gOut.addColorStop(0, spellColor+'bb');
+            gOut.addColorStop(0.35, spellColor+'44');
+            gOut.addColorStop(1, spellColor+'00');
+            ctx.globalAlpha=0.75;
+            ctx.beginPath(); ctx.arc(tip.x,tip.y,(orbR+pulse)*3.2,0,Math.PI*2);
+            ctx.fillStyle=gOut; ctx.shadowBlur=0; ctx.fill();
+
+            // inner glowing orb
+            ctx.globalAlpha=0.92;
+            ctx.beginPath(); ctx.arc(tip.x,tip.y,orbR+pulse,0,Math.PI*2);
+            ctx.fillStyle=spellColor; ctx.shadowColor=spellColor; ctx.shadowBlur=18;
+            ctx.fill();
+
+            // white spark core
+            ctx.globalAlpha=1;
+            ctx.beginPath(); ctx.arc(tip.x,tip.y,2.8,0,Math.PI*2);
+            ctx.fillStyle='#ffffff'; ctx.shadowColor='#fff'; ctx.shadowBlur=8; ctx.fill();
+        } else {
+            // curled fingertip — dim ember
+            ctx.globalAlpha=0.3;
+            ctx.beginPath(); ctx.arc(tip.x,tip.y,3.5,0,Math.PI*2);
+            ctx.fillStyle=spellColor; ctx.shadowBlur=3; ctx.fill();
+        }
+    }
+
+    /* ── 4. Palm sigil: rotating rune while charging ── */
+    if(currentPose && poseHoldFrames>4){
+        const palmPts=[0,5,9,13,17].map(i=>p(i));
+        const cx=palmPts.reduce((s,q)=>s+q.x,0)/palmPts.length;
+        const cy=palmPts.reduce((s,q)=>s+q.y,0)/palmPts.length;
+        const pct=poseHoldFrames/HOLD_FRAMES;
+        const spin=frameCount*0.045;
+        const sr=28;
+
+        ctx.globalAlpha=pct*0.85;
+        ctx.strokeStyle=spellColor; ctx.shadowColor=spellColor;
+        ctx.shadowBlur=onCooldown?4:14; ctx.lineWidth=1.4;
+
+        // outer ring
+        ctx.beginPath(); ctx.arc(cx,cy,sr,0,Math.PI*2); ctx.stroke();
+
+        // inner spinning star lines (6-fold)
+        for(let i=0;i<6;i++){
+            const a=spin+(i/6)*Math.PI*2;
+            const x1=cx+Math.cos(a)*sr*0.9, y1=cy+Math.sin(a)*sr*0.9;
+            const x2=cx+Math.cos(a+Math.PI)*sr*0.9, y2=cy+Math.sin(a+Math.PI)*sr*0.9;
+            ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+        }
+
+        // orbiting spark bead
+        const bx=cx+Math.cos(-spin*1.8)*sr, by=cy+Math.sin(-spin*1.8)*sr;
+        ctx.globalAlpha=pct;
+        ctx.beginPath(); ctx.arc(bx,by,3.5,0,Math.PI*2);
+        ctx.fillStyle='#ffffff'; ctx.shadowBlur=10; ctx.fill();
+    }
+
     ctx.restore();
 
-    /* ── Pinch visualizer (thumb ↔ index) ──── */
-    const thm = lp(4);
-    const idx = lp(8);
-    const ratio = Math.max(0, 1 - pinchDist / (CW * 0.12));  // 0 = open, 1 = pinched
+    /* ── 5. Wrist hold-arc with spark at tip ── */
+    if(currentPose && poseHoldFrames>0 && COMMANDS[currentPose]){
+        const wrist=p(0);
+        const pct=poseHoldFrames/HOLD_FRAMES;
+        const ringColor=cd>0?'#636e72':cmd.color;
+        const endAngle=-Math.PI/2+pct*Math.PI*2;
 
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(wrist.x,wrist.y,30,-Math.PI/2,endAngle);
+        ctx.strokeStyle=ringColor; ctx.lineWidth=3.5;
+        ctx.shadowColor=ringColor; ctx.shadowBlur=cd>0?0:16;
+        ctx.lineCap='round'; ctx.stroke();
+
+        // spark bead at leading edge
+        if(cd===0 && pct>0.04){
+            const sx=wrist.x+Math.cos(endAngle)*30;
+            const sy=wrist.y+Math.sin(endAngle)*30;
+            ctx.beginPath(); ctx.arc(sx,sy,4.5,0,Math.PI*2);
+            ctx.fillStyle='#ffffff'; ctx.shadowColor=ringColor; ctx.shadowBlur=14;
+            ctx.fill();
+        }
+        ctx.restore();
+    }
+}
+
+/* ═══════════════════════════════════════════════
+   DRAW: PLAYER BASE
+═══════════════════════════════════════════════ */
+function drawBase(){
+    const x=BASE_X, y=CH/2;
+    const pulse=Math.sin(frameCount*0.05)*3;
     ctx.save();
-    // Line between the two tips
+    ctx.shadowColor='#23f5b2'; ctx.shadowBlur=12+pulse;
     ctx.beginPath();
-    ctx.moveTo(thm.x, thm.y);
-    ctx.lineTo(idx.x, idx.y);
-    ctx.strokeStyle = `rgba(253, 203, 110, ${0.25 + ratio * 0.75})`;
-    ctx.lineWidth   = 1.5 + ratio * 3.5;
-    ctx.shadowColor = '#fdcb6e';
-    ctx.shadowBlur  = ratio * 14;
-    ctx.stroke();
+    for(let i=0;i<6;i++){
+        const a=(i/6)*Math.PI*2-Math.PI/2, r=22+pulse;
+        const [px,py]=[x+Math.cos(a)*r, y+Math.sin(a)*r];
+        i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
+    }
+    ctx.closePath();
+    ctx.fillStyle='rgba(10,28,36,.9)'; ctx.strokeStyle='#23f5b2'; ctx.lineWidth=2;
+    ctx.fill(); ctx.stroke();
+    ctx.shadowBlur=0; ctx.font='20px serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle='#fff'; ctx.fillText('🔬',x,y);
 
-    // Thumb tip dot (gold)
-    ctx.beginPath(); ctx.arc(thm.x, thm.y, 6 + ratio * 5, 0, Math.PI * 2);
-    ctx.fillStyle   = '#fdcb6e';
-    ctx.globalAlpha = 0.55 + ratio * 0.45;
-    ctx.shadowBlur  = ratio * 10;
-    ctx.fill();
-
-    // Index tip glow
-    const g = ctx.createRadialGradient(idx.x, idx.y, 0, idx.x, idx.y, 28);
-    g.addColorStop(0,   '#23f5b2ff');
-    g.addColorStop(0.4, '#23f5b260');
-    g.addColorStop(1,   '#23f5b200');
-    ctx.beginPath(); ctx.arc(idx.x, idx.y, 28, 0, Math.PI * 2);
-    ctx.fillStyle = g; ctx.globalAlpha = 1; ctx.fill();
-    ctx.beginPath(); ctx.arc(idx.x, idx.y, 8, 0, Math.PI * 2);
-    ctx.fillStyle = '#23f5b2'; ctx.shadowBlur = 10;
-    ctx.fill();
-    ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.stroke();
-
-    ctx.restore();
+    // Dashed lane guides
+    ctx.globalAlpha=0.1; ctx.strokeStyle='#23f5b2'; ctx.lineWidth=1;
+    ctx.setLineDash([6,9]);
+    for(let l=0;l<LANES;l++){
+        ctx.beginPath(); ctx.moveTo(x+30,laneY(l)); ctx.lineTo(CW,laneY(l)); ctx.stroke();
+    }
+    ctx.setLineDash([]); ctx.restore();
 }
 
 /* ═══════════════════════════════════════════════
-   ON-CANVAS TARGET HINT  (top-left corner)
+   DRAW: SHIELDS
 ═══════════════════════════════════════════════ */
-function drawTargetHint() {
-    if (!targetAnimal) return;
-    const px = 14, py = 14, w = 132, h = 52, r = 10;
+function updateShields(){
+    shields=shields.filter(s=>s.duration>0);
+    for(const s of shields){
+        s.duration--;
+        const a=s.duration/s.maxDur;
+        ctx.save(); ctx.globalAlpha=a*0.82;
+        ctx.beginPath(); ctx.rect(s.x-8,0,16,CH);
+        ctx.fillStyle=s.color+'35'; ctx.fill();
+        ctx.strokeStyle=s.color; ctx.lineWidth=3;
+        ctx.shadowColor=s.color; ctx.shadowBlur=10; ctx.stroke(); ctx.restore();
+        // Block enemies behind shield
+        const killed=enemies.filter(e=>e.x<s.x+10);
+        killed.forEach(e=>{
+            score+=e.maxHp*5;
+            for(let i=0;i<8;i++) particles.push(new Particle(e.x,e.y,s.color));
+        });
+        if(killed.length){ enemies=enemies.filter(e=>e.x>=s.x+10); updateHUD(); }
+    }
+}
 
-    ctx.save();
-    ctx.globalAlpha = 0.88;
+/* ═══════════════════════════════════════════════
+   DRAW: ON-CANVAS POSE HINT (bottom-right)
+═══════════════════════════════════════════════ */
+function drawPoseHint(){
+    if(!currentPose||!COMMANDS[currentPose]) return;
+    const cmd=COMMANDS[currentPose];
+    const cd =cmdCooldowns[currentPose]??0;
+    const pct=Math.min(1,poseHoldFrames/HOLD_FRAMES);
+    const px=CW-152, py=CH-62, w=142, h=50;
 
-    rrect(px, py, w, h, r);
-    ctx.fillStyle = 'rgba(10, 20, 28, 0.9)'; ctx.fill();
-    rrect(px, py, w, h, r);
-    ctx.strokeStyle = '#23f5b2'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.save(); ctx.globalAlpha=0.9;
+    rrect(px,py,w,h,10);
+    ctx.fillStyle='rgba(10,20,28,.9)'; ctx.fill();
+    rrect(px,py,w,h,10);
+    ctx.strokeStyle=cd>0?'#636e72':cmd.color; ctx.lineWidth=1.5; ctx.stroke();
 
-    ctx.font      = '11px "SUIT", sans-serif';
-    ctx.fillStyle = '#7fbfd4';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'top';
-    ctx.fillText('CATCH →', px + 10, py + 10);
+    ctx.font=`bold 13px "SUIT",sans-serif`; ctx.textAlign='left';
+    ctx.textBaseline='top'; ctx.fillStyle=cmd.color;
+    ctx.fillText(`${cmd.icon} ${cmd.name}`,px+10,py+10);
 
-    ctx.font      = '26px serif';
-    ctx.textBaseline = 'middle';
-    ctx.fillStyle = '#ffffff';
-    ctx.fillText(targetAnimal.emoji, px + 10, py + 36);
-
-    ctx.font      = `bold 15px "SUIT", sans-serif`;
-    ctx.fillStyle = '#23f5b2';
-    ctx.fillText(targetAnimal.name, px + 44, py + 36);
-
+    const bx=px+8,by=py+30,bw=w-16,bh=7;
+    ctx.beginPath(); ctx.rect(bx,by,bw,bh);
+    ctx.fillStyle='rgba(0,0,0,.4)'; ctx.fill();
+    ctx.beginPath();
+    ctx.rect(bx,by,bw*(cd>0?1-cd/cmd.cooldown:pct),bh);
+    ctx.fillStyle=cd>0?'#636e72':cmd.color; ctx.fill();
     ctx.restore();
 }
 
 /* ═══════════════════════════════════════════════
    MAIN GAME LOOP
 ═══════════════════════════════════════════════ */
-function gameLoop() {
-    if (gameState !== STATES.PLAYING) return;
+function gameLoop(){
+    if(gameState!==STATES.PLAYING) return;
+    frameCount++;
+    ctx.clearRect(0,0,CW,CH);
 
-    ctx.clearRect(0, 0, CW, CH);
-
-    // 1. Mirrored webcam
-    if (videoEl) {
-        ctx.save();
-        ctx.scale(-1, 1);
-        ctx.drawImage(videoEl, -CW, 0, CW, CH);
-        ctx.restore();
+    // 1. Webcam (mirrored)
+    if(videoEl){
+        ctx.save(); ctx.scale(-1,1); ctx.drawImage(videoEl,-CW,0,CW,CH); ctx.restore();
     }
 
-    // 2. Dark scene overlay
-    ctx.fillStyle = 'rgba(7, 17, 24, 0.40)';
-    ctx.fillRect(0, 0, CW, CH);
+    // 2. Scene overlay
+    ctx.fillStyle='rgba(7,17,24,.42)'; ctx.fillRect(0,0,CW,CH);
 
-    // 3. Gestures
-    processGestures();
+    // 3. Pose processing
+    processPoseHold();
 
-    // 4. Animals
-    for (const a of animals) { a.update(); a.draw(); }
-    animals = animals.filter(a => !a.passed && !a.caught);
+    // 4. Player base + lane guides
+    drawBase();
 
-    // 5. Particles + floating text
-    for (const p of particles) { p.update(); p.draw(); }
-    for (const e of effects)   { e.update(); e.draw(); }
-    particles = particles.filter(p => !p.isDead());
-    effects   = effects.filter(e => !e.isDead());
+    // 5. Shield walls
+    updateShields();
 
-    // 6. Combo timer
-    if (comboFrames > 0) { comboFrames--; }
-    else if (combo > 1)  { combo = 1; updateHUD(); }
+    // 6. Enemies
+    for(const e of enemies){ e.update(); e.draw(); }
 
-    // 7. Hand skeleton + pinch viz
-    if (fingerPos?.landmarks) drawHand(fingerPos.landmarks);
+    // Enemies that reached base
+    const breached=enemies.filter(e=>e.reachedBase());
+    breached.forEach(b=>{
+        lives=Math.max(0,lives-1);
+        effects.push(floatText(BASE_X+25,CH/2-40,`${b.type.emoji} Escaped!  -❤️`,'#ff6348',20));
+    });
+    enemies=enemies.filter(e=>!e.reachedBase());
+    if(breached.length) updateHUD();
 
-    // 8. Target reminder overlay
-    drawTargetHint();
+    // 7. Projectiles
+    for(const p of projectiles){ p.update(); p.checkHits(); p.draw(); }
+    projectiles=projectiles.filter(p=>!p.isDead());
 
-    // 9. No-hand nudge
-    if (!fingerPos) {
-        ctx.save();
-        ctx.fillStyle  = 'rgba(255,255,255,0.48)';
-        ctx.font       = '15px "SUIT", sans-serif';
-        ctx.textAlign  = 'center';
-        ctx.fillText('✋  Show your hand to the camera', CW / 2, CH - 18);
-        ctx.restore();
+    // 8. Particles + floating text
+    for(const p of particles){ p.update(); p.draw(); }
+    for(const e of effects)  { e.update(); e.draw(); }
+    particles=particles.filter(p=>!p.isDead());
+    effects  =effects.filter(e=>!e.isDead());
+
+    // 9. Hand skeleton
+    if(fingerPos?.landmarks) drawHand(fingerPos.landmarks);
+
+    // 10. Pose hint overlay
+    drawPoseHint();
+
+    // 11. No-hand nudge
+    if(!fingerPos){
+        ctx.save(); ctx.fillStyle='rgba(255,255,255,.45)';
+        ctx.font='15px "SUIT",sans-serif'; ctx.textAlign='center';
+        ctx.fillText('✋  Show your hand to the camera',CW/2,CH-18); ctx.restore();
     }
 
-    // 10. Game over?
-    if (lives <= 0) { endGame(); return; }
+    // 12. Between-waves countdown
+    if(betweenWaves){
+        waveDelay--;
+        if(waveDelay<=0){
+            betweenWaves=false;
+            wave++;
+            startWave(wave);
+            updateHUD();
+            effects.push(floatText(CW/2,CH/2-60,`⚠️ Wave ${wave} incoming!`,'#ff6348',26));
+        }
+    }
 
-    frameId = requestAnimationFrame(gameLoop);
+    // 13. Wave complete check
+    checkWaveComplete();
+
+    // 14. Game over?
+    if(lives<=0){ endGame(); return; }
+
+    frameId=requestAnimationFrame(gameLoop);
 }
 
 /* ═══════════════════════════════════════════════
-   END & RESTART
+   END / RESTART
 ═══════════════════════════════════════════════ */
-function endGame() {
-    gameState = STATES.GAMEOVER;
+function endGame(){
+    gameState=STATES.GAMEOVER;
     clearInterval(spawnTimer);
     cancelAnimationFrame(frameId);
-    finalScoreEl.textContent = score;
+    finalScoreEl.textContent=score;
+    if(finalWaveEl) finalWaveEl.textContent=`Survived to Wave ${wave}`;
     gameOverOverlay.classList.remove('hidden');
-    if (videoEl?.srcObject) {
-        videoEl.srcObject.getTracks().forEach(t => t.stop());
-        videoEl.srcObject = null;
-    }
-    if (videoEl?.parentNode) videoEl.parentNode.removeChild(videoEl);
-    videoEl = null;
+    if(videoEl?.srcObject){ videoEl.srcObject.getTracks().forEach(t=>t.stop()); videoEl.srcObject=null; }
+    if(videoEl?.parentNode) videoEl.parentNode.removeChild(videoEl);
+    videoEl=null;
+    // Reset cmd guide highlights
+    cmdItems.forEach(el=>el.classList.remove('active'));
 }
 
-function restartGame() {
-    gameOverOverlay.classList.add('hidden');
-    startGame();
-}
+function restartGame(){ gameOverOverlay.classList.add('hidden'); startGame(); }
 
-startBtn.addEventListener('click',   startGame);
-restartBtn.addEventListener('click', restartGame);
+startBtn.addEventListener('click',  startGame);
+restartBtn.addEventListener('click',restartGame);

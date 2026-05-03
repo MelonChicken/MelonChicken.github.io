@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animal Spotter | Junu's Lab</title>
+    <title>Gesture Commander | Junu's Lab</title>
 
     <link rel="stylesheet" href="css/themePalatte.css">
     <link rel="stylesheet" href="css/style.css">
@@ -46,29 +46,23 @@
 
                 <!-- Intro overlay -->
                 <div class="gameOverlay" id="introOverlay">
-                    <div class="overlayContent">
+                    <div class="overlayContent wide">
                         <div class="cvBadge">
-                            <i class="fa-solid fa-paw"></i> Animal Behavior CV Demo
+                            <i class="fa-solid fa-hand-fist"></i> CV Gesture Classification Demo
                         </div>
-                        <h2>Animal Spotter</h2>
-                        <p>Animal cards fly across the screen — <strong>classify them with your hand</strong>!</p>
-                        <div class="gestureGuide">
-                            <div class="gestureItem">
-                                <span class="gestureIcon">🤏</span>
-                                <div>
-                                    <strong>Pinch</strong>
-                                    <p>Catch the target animal</p>
-                                </div>
-                            </div>
-                            <div class="gestureItem">
-                                <span class="gestureIcon">👋</span>
-                                <div>
-                                    <strong>Swipe</strong>
-                                    <p>Wave away wrong animals</p>
-                                </div>
-                            </div>
+                        <h2>Gesture Commander</h2>
+                        <p>Defend your base using <strong>hand pose commands</strong>.<br>
+                           Hold a gesture for 0.5s to fire — 7 poses, 7 unique spells.</p>
+                        <div class="introCommandGrid">
+                            <div class="introCmd"><span>✊</span><strong>FIST</strong><small>Explosion</small></div>
+                            <div class="introCmd"><span>🖐️</span><strong>OPEN</strong><small>Shield</small></div>
+                            <div class="introCmd"><span>☝️</span><strong>POINT</strong><small>Laser</small></div>
+                            <div class="introCmd"><span>✌️</span><strong>PEACE</strong><small>Spread</small></div>
+                            <div class="introCmd"><span>🖖</span><strong>3 FIN.</strong><small>Barrage</small></div>
+                            <div class="introCmd"><span>🤘</span><strong>ROCK</strong><small>Chain ⚡</small></div>
+                            <div class="introCmd"><span>👍</span><strong>THUMB</strong><small>Freeze ❄️</small></div>
                         </div>
-                        <p class="techNote">MediaPipe Hand Landmark Detection · 21 keypoints · Real-time</p>
+                        <p class="techNote">Rule-based landmark geometry · MediaPipe 21-keypoint hands · No ML model needed</p>
                         <button class="startBtn" id="startBtn">
                             <i class="fa-solid fa-camera"></i> Start Game
                         </button>
@@ -80,17 +74,18 @@
                     <div class="overlayContent">
                         <div class="loadingSpinner"></div>
                         <p>Initializing hand tracking model…</p>
-                        <p class="techNote">Loading pinch + gesture detection network</p>
+                        <p class="techNote">Loading gesture recognition pipeline</p>
                     </div>
                 </div>
 
                 <!-- Game Over overlay -->
                 <div class="gameOverlay hidden" id="gameOverOverlay">
                     <div class="overlayContent">
-                        <div class="cvBadge"><i class="fa-solid fa-trophy"></i> Session Complete</div>
-                        <h2>Nice Spotting!</h2>
-                        <p class="finalScoreLabel">Animals Classified</p>
+                        <div class="cvBadge"><i class="fa-solid fa-skull"></i> Base Destroyed</div>
+                        <h2>Mission Failed</h2>
+                        <p class="finalScoreLabel">Final Score</p>
                         <p class="finalScoreValue" id="finalScore">0</p>
+                        <p id="finalWave" style="color:var(--color-text-secondary);margin:0 0 1rem;font-size:0.9rem;"></p>
                         <button class="startBtn" id="restartBtn">
                             <i class="fa-solid fa-rotate-right"></i> Try Again
                         </button>
@@ -109,51 +104,77 @@
                         <span class="value" id="scoreDisplay">0</span>
                     </div>
                     <div class="scoreItem">
-                        <span class="label">LIVES</span>
-                        <span class="value livesValue" id="livesDisplay">❤️❤️❤️</span>
+                        <span class="label">WAVE</span>
+                        <span class="value" id="waveDisplay">1</span>
                     </div>
                     <div class="scoreItem">
-                        <span class="label">COMBO</span>
-                        <span class="value" id="comboDisplay">x1</span>
+                        <span class="label">LIVES</span>
+                        <span class="value livesValue" id="livesDisplay">❤️❤️❤️❤️❤️</span>
                     </div>
                 </div>
 
-                <!-- Target animal -->
-                <div class="infoCard targetCard">
-                    <h3><i class="fa-solid fa-crosshairs"></i> Catch This!</h3>
-                    <div id="targetPanel" class="targetDisplay">
-                        <span class="targetEmoji">—</span>
-                        <span class="targetName">—</span>
+                <!-- Active gesture / hold bar -->
+                <div class="infoCard poseCard">
+                    <h3><i class="fa-solid fa-hand"></i> Active Gesture</h3>
+                    <div class="poseRow">
+                        <span id="poseName" class="poseName">— no hand —</span>
+                        <span id="cmdName"  class="cmdName">show a gesture</span>
                     </div>
-                    <p class="targetHint">🤏 Pinch when this animal flies by</p>
+                    <div class="holdBarTrack" title="Hold the pose to charge">
+                        <div id="holdBar" class="holdBarFill"></div>
+                    </div>
+                    <p class="holdHint">Hold pose 0.5 s to fire</p>
                 </div>
 
-                <!-- How to play -->
+                <!-- Command guide -->
                 <div class="infoCard">
-                    <h3><i class="fa-solid fa-hand-pointer"></i> Gestures</h3>
-                    <div class="gestureRow">
-                        <div class="gestureChip"><span>🤏</span> Pinch = Catch target</div>
-                        <div class="gestureChip"><span>👋</span> Swipe = Wave away others</div>
-                        <div class="gestureChip"><span>❌</span> Pinch wrong = -1 life</div>
-                        <div class="gestureChip"><span>✨</span> Catch combo = bonus pts</div>
+                    <h3><i class="fa-solid fa-book-open"></i> Command Guide</h3>
+                    <div class="commandGrid">
+                        <div class="cmdItem" data-pose="FIST">
+                            <span class="cmdIcon">✊</span>
+                            <div><strong>Fist</strong><p>Explosion AOE</p></div>
+                        </div>
+                        <div class="cmdItem" data-pose="OPEN">
+                            <span class="cmdIcon">🖐️</span>
+                            <div><strong>Open Palm</strong><p>Shield Wall</p></div>
+                        </div>
+                        <div class="cmdItem" data-pose="POINT">
+                            <span class="cmdIcon">☝️</span>
+                            <div><strong>Point</strong><p>Precision Laser</p></div>
+                        </div>
+                        <div class="cmdItem" data-pose="PEACE">
+                            <span class="cmdIcon">✌️</span>
+                            <div><strong>Peace</strong><p>2-way Spread</p></div>
+                        </div>
+                        <div class="cmdItem" data-pose="THREE">
+                            <span class="cmdIcon">🖖</span>
+                            <div><strong>3 Fingers</strong><p>Triple Barrage</p></div>
+                        </div>
+                        <div class="cmdItem" data-pose="ROCK_ON">
+                            <span class="cmdIcon">🤘</span>
+                            <div><strong>Rock On</strong><p>Chain Lightning</p></div>
+                        </div>
+                        <div class="cmdItem" data-pose="THUMBS_UP">
+                            <span class="cmdIcon">👍</span>
+                            <div><strong>Thumbs Up</strong><p>Freeze All</p></div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Tech info -->
                 <div class="infoCard techInfo">
-                    <h3><i class="fa-solid fa-microchip"></i> Under the Hood</h3>
+                    <h3><i class="fa-solid fa-microchip"></i> Pose Detection</h3>
                     <div class="tagRow">
-                        <span class="techTag">Pinch Detection</span>
-                        <span class="techTag">Swipe Velocity</span>
+                        <span class="techTag">Rule-Based</span>
+                        <span class="techTag">No ML Model</span>
                         <span class="techTag">21 Landmarks</span>
-                        <span class="techTag">Real-time CV</span>
+                        <span class="techTag">Geometry Only</span>
                     </div>
                     <p class="techDesc">
-                        <strong>Pinch</strong>: measures distance between thumb tip (LM 4) and
-                        index tip (LM 8) — triggers at &lt;6.5% of canvas width.<br><br>
-                        <strong>Swipe</strong>: tracks wrist (LM 0) x-velocity over 8 frames —
-                        fires when displacement exceeds 15% of canvas width in &lt;350 ms.
-                        The same velocity-estimation technique is used in animal behavior analysis.
+                        Each finger is classified <strong>extended/curled</strong> by comparing
+                        tip-to-wrist distance vs. PIP-to-wrist distance — rotation-invariant geometry.
+                        Thumb uses normalized y-axis vs. palm centroid.
+                        Same principle as pose-based action recognition in animal behavior studies.
                     </p>
                 </div>
             </div>

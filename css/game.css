@@ -280,7 +280,133 @@
     color: var(--color-accent);
 }
 
-/* ── Target animal card ──────────────────────────────── */
+/* ── Pose card (active gesture display) ─────────────────*/
+.poseCard .poseRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.6rem;
+}
+
+.poseName {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--color-accent);
+    white-space: nowrap;
+}
+
+.cmdName {
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    text-align: right;
+}
+
+.holdBarTrack {
+    height: 8px;
+    background: rgba(0,0,0,0.25);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.holdBarFill {
+    height: 100%;
+    width: 0%;
+    background: var(--color-accent);
+    border-radius: 4px;
+    transition: width 0.07s linear, background 0.2s;
+}
+
+.holdHint {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    margin: 0.4rem 0 0;
+    text-align: center;
+}
+
+/* ── Command guide grid ──────────────────────────────── */
+.commandGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.45rem;
+}
+
+.cmdItem {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.5rem;
+    border-radius: var(--radius-sm);
+    background: var(--color-badge-bg);
+    border: 1.5px solid transparent;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.cmdItem.active {
+    border-color: var(--color-accent);
+    background: var(--color-accent-soft);
+}
+
+.cmdIcon {
+    font-size: 1.5rem;
+    width: 2rem;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.cmdItem strong {
+    display: block;
+    font-size: 0.76rem;
+    color: var(--color-text-primary);
+    line-height: 1.2;
+}
+
+.cmdItem p {
+    font-size: 0.7rem;
+    color: var(--color-accent);
+    margin: 0;
+    line-height: 1.2;
+}
+
+/* ── Intro command grid ──────────────────────────────── */
+.overlayContent.wide {
+    max-width: 480px;
+}
+
+.introCommandGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+    margin: 1rem 0 0.75rem;
+}
+
+.introCmd {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    background: var(--color-badge-bg);
+    border-radius: var(--radius-sm);
+    padding: 0.5rem 0.25rem;
+}
+
+.introCmd span {
+    font-size: 1.6rem;
+    line-height: 1;
+}
+
+.introCmd strong {
+    font-size: 0.68rem;
+    color: var(--color-accent);
+    letter-spacing: 0.04em;
+}
+
+.introCmd small {
+    font-size: 0.62rem;
+    color: var(--color-text-secondary);
+}
+
+/* ── Target animal card (kept for fallback) ──────────── */
 .targetCard .targetDisplay {
     display: flex;
     align-items: center;
