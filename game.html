@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finger Catch | Junu's Lab</title>
+
+    <!-- Portfolio shared styles -->
+    <link rel="stylesheet" href="css/themePalatte.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/button.css">
+    <!-- Game-specific styles -->
+    <link rel="stylesheet" href="css/game.css">
+
+    <!-- Icons & Fonts -->
+    <script src="https://kit.fontawesome.com/8da0f3b785.js" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/gh/sun-typeface/SUIT@2/fonts/static/woff2/SUIT.css" rel="stylesheet">
+
+    <!-- Theme switch (must be before body renders) -->
+    <script src="js/themeSwitch.js"></script>
+
+    <!-- MediaPipe Hands (browser CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <!-- ── HEADER ─────────────────────────────────── -->
+    <header>
+        <nav>
+            <a href="./index.html">
+                <h1><i class="fa-solid fa-flask-vial"></i> Junu's Lab</h1>
+            </a>
+            <div>
+                <a href="./index.html">Home</a>
+                <a href="./projects.html">Projects</a>
+                <a href="./mygithub.html">My GitHub</a>
+                <a href="./skills.html">Skills</a>
+                <a href="./contact.html">Contact</a>
+            </div>
+        </nav>
+    </header>
+
+    <button class="themeSwitch">&gt; STD_MODE</button>
+
+    <!-- ── MAIN ───────────────────────────────────── -->
+    <main class="gameMain">
+        <div class="gameLayout">
+
+            <!-- LEFT: Canvas ─────────────────────── -->
+            <div class="canvasWrapper">
+                <canvas id="gameCanvas"></canvas>
+
+                <!-- Intro overlay -->
+                <div class="gameOverlay" id="introOverlay">
+                    <div class="overlayContent">
+                        <div class="cvBadge">
+                            <i class="fa-solid fa-eye"></i> Computer Vision Demo
+                        </div>
+                        <h2>Finger Catch</h2>
+                        <p>Catch the falling bubbles with your <strong>index finger</strong>!</p>
+                        <p class="techNote">Powered by MediaPipe Hand Landmark Detection</p>
+                        <button class="startBtn" id="startBtn">
+                            <i class="fa-solid fa-camera"></i> Start Game
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Loading overlay -->
+                <div class="gameOverlay hidden" id="loadingOverlay">
+                    <div class="overlayContent">
+                        <div class="loadingSpinner"></div>
+                        <p>Initializing hand tracking model…</p>
+                        <p class="techNote">Loading 21-landmark neural network</p>
+                    </div>
+                </div>
+
+                <!-- Game Over overlay -->
+                <div class="gameOverlay hidden" id="gameOverOverlay">
+                    <div class="overlayContent">
+                        <div class="cvBadge"><i class="fa-solid fa-trophy"></i> Game Over</div>
+                        <h2>Nice Catching!</h2>
+                        <p class="finalScoreLabel">Final Score</p>
+                        <p class="finalScoreValue" id="finalScore">0</p>
+                        <button class="startBtn" id="restartBtn">
+                            <i class="fa-solid fa-rotate-right"></i> Play Again
+                        </button>
+                        <a href="./index.html" class="homeBtn">← Back to Portfolio</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: Info Panel ─────────────────── -->
+            <div class="infoPanel">
+
+                <!-- Score board -->
+                <div class="scoreBoard">
+                    <div class="scoreItem">
+                        <span class="label">SCORE</span>
+                        <span class="value" id="scoreDisplay">0</span>
+                    </div>
+                    <div class="scoreItem">
+                        <span class="label">LIVES</span>
+                        <span class="value livesValue" id="livesDisplay">❤️❤️❤️</span>
+                    </div>
+                    <div class="scoreItem">
+                        <span class="label">COMBO</span>
+                        <span class="value" id="comboDisplay">x1</span>
+                    </div>
+                </div>
+
+                <!-- How to play -->
+                <div class="infoCard">
+                    <h3><i class="fa-solid fa-gamepad"></i> How to Play</h3>
+                    <ol>
+                        <li>Click <strong>Start Game</strong> and allow camera access</li>
+                        <li>Hold up your hand in front of the camera</li>
+                        <li>Point your <strong>index finger</strong> at falling bubbles to catch them</li>
+                        <li>Catch combos in a row for bonus points!</li>
+                        <li>You have <strong>3 lives</strong> — don't let bubbles escape</li>
+                    </ol>
+                </div>
+
+                <!-- Tech info -->
+                <div class="infoCard techInfo">
+                    <h3><i class="fa-solid fa-microchip"></i> Tech Under the Hood</h3>
+                    <div class="tagRow">
+                        <span class="techTag">MediaPipe Hands</span>
+                        <span class="techTag">21 Landmarks</span>
+                        <span class="techTag">Real-time CV</span>
+                        <span class="techTag">TensorFlow.js</span>
+                    </div>
+                    <p class="techDesc">
+                        This game uses Google's MediaPipe to detect <strong>21 3D hand landmarks</strong>
+                        at ~30 fps entirely in your browser — no server, no data upload.
+                        The same landmark-tracking technique underpins research in
+                        gesture recognition and animal behavior analysis.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ── FOOTER ─────────────────────────────────── -->
+    <footer>
+        <section>
+            <p>Junu's lab portfolio 2.1.0.</p>
+            <p>&copy; 2026 Junu Kim. All rights reserved.</p>
+            <p>Email: m.l02n23@gmail.com</p>
+            <p>
+                <a href="https://github.com/MelonChicken"><i class="fa-brands fa-github"></i></a>
+            </p>
+        </section>
+    </footer>
+
+    <script src="js/game.js"></script>
+</body>
+
+</html>

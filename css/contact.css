@@ -1,0 +1,299 @@
+main {
+    height: 94dvh;
+    min-height: max-content;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding-right: 3vw;
+    padding-left: 3vw;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    .infoContainer {
+        grid-column: span 1;
+        height: 100%;
+        padding-top: 1dvh;
+
+        .textContainer {
+            grid-column: span 1;
+            width: 80%;
+
+            h2 {
+                font-size: 3rem;
+                font-weight: 800;
+                margin: 0;
+            }
+
+            h3 {
+                font-size: 0.9rem;
+                font-weight: 400;
+                margin-bottom: 0;
+                color: var(--color-text-primary);
+            }
+
+            p {
+                color: var(--color-text-secondary);
+            }
+        }
+
+        ul {
+            /* https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/list-style */
+
+            list-style: none;
+            margin: 0;
+            padding: 0;
+
+            li {
+                width: 80%;
+                display: grid;
+                grid-template-columns: 1fr 5fr 1fr;
+                padding: 1rem;
+                margin-top: 2rem;
+                background-color: var(--color-button-secondary-bg);
+                border-radius: var(--radius-md);
+                color: var(--color-button-secondary-text);
+                border: 2px solid var(--color-button-secondary-border);
+
+                &:hover {
+                    background-color: var(--color-button-secondary-bg-hover);
+                }
+
+                .iconBox,
+                .arrowBox {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    align-self: center;
+                    justify-self: center;
+                    font-size: 1.2rem;
+                }
+
+                .iconBox {
+                    width: 60%;
+                    aspect-ratio: 1 / 1;
+                    border-radius: var(--radius-sm);
+                    background-color: var(--color-accent);
+                    color: var(--color-text-inverse);
+                }
+
+                .textBox {
+                    font-weight: bold;
+
+                    .contactName {
+                        color: var(--color-text-secondary);
+                    }
+                }
+
+                .arrowBox {
+                    color: var(--color-badge-text);
+                }
+            }
+
+            li:nth-child(odd) {
+                .iconBox {
+                    background-color: var(--color-accent-soft);
+                    color: var(--color-accent);
+                }
+            }
+        }
+    }
+
+    .formContainer {
+        grid-column: span 1;
+        width: 90%;
+        height: 90%;
+        border-radius: var(--radius-md);
+        background-color: var(--color-surface);
+        border: 2px solid var(--color-button-secondary-border);
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        .headingCover {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 2rem;
+            img {
+                width: 40%;
+                aspect-ratio: 1 / 1;
+            }
+        }
+
+        h2 {
+            color: var(--color-accent);
+        }
+
+        .contactForm {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            label {
+                margin-top: 2rem;
+                color: var(--color-text-primary);
+                font-weight: 700;
+            }
+
+            input,
+            textarea {
+                width: 70%;
+                resize: none;
+            }
+
+            button {
+                width: 20%;
+                aspect-ratio: 3 / 1;
+                margin-top: 1rem;
+                border-radius: var(--radius-lg);
+
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                font-size: 1.1rem;
+                text-decoration: none;
+                border: 2px solid var(--color-border);
+
+                box-shadow: var(--shadow-md);
+
+                &:hover {
+                    background-color: var(--color-button-secondary-bg-hover);
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    main {
+        height: auto;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        padding: 2dvh 4vw 4dvh;
+
+        .infoContainer {
+            width: 100%;
+            height: auto;
+
+            .textContainer h2 {
+                font-size: 2.2rem;
+            }
+
+            ul li {
+                width: 100%;
+                grid-template-columns: auto 1fr auto;
+                gap: 0.75rem;
+                box-sizing: border-box;
+
+                .textBox {
+                    min-width: 0;
+
+                    p {
+                        overflow-wrap: anywhere;
+                    }
+                }
+            }
+        }
+
+        .formContainer {
+            width: 100%;
+            height: auto;
+            box-sizing: border-box;
+
+            .headingCover {
+                flex-wrap: wrap;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .headingCover img {
+                max-width: 100%;
+                height: auto;
+            }
+
+            .contactForm {
+                input,
+                textarea,
+                button {
+                    width: 85%;
+                }
+
+                button {
+                    aspect-ratio: auto;
+                    padding: 0.85rem 1.5rem;
+                }
+            }
+        }
+
+    }
+}
+
+@media (max-width: 480px) {
+    main {
+        padding-right: 1rem;
+        padding-left: 1rem;
+        gap: 1.5rem;
+
+        .infoContainer {
+            .textContainer {
+                width: 100%;
+
+                h2 {
+                    font-size: 1.7rem;
+                }
+
+                p {
+                    font-size: 0.95rem;
+                    line-height: 1.6;
+                }
+            }
+
+            ul li {
+                padding: 0.85rem;
+                margin-top: 1rem;
+
+                .iconBox,
+                .arrowBox {
+                    font-size: 1rem;
+                }
+
+                .textBox {
+                    font-size: 0.92rem;
+                }
+            }
+        }
+
+        .formContainer {
+            padding-bottom: 1.25rem;
+
+            .headingCover {
+                padding: 1.25rem 1rem 0.5rem;
+            }
+
+            h1,
+            h2 {
+                text-align: center;
+                padding-left: 1rem;
+                padding-right: 1rem;
+                box-sizing: border-box;
+            }
+
+            .contactForm {
+                label {
+                    margin-top: 1.25rem;
+                }
+
+                input,
+                textarea,
+                button {
+                    width: 90%;
+                }
+            }
+        }
+    }
+}
