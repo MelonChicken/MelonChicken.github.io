@@ -50,7 +50,7 @@ async function debugTarget(target: SyncTarget) {
   try {
     database = await retrieveDatabase(databaseId);
   } catch (error) {
-    console.error(`    failed: ${error instanceof Error ? error.message : String(error)}`);
+    console.log(`    failed: ${getErrorHeadline(error)}`);
     console.log('  probe queryDataSource(databaseId)');
     const response = await queryDataSource(databaseId, { page_size: 1 });
     console.log(`    ok: env id works as data_source_id; ${response.results?.length || 0} sample page(s), has_more=${Boolean(response.has_more)}`);
@@ -96,6 +96,11 @@ function parseTargets(args: string[]) {
 function formatDataSources(dataSources: any[]) {
   if (!dataSources.length) return '<none>';
   return dataSources.map((source) => `${source.id}${source.name ? ` (${source.name})` : ''}`).join(', ');
+}
+
+function getErrorHeadline(error: unknown) {
+  if (!(error instanceof Error)) return String(error);
+  return error.message.split('\n')[0];
 }
 
 function getTitle(properties: Record<string, any> = {}) {
