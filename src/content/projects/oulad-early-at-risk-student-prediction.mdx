@@ -1,0 +1,401 @@
+---
+title: "OULAD Early At-Risk Student Prediction"
+slug: "oulad-early-at-risk-student-prediction"
+generated: true
+status: "seed"
+summary: "Virtual Learning Environment (VLE) 에서 수집하는 학생 데이터를 토대로 학습 어려움이 있는 학생을 조기 탐지"
+group: "ml"
+stack: 
+  - "Jupyter Notebook"
+  - "Python"
+  - "Pandas"
+  - "scikit-learn"
+roles: 
+  - "🔢 Data Analyst Modeling"
+  - "🛠️ ML Engineer"
+output: "🧠 ML"
+repo: "https://github.com/MelonChicken/oulad-student-classification"
+notion: "https://app.notion.com/p/OULAD-Early-At-Risk-Student-Prediction-38814b84a0f280909f1ec58e5c19c638"
+featured: false
+problem: "Virtual Learning Environment (VLE) 에서 수집하는 학생 데이터를 토대로 학습 어려움이 있는 학생을 조기 탐지"
+---
+
+{/* This file is generated from Notion. Do not edit directly. */}
+
+# Early At-Risk Student Prediction - A Data Mining Approach Using the OULAD Dataset
+
+> _Can student demographics, academic background, and early behavioral engagement predict at-risk status before it is too late to intervene?_
+
+> Learning activity data를 활용하여 조기 위험 학생을 예측하고, 기존 논문 기반 접근을 더 큰 공개 데이터셋과 다양한 feature setting으로 확장한 프로젝트
+
+> **원문 논문**
+> 
+> **Title:** A Case Study on the Data Mining-Based Prediction of Students’ Performance for Effective and Sustainable E-Learning
+> 
+> **Authors:** Evelina Staneviciene, Daina Gudoniene, Vytenis Punys, Arturas Kukstys
+> 
+> **Journal:** _Sustainability_, Vol\. 16, Article 10442, 2024, MDPI
+> 
+> **Published:** 28 November 2024
+> 
+> **DOI:** 10\.3390/su162310442
+> 
+> **arXiv ID:** N/A
+> 
+> **Keywords:** educational data mining; prediction; academic success; student performance; sustainable development goals; machine learning
+> 
+> **IEEE Citation:**
+> 
+> E\. Staneviciene, D\. Gudoniene, V\. Punys, and A\. Kukstys, “A Case Study on the Data Mining-Based Prediction of Students’ Performance for Effective and Sustainable E-Learning,” _Sustainability_, vol\. 16, Art\. no\. 10442, 2024, doi: 10\.3390/su162310442\.
+
+---
+
+## 🎯 Executive Summary
+
+- **Problem:** 온라인 학습 환경에서 학습 중도 이탈 또는 실패 위험 학생을 조기에 식별하는 문제
+
+- **Reference Paper:** Staneviciene et al\. \(2024\), _A Case Study on the Data Mining-Based Prediction of Students’ Performance for Effective and Sustainable E-Learning_
+
+- **Reproduction Goal:** 원 논문의 student performance prediction 문제 설정, 평가 방식, 모델 비교 흐름을 재현
+
+- **Extension Goal:** OULAD 데이터셋을 사용하여 더 큰 규모의 학습 로그 기반 조기 예측 실험으로 확장
+
+- **Key Result:** Behavioral feature가 demographic/background feature보다 더 강한 예측력을 보였으며, Week 10 기준 Random Forest behavioral model이 가장 높은 성능을 보임
+  <figure>
+    <img src="/notion-assets/oulad-early-at-risk-student-prediction/38814b84a0f28005a0a2dc494fb6f3ce.png" alt="Source: author's Notion note" />
+    <figcaption>Source: author's Notion note</figcaption>
+  </figure>
+
+- **Main Contribution:** cutoff-based prediction, leakage prevention, active cohort filtering, feature group ablation, reference paper comparison
+
+---
+
+## 2\. Research Background
+
+온라인 학습 환경에서는 학생의 학습 활동이 로그 데이터로 축적된다\. 이러한 데이터는 학생의 학습 참여도, 과제 수행 패턴, 마지막 활동 시점 등을 반영하므로 학업 실패나 중도 이탈 위험을 조기에 예측하는 데 활용될 수 있다\.
+
+이 프로젝트는 기존 논문에서 제시한 educational data mining 기반 student performance prediction 접근을 참고하여, OULAD 공개 데이터셋에서 조기 위험 학생 예측 문제를 재구성하였다\.
+
+---
+
+## 3\. Problem Definition
+
+### Target
+
+- **At-risk student = Withdrawn or Fail**
+
+- **Successful student = Pass or Distinction**
+
+### Prediction Setting
+
+- Week 5, Week 7, Week 10 시점까지의 정보만 사용
+
+- 해당 cutoff 이전의 학습 로그, 평가 기록, 배경 정보를 기반으로 최종 at-risk 여부 예측
+
+### Why cutoff-based prediction?
+
+최종 결과를 예측하는 것보다 중요한 것은 학기가 끝나기 전에 위험 학생을 조기에 탐지하는 것이다\. 따라서 전체 데이터를 사용하는 방식이 아니라, 특정 주차까지 관찰 가능한 데이터만 사용하여 예측 문제를 설계하였다\.
+
+---
+
+## 4\. Reference Paper Summary
+
+원 논문은 Moodle 기반 학습 환경에서 학생의 로그인 수와 클릭 수를 활용하여 academic success/failure를 예측하였다\. CRISP-DM 절차를 기반으로 데이터 이해, 준비, 모델링, 평가를 수행했으며, Decision Tree, Bayesian Classifier, Random Forest, SVC, KNN 등의 모델을 비교하였다\.
+
+원 논문에서 중요한 점은 다음과 같다\.
+
+- 학습 로그 기반 조기 예측 문제를 설정함
+
+- 로그인 수와 클릭 수 같은 단순 행동 feature를 사용함
+
+- 여러 classifier를 비교함
+
+- Random Forest가 상대적으로 우수한 성능을 보임
+
+- 예측 결과를 조기 개입 시스템과 연결할 수 있음을 제안함
+
+---
+
+## 5\. Reproduction Scope
+
+이 프로젝트는 원 논문의 모든 조건을 완전히 동일하게 재현한 것은 아니다\. 대신 다음 요소를 중심으로 개념적 재현과 확장을 수행하였다\.
+
+### Reproduced Aspects
+
+- Student performance prediction 문제 설정
+
+- Failure / success 이진 분류 구조
+
+- 학습 로그 기반 feature 사용
+
+- Decision Tree, Naive Bayes, Random Forest, SVC, KNN 등 다중 모델 비교
+
+- Precision, Recall, F1, ROC-AUC 기반 평가
+
+- 조기 위험 학생 탐지 관점의 해석
+
+### Different Aspects
+
+- 원 논문은 Moodle 기반 소규모 데이터 사용
+
+- 본 프로젝트는 OULAD 공개 데이터셋 사용
+
+- 원 논문은 login/click 중심 feature 사용
+
+- 본 프로젝트는 VLE activity, assessment, student background feature를 함께 사용
+
+- 원 논문은 Weka 기반 실험
+
+- 본 프로젝트는 Python / scikit-learn 기반 실험
+
+---
+
+## 6\. Dataset and Preprocessing
+
+### Dataset
+
+- **Dataset:** [Open University Learning Analytics Dataset, OULAD](https://www.kaggle.com/datasets/anlgrbz/student-demographics-online-education-dataoulad)
+
+- **Data Sources:** studentInfo, studentVle, vle, assessments, studentAssessment, courses, studentRegistration
+
+### Preprocessing Steps
+
+1. Target label 생성
+
+1. Cutoff week 기준 데이터 필터링
+
+1. Leakage 가능성이 있는 변수 제거
+
+1. Active cohort filtering
+
+1. VLE activity aggregation
+
+1. Assessment feature aggregation
+
+1. Missing value 처리 및 missing flag 생성
+
+1. Categorical feature encoding
+
+### Leakage Prevention
+
+최종 결과 또는 미래 정보를 직접적으로 포함할 수 있는 변수는 제거하였다\. 특히 조기 예측 문제에서는 cutoff 이후의 활동 정보가 모델에 들어가지 않도록 처리하였다\.
+
+---
+
+## 7\. Feature Engineering
+
+### Feature Groups
+
+### 1\. Demographic Features
+
+- gender
+
+- region
+
+- age\_band
+
+- imd\_band
+
+### 2\. Student Background Features
+
+- highest\_education
+
+- previous\_attempts
+
+- studied\_credits / credits\_bin
+
+### 3\. Behavioral Features
+
+- active\_days\_until\_cutoff
+
+- total\_click\_until\_cutoff
+
+- days\_since\_last\_activity\_at\_cutoff
+
+- avg\_click\_per\_active\_day
+
+- assessment\_count\_until\_cutoff
+
+- mean\_score\_until\_cutoff
+
+- avg\_days\_before\_due\_until\_cutoff
+
+### Main Hypothesis
+
+학생의 인구통계학적 정보보다 실제 학습 행동 로그가 at-risk prediction에 더 직접적인 신호를 제공할 것이라고 가정하였다\.
+
+---
+
+## 8\. Experimental Design
+
+### Models
+
+- Decision Tree
+
+- Gaussian Naive Bayes
+
+- K-Nearest Neighbors
+
+- Logistic Regression
+
+- Random Forest
+
+- Support Vector Classifier
+
+### Evaluation
+
+- Stratified 5-Fold Cross Validation
+
+- Precision
+
+- Recall
+
+- F1 Score
+
+- ROC-AUC
+
+### Main Comparison Axes
+
+1. Cutoff week별 성능 비교
+
+1. Feature group별 성능 비교
+
+1. Model별 성능 비교
+
+1. Reference paper 결과와의 비교
+
+1. Behavioral-only vs Integrated feature set 비교
+
+---
+
+## 9\. Results
+
+### Main Findings
+
+- Demographic-only feature는 예측력이 약했다\.
+
+- Student background feature는 demographic feature보다 나았지만, 단독으로는 제한적이었다\.
+
+- Behavioral feature가 가장 강한 예측력을 보였다\.
+
+- Week 10으로 갈수록 더 많은 행동 정보가 누적되어 성능이 향상되었다\.
+
+- Random Forest는 behavioral feature setting에서 가장 강한 성능을 보였다\.
+
+- Integrated model은 성능만 보면 behavioral-only보다 약간 낮을 수 있지만, 해석 가능성과 맥락 정보 측면에서 의미가 있었다\.
+
+### Best Result
+
+- **Best setting:** Week 10 behavioral features
+
+- **Best model:** Random Forest
+
+- **Key metric:** ROC-AUC 0\.776
+
+---
+
+## 10\. Comparison with Reference Paper
+
+| Aspect | Reference Paper | This Project |
+| --- | --- | --- |
+| Dataset | Moodle-based university data | OULAD public dataset |
+| Sample size | Smaller institutional dataset | Larger multi-module dataset |
+| Main features | Login, clicks | Activity, assessment, background features |
+| Models | DT, Bayesian, RF, SVC, KNN | DT, GNB, KNN, LogReg, RF, SVC |
+| Tool | Weka | Python / scikit-learn |
+| Main focus | Academic success prediction | Early at-risk prediction |
+| Best model tendency | Random Forest | Random Forest / Logistic Regression depending on setting |
+
+### Interpretation
+
+원 논문과 본 프로젝트는 데이터셋과 feature 구성이 다르기 때문에 성능 수치를 직접적으로 동일 조건에서 비교할 수는 없다\. 다만 두 실험 모두 학습 행동 데이터가 학생 성과 예측에 유효하며, Random Forest 계열 모델이 강한 성능을 보일 수 있다는 점에서 유사한 결론을 보인다\.
+
+---
+
+## 11\. My Contributions
+
+- 원 논문 분석 및 reproduction scope 정의
+
+- OULAD 데이터셋 기반 문제 재설계
+
+- At-risk target 정의
+
+- Cutoff week 기반 조기 예측 실험 설계
+
+- Leakage-prone variable 제거
+
+- Feature engineering pipeline 구성
+
+- Model comparison 및 evaluation pipeline 구현
+
+- Feature group ablation 수행
+
+- Reference paper와의 결과 비교 및 해석
+
+- 최종 발표 자료 및 결과 정리
+
+---
+
+## 12\. Technical Decisions
+
+### Decision 1\. Accuracy 대신 F1과 ROC-AUC를 중심으로 평가
+
+- **Reason:** At-risk student는 상대적으로 minority class일 수 있으므로 accuracy만으로는 모델의 유효성을 판단하기 어렵다\.
+
+- **Alternative:** Accuracy 중심 평가
+
+- **Why rejected:** 실패 학생을 놓치는 문제가 가려질 수 있음
+
+### Decision 2\. Cutoff week 기반 실험 설계
+
+- **Reason:** 조기 개입 가능성을 평가하려면 학기 전체 데이터가 아니라 특정 시점까지의 데이터만 사용해야 한다\.
+
+- **Alternative:** 전체 학기 데이터 사용
+
+- **Why rejected:** 실제 조기 예측 상황과 맞지 않음
+
+### Decision 3\. Feature group ablation 수행
+
+- **Reason:** 어떤 종류의 정보가 예측에 중요한지 확인하기 위해 demographic, background, behavioral feature를 분리하여 비교했다\.
+
+- **Alternative:** 모든 feature를 한 번에 투입
+
+- **Why rejected:** 성능은 볼 수 있지만 해석이 어려움
+
+---
+
+## 13\. Limitations
+
+- 원 논문과 데이터셋이 달라 완전한 동일 조건 재현은 아니다\.
+
+- OULAD의 course/module 구조가 복잡하여 cohort 정의에 따라 결과가 달라질 수 있다\.
+
+- Behavioral feature는 강력하지만, 개입 가능한 원인을 완전히 설명하지는 못한다\.
+
+- 모델의 성능이 높더라도 실제 교육 현장 적용에는 윤리, 개인정보, intervention design 문제가 남아 있다\.
+
+- Sequential model이나 time-series model은 아직 적용하지 않았다\.
+
+---
+
+## 14\. Future Work
+
+- Weekly sequence 기반 LSTM / Transformer 모델 적용
+
+- Student trajectory clustering
+
+- SHAP 기반 feature interpretation
+
+- At-risk threshold 조정에 따른 intervention cost 분석
+
+- Student behavior pattern visualization
+
+- 다른 학습 로그 데이터셋에 대한 generalization test
+
+---
+
+## 15\. Reflection
+
+이 프로젝트를 통해 단순히 모델 성능을 높이는 것보다, 문제 정의와 데이터 사용 시점이 중요하다는 점을 배웠다\. 특히 조기 예측 문제에서는 cutoff 이후 정보를 제거하는 leakage prevention이 핵심이었다\.
+
+또한 demographic/background 정보보다 실제 행동 로그가 더 강한 예측 신호를 제공한다는 점을 확인했다\. 이는 향후 동물 행동 분석이나 시계열 행동 예측 문제에서도, 정적인 배경 정보보다 관찰 가능한 행동 sequence가 더 중요한 역할을 할 수 있음을 시사한다\.

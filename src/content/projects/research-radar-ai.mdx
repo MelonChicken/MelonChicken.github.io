@@ -1,0 +1,190 @@
+---
+title: "Research Radar – AI 기반 시장 인텔리전스 대시보드"
+slug: "research-radar-ai"
+generated: true
+status: "seed"
+summary: "컨설팅 리서치를 기회로 바꾸는 자동 탐색 시스템"
+group: "product"
+stack: 
+  - "FastAPI"
+  - "Python"
+  - "OpenAI API"
+  - "NLP"
+  - "Vanila JS"
+  - "CSS"
+roles: 
+  - "👤 Project Management"
+  - "📚 Full-stack"
+  - "💾 Back End"
+  - "🔢 Data Analyst Modeling"
+output: "🌐 Web"
+repo: "https://github.com/MelonChicken/opportunity-radar"
+deploy: "https://catch-opportunity.streamlit.app/"
+notion: "https://app.notion.com/p/Research-Radar-AI-2ec14b84a0f280bdad9fe0c60b3d8441"
+featured: false
+problem: "컨설팅 리서치를 기회로 바꾸는 자동 탐색 시스템"
+---
+
+{/* This file is generated from Notion. Do not edit directly. */}
+
+{/* Unsupported Notion block type: child_database (2fd14b84-a0f2-8042-aeca-dedbbfd2bc2d) */}
+
+# Research Radar – AI 기반 시장 인텔리전스 대시보드
+
+<details>
+  <summary>초기 버전 화면</summary>
+
+<figure>
+  <img src="/notion-assets/research-radar-ai/2ed14b84a0f28093aca7ddbe873cfee8.png" alt="Source: author's Notion note" />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+</details>
+
+<figure>
+  <img src="/notion-assets/research-radar-ai/30214b84a0f280528c70dec738353709.png" alt="Source: author's Notion note" />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+> AI가 글로벌 리서치 리포트에서 스타트업에 실제로 필요한 사업 기회를 추출하는 시장 레이더
+
+> 해커톤/공모전 정보: 없음
+
+---
+
+## 🎯 Executive Summary
+
+- **문제**: 스타트업과 개발자가 대형 리서치 리포트에서 실질적인 사업 기회와 기술적 공백을 식별하기 어렵다는 문제
+
+- **해결**: LLM 기반 필터링으로 리서치 리포트의 ‘기업 홍보성 문구’를 제거하고, 사업 기회 신호만 추출·점수화하는 대시보드
+
+---
+
+## 1\. 배경·목표
+
+- **사용자/페르소나**:
+  - 스타트업 창업가
+  
+  - 초기 제품/기술을 탐색하는 개발자
+
+- **성공 기준\(KPI\)**: 없음
+
+- **범위\(Out of scope\)**: 없음
+
+---
+
+## 2\. 역할·스택·기간
+
+- **역할/기여**:
+  - 개인 프로젝트
+
+- **스택**:
+  - Frontend: Streamlit \(Python\)
+  
+  - AI Core: OpenAI GPT-3\.5 Turbo \(JSON Mode\)
+  
+  - Data Engineering: Feedparser, BeautifulSoup4, PyPDF
+  
+  - Data Validation: Pydantic
+  
+  - Storage: JSON \(Lightweight MVP\)
+
+- **기간**: 내용 없음
+
+---
+
+## 3\. 데모 & 링크
+
+- **Demo**: 내용 없음
+
+- **Repo**: 내용 없음
+
+- **문서\(API/ERD/디자인\)**: 내용 없음
+
+- **시연영상**: 내용 없음
+
+---
+
+## 4\. 아키텍처 요약
+
+- **다이어그램**: 내용 없음
+
+- **데이터 흐름/외부 의존성**:
+  - RSS Feed → HTML/PDF 파싱 → LLM 기반 신호 추출 → JSON 저장 → Streamlit 대시보드 시각화
+
+- **배포/CI·CD/롤백**: 내용 없음
+
+---
+
+## 5\. 핵심 기능 \(스크린샷/GIF 포함\)
+
+1. **Startup-Focused AI Filter** — 스타트업 관점에서 의미 없는 거시적 문장을 제거하고, 실제 사업·기술적 문제만 추출
+  / 엣지 케이스 처리: Admin View에서 필터링된 결과 검증 가능
+
+1. **Dual-Language Support \(EN/KR\)** — 글로벌 리포트를 한국어로 즉시 이해 가능
+  / 엣지 케이스 처리: 기존 데이터도 재번역 가능
+
+1. **Interactive Dashboard** — 산업·기술 태그·중요도 점수 기반 필터링 제공
+  / 엣지 케이스 처리: 카드 상세 모달에서 근거·출처 확인
+
+---
+
+## 6\. 기술 결정\(ADR 요약\)
+
+- **결론**: Streamlit \+ JSON 기반 MVP 선택
+
+- **버린 대안**: 전통적인 웹 프레임워크 기반 대시보드
+
+- **근거**:
+  - 성능: MVP 단계에서 충분
+  
+  - 비용: 서버·DB 비용 최소화
+  
+  - 복잡도: 빠른 실험과 반복에 유리
+
+- **리스크 및 완화**:
+  - 리스크: JSON 스토리지 확장성 한계
+  
+  - 완화: 향후 DB 도입 전환 고려
+
+---
+
+## 7\. 문제와 해결\(버그·장애 포함\)
+
+- **이슈**: 내용 없음
+
+- **이슈**: 내용 없음
+
+---
+
+## 8\. 측정 결과\(전/후 비교\)
+
+- **p95 지연**: 내용 없음 → 내용 없음
+
+- **전환율**: 내용 없음 → 내용 없음
+
+- **활성 사용자**: 내용 없음 → 내용 없음
+
+- 그래프: 내용 없음
+
+---
+
+## 9\. 회고 & 개선
+
+- **잘된 점**
+  1. LLM을 활용한 ‘스타트업 관점 필터링’이라는 문제 정의의 명확성 \(근거: README 핵심 기능\)
+  
+  1. 한국어/영어 이중 언어 지원으로 접근성 확보
+  
+  1. MVP 지향 아키텍처로 빠른 실행 가능
+
+- **아쉬운 점**
+  1. 
+  
+  1. 
+  
+  1.
+
+- **기술부채 목록과 상환 계획**
+  - JSON 스토리지 → DB 전환 \(우선순위: 중 / 예상 공수: 내용 없음\)
+  
+  - LLM 모델 고도화 \(우선순위: 중 / 예상 공수: 내용 없음\)

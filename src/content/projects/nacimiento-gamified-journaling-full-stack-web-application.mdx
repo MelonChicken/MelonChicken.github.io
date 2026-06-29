@@ -1,0 +1,304 @@
+---
+title: "Nacimiento - Gamified Journaling Full-Stack Web Application"
+slug: "nacimiento-gamified-journaling-full-stack-web-application"
+generated: true
+status: "seed"
+summary: "나의 일상을 기록하는데 동기부여가 필요하다 → 게임처럼 일기를 써보자"
+group: "product"
+stack: 
+  - "CSS"
+  - "React"
+  - "node.js"
+  - "Express"
+  - "Vercel"
+  - "Render"
+  - "SQLite"
+  - "JWT"
+roles: 
+  - "💾 Back End"
+  - "📜 Design"
+output: "📱 App"
+repo: "https://github.com/MelonChicken/memory-egg-back"
+deploy: "https://nacimiento.vercel.app/nest"
+notion: "https://app.notion.com/p/Nacimiento-Gamified-Journaling-Full-Stack-Web-Application-38814b84a0f280b0b34fee337e29f624"
+featured: false
+problem: "나의 일상을 기록하는데 동기부여가 필요하다 → 게임처럼 일기를 써보자"
+---
+
+{/* This file is generated from Notion. Do not edit directly. */}
+
+<figure>
+  <img src="/notion-assets/nacimiento-gamified-journaling-full-stack-web-application/38814b84a0f2808eb4afe5efc15536a0.png" alt="Source: author's Notion note" />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+# Nacimiento / Memory Egg – 게임형 저널링 웹 애플리케이션
+
+> 매일의 기록을 퀘스트와 보상으로 연결하여, 사용자가 글을 쓰며 가상의 알을 성장시키는 gamified journaling service
+
+> Web Programming Team Project / 2026-1학기
+> 
+> - **핵심 기능 6개 구현 완료, React \+ Node\.js/Express \+ SQLite 기반 풀스택 서비스 구현**
+
+---
+
+> 🎯 Executive Summary
+
+- **문제:** 일기나 회고 작성은 장기적으로 의미 있지만, 사용자가 꾸준히 기록을 이어가기 어렵다\.
+
+- **해결:** 글쓰기, 일일 퀘스트, 보상 재화인 Will, 아이템 구매/장착, Egg 성장 요소를 결합하여 기록 행동에 게임적 동기를 부여했다\.
+
+- **결과:** Auth, Post, Quest, Egg, Shop, Inventory 등 6개 핵심 도메인을 구현했고, REST API, SQLite persistence, JWT 인증, Swagger 문서화, 테스트 및 CI를 포함한 풀스택 구조를 완성했다\.
+
+- **다음 단계:** AI/CV 기반 퀘스트 검증, streak reward, hatching sequence, public feed, 사용자 행동 기반 추천 퀘스트로 확장 가능
+
+## 1\. 배경·목표
+
+- **사용자/페르소나:**
+  꾸준히 일기, 회고, 감정 기록을 남기고 싶지만 반복적인 기록 습관을 유지하기 어려운 사용자
+
+- **성공 기준\(KPI\):**
+  - 사용자가 회원가입/로그인 후 자신의 Egg 상태를 확인할 수 있어야 함
+  
+  - 사용자가 글을 작성하고, 작성 행동이 보상 또는 퀘스트와 연결되어야 함
+  
+  - 사용자가 Will을 사용해 아이템을 구매하고 Egg에 장착할 수 있어야 함
+  
+  - 핵심 API가 문서화되고 테스트 가능해야 함
+  
+  - 배포 환경에서 API Docs와 주요 기능이 접근 가능해야 함
+
+- **범위\(Out of scope\):**
+  - 실제 결제 시스템
+  
+  - 대규모 실시간 멀티유저 기능
+  
+  - AI 기반 감정 분석 또는 퀘스트 자동 검증
+  
+  - 모바일 앱
+  
+  - 고도화된 추천 시스템
+
+## 2\. 역할·스택
+
+- **역할/기여:**
+  - Backend API 설계 및 구현 중심
+  
+  - SQLite 기반 DB schema 구성
+  
+  - JWT/bcrypt 기반 인증 로직 구현
+  
+  - Egg, Shop, Purchase, Inventory 관련 핵심 로직 구현
+  
+  - Swagger/OpenAPI 문서화
+  
+  - Jest/Supertest 기반 테스트 작성
+  
+  - GitHub Actions CI 및 Render 배포 과정 참여
+  
+  - 프론트엔드 일부 연동 및 통합 테스트 참여
+
+- **스택:**
+  - Frontend: React
+  
+  - Backend: Node\.js, Express
+  
+  - Database: SQLite
+  
+  - Authentication: JWT, bcrypt
+  
+  - API Docs: OpenAPI, Swagger UI
+  
+  - Testing: Jest, Supertest
+  
+  - CI/CD: GitHub Actions
+  
+  - Deployment: Render
+  
+  - Version Control: Git, GitHub
+
+## 3\. 아키텍처 요약
+
+- **데이터 흐름/외부 의존성:**
+  1. 사용자가 React client에서 회원가입 또는 로그인
+  
+  1. Express backend가 bcrypt로 비밀번호를 검증하고 JWT 발급
+  
+  1. 인증이 필요한 요청은 Bearer JWT를 통해 보호된 route에 접근
+  
+  1. 사용자는 글 작성, 퀘스트 조회/완료, Will 획득, 아이템 구매, 아이템 장착 기능을 사용
+  
+  1. 데이터는 SQLite에 저장되며, API 명세는 Swagger UI로 확인 가능
+
+- **주요 도메인 모델:**
+  - User
+  
+  - Egg
+  
+  - Post
+  
+  - Quest
+  
+  - UserQuest
+  
+  - ShopItem
+  
+  - UserItem
+
+- **배포/CI·CD/롤백:**
+  - GitHub Actions를 통해 테스트 자동화
+  
+  - Render를 통해 backend 및 API 문서 배포
+  
+  - SQLite 기반 persistence 사용
+  
+  - 롤백 전략: TODO
+
+## 4\. 핵심 기능\(스크린샷/GIF 포함\)
+
+1. **회원가입/로그인 — 사용자별 기록 공간 제공**
+  - JWT 기반 인증
+  
+  - bcrypt를 사용한 password hashing
+  
+  - 보호된 route 접근 제어
+  
+  - `/api/auth/register`, `/api/auth/login`, `/api/auth/me`
+
+1. **Memory Post / Archive — 사용자의 기록 저장**
+  - 사용자가 일기 또는 기억을 작성
+  
+  - 작성된 post를 archive 형태로 조회
+  
+  - 기록 행동이 Will 또는 Egg 성장과 연결될 수 있는 구조
+
+1. **Daily Quest — 기록 행동을 유도하는 퀘스트 시스템**
+  - 사용자의 오늘 퀘스트 조회
+  
+  - 퀘스트 완료 및 보상 처리
+  
+  - 중복 퀘스트 생성 방지 로직 적용
+
+1. **Egg Dashboard — 기록 결과를 시각적 성장으로 연결**
+  - 사용자의 Egg 상태 조회
+  
+  - Egg의 warmth, glow, weight 등 성장 요소와 연결 가능
+  
+  - 장착 아이템에 따라 Egg 상태가 변화하는 구조
+
+1. **Shop / Purchase — Will 기반 아이템 구매**
+  - shop item 목록 조회
+  
+  - Will balance 확인
+  
+  - 아이템 구매 처리
+  
+  - 구매 실패 케이스 처리: 잔액 부족, 잘못된 item id, 중복 보유 등
+
+1. **Inventory / Equip — 구매한 아이템 장착**
+  - 사용자가 보유한 아이템 조회
+  
+  - background, music, cosmetic 등 아이템 장착
+  
+  - Egg의 active item 상태 업데이트
+
+## 5\. 기술 결정\(ADR 요약\)
+
+- **결론:** SQLite를 사용해 과제 규모에 맞는 가벼운 persistence layer를 구성
+  **버린 대안:** PostgreSQL, MySQL
+  
+  **근거:** 팀 프로젝트 규모에서 설정 비용이 낮고, 로컬 개발과 테스트가 단순하며, 빠르게 기능 구현 가능
+  
+  **리스크 및 완화:** 대규모 동시성에는 부적합할 수 있으므로, 향후 서비스 확장 시 PostgreSQL로 이전 가능
+
+- **결론:** JWT 기반 stateless authentication 사용
+  **버린 대안:** Session 기반 인증
+  
+  **근거:** REST API 구조와 잘 맞고, frontend/backend 분리 구조에서 사용하기 쉬움
+  
+  **리스크 및 완화:** 토큰 탈취 위험이 있으므로 protected route, middleware, 환경변수 기반 secret 관리 필요
+
+- **결론:** Swagger/OpenAPI로 API 명세 관리
+  **버린 대안:** README에 endpoint 수동 정리
+  
+  **근거:** 팀원 간 API 계약을 명확히 하고, 테스트 및 프론트 연동 시 확인 비용 감소
+  
+  **리스크 및 완화:** 실제 구현과 문서가 어긋날 수 있으므로 endpoint 변경 시 OpenAPI 문서 동시 업데이트 필요
+
+- **결론:** Jest/Supertest 기반 API 테스트 작성
+  **버린 대안:** 수동 Postman 테스트 중심 진행
+  
+  **근거:** 인증, 구매, 퀘스트, protected route 등 반복 검증이 필요한 기능이 많아 자동화 테스트가 적합
+  
+  **리스크 및 완화:** 테스트 DB 초기화와 seed 관리가 필요하므로 테스트 환경을 분리
+
+## 6\. 문제와 해결\(버그·장애 포함\)
+
+- **이슈:** 오늘의 퀘스트가 중복 생성될 수 있음
+  **원인:** user\_id, quest\_id, assigned\_date 단위의 중복 방지 제약이 부족함
+  
+  **조치:** `UNIQUE(user_id, quest_id, assigned_date)` 제약 또는 이에 준하는 중복 방지 로직 적용
+  
+  **재발 방지:** 퀘스트 생성 API 테스트에 중복 생성 케이스 추가
+
+- **이슈:** 구매 로직에서 잔액, 잘못된 item id, DB transaction 처리가 복잡해짐
+  **원인:** 구매는 user balance, shop\_items, user\_items를 동시에 변경하는 기능이므로 부분 실패 가능성이 존재
+  
+  **조치:** validation, transaction safety, error handling 강화
+  
+  **재발 방지:** purchase success / insufficient balance / invalid item / duplicate item 테스트 작성
+
+- **이슈:** 인증이 필요한 API에서 사용자별 데이터 접근 제어 필요
+  **원인:** user\_id 기반 resource 접근이므로 다른 사용자의 egg, inventory, post에 접근하면 안 됨
+  
+  **조치:** JWT middleware에서 `req.user.user_id`를 사용하여 사용자별 접근 제어
+  
+  **재발 방지:** protected route 및 unauthorized access 테스트 작성
+
+- **이슈:** 로컬 Node 버전과 GitHub Actions Node 버전 차이 가능성
+  **원인:** 개발 환경과 CI 환경의 Node/npm 버전 불일치
+  
+  **조치:** GitHub Actions 기준 Node version 명시 및 lockfile 관리
+  
+  **재발 방지:** `engines` 또는 README에 권장 Node 버전 명시
+
+## 7\. 구현 결과
+
+- **핵심 기능 구현:** 6개 core feature 구현 완료
+
+- **Backend routes:** Auth, Egg, Posts, Quests, Shop, Inventory 등 주요 REST API 구현
+
+- **테스트:** 13개 backend test file 기반 unit/service/API boundary test 수행
+
+- **문서화:** Swagger/OpenAPI 기반 API 문서 제공
+
+- **CI:** GitHub Actions 기반 test automation 구성
+
+- **배포:** Render 기반 backend/API docs 배포
+
+## 8\. 회고 & 개선
+
+- **잘된 점 3가지**
+  1. 단순 CRUD가 아니라 Quest, Will, Shop, Egg 성장이라는 서비스 도메인을 하나의 사용자 흐름으로 연결했다\.
+  
+  1. JWT 인증, SQLite persistence, protected route, API 문서화, 테스트 자동화를 포함하여 백엔드 프로젝트의 기본 구조를 갖췄다\.
+  
+  1. 구매, 장착, 퀘스트 완료처럼 여러 테이블이 연결되는 기능을 구현하며 transaction과 validation의 중요성을 경험했다\.
+
+- **아쉬운 점 3가지**
+  1. 실제 사용자 데이터를 기반으로 retention, writing frequency, quest completion rate 같은 서비스 지표를 측정하지 못했다\.
+  
+  1. Egg 성장 로직과 hatching sequence가 더 정교한 상태 전이 모델로 발전하지는 못했다\.
+  
+  1. AI/CV 기반 퀘스트 검증, 감정 분석, 개인화 추천 등 확장 아이디어는 구현 범위에 포함하지 못했다\.
+
+- **기술부채 목록**
+  1. **DB 확장성:** SQLite → PostgreSQL 이전 검토
+  
+  1. **API 문서-구현 동기화:** OpenAPI 문서 자동 검증 도입
+  
+  1. **Frontend 상태 관리 정리:** 인증 상태, inventory, egg state 관리 구조 개선
+  
+  1. **테스트 커버리지 확대:** quest, purchase, equip edge case 추가
+  
+  1. **서비스 지표 수집:** writing streak, quest completion rate, item purchase rate 로깅
