@@ -193,25 +193,27 @@ main {
 
     .projectContainer {
         width: 100%;
-        height: 100dvh;
+        height: auto;
         min-height: max-content;
         padding-bottom: 10dvh;
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        grid-template-rows: 1fr 1fr;
+        grid-auto-rows: minmax(430px, auto);
         gap: 1.5vw;
         grid-auto-flow: row;
+        align-items: stretch;
 
         .cardDeck {
             grid-column: span 1;
             grid-row: span 1;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: stretch;
 
             .card {
                 width: 90%;
-                height: 84%;
+                min-height: 430px;
+                height: 100%;
                 color: inherit;
                 background-color: var(--color-surface);
                 box-shadow: var(--shadow-md);
@@ -365,6 +367,7 @@ main {
 
                     .projectAction {
                         width: max-content;
+                        max-width: 100%;
                         display: inline-flex;
                         align-items: center;
                         gap: 0.35rem;
@@ -376,6 +379,7 @@ main {
                         border-radius: var(--radius-md);
                         font-size: 0.88rem;
                         font-weight: 700;
+                        box-sizing: border-box;
                     }
 
                     .projectAction.primary {

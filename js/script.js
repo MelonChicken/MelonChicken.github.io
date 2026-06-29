@@ -45,39 +45,6 @@ function selectedValues(inputs) {
     return inputs.filter((input) => input.checked).map((input) => input.id.toLowerCase());
 }
 
-function projectMatchesFilters(project) {
-    const searchText = (searchInput?.value || "").trim().toLowerCase();
-    const selectedCategories = selectedValues(categoryInputs);
-    const selectedStatuses = selectedValues(statusInputs);
-    const type = (project.type || "").toLowerCase();
-    const status = (project.status || "").toLowerCase();
-    const stacks = (project.stacks || []).map((stack) => stack.toLowerCase());
-    const roles = (project.roles || []).map((role) => role.toLowerCase());
-
-    const searchableText = [
-        project.title,
-        project.oneLiner,
-        project.status,
-        project.type,
-        project.gitRepository,
-        project.deployUrl,
-        project.demonstrationUrl,
-        project.detailUrl,
-        ...(project.stacks || []),
-        ...(project.roles || []),
-    ].join(" ").toLowerCase();
-
-    const matchesSearch = !searchText || searchableText.includes(searchText);
-    const matchesCategory = selectedCategories.length === 0
-        || selectedCategories.some((category) => {
-            return type.includes(category) || stacks.some((value) => value.includes(category));
-        });
-    const matchesStatus = selectedStatuses.length === 0
-        || selectedStatuses.some((selectedStatus) => status.includes(selectedStatus));
-
-    return matchesSearch && matchesCategory && matchesStatus;
-}
-
 function includesAny(value, keywords) {
     const normalizedValue = String(value || "").toLowerCase();
     return keywords.some((keyword) => normalizedValue.includes(keyword));
@@ -86,9 +53,9 @@ function includesAny(value, keywords) {
 function projectSortPriority(project) {
     const status = project.status || "";
     const type = project.type || "";
-    const isOngoing = includesAny(status, ["work in progress", "working in progress", "wip", "진행", "작업"]);
-    const isDoneOrArchived = includesAny(status, ["completed", "complete", "archived", "완료", "아카이브"]);
-    const isIdea = includesAny(status, ["idea", "아이디어"]);
+    const isOngoing = includesAny(status, ["work in progress", "working in progress", "wip", "\uC9C4\uD589", "\uC791\uC5C5"]);
+    const isDoneOrArchived = includesAny(status, ["completed", "complete", "archived", "\uC644\uB8CC", "\uC544\uCE74\uC774\uBE0C"]);
+    const isIdea = includesAny(status, ["idea", "\uC544\uC774\uB514\uC5B4"]);
     const isMlOrCv = includesAny(type, ["ml", "cv", "machine learning", "computer vision"]);
     const isWebOrApp = includesAny(type, ["web", "app"]);
 
@@ -118,7 +85,37 @@ function compareProjects(projectA, projectB) {
         return priorityDiff;
     }
 
-    return String(projectA.title || "").localeCompare(String(projectB.title || ""));
+    return (projectA.sourceOrder || 0) - (projectB.sourceOrder || 0);
+}
+
+function projectMatchesFilters(project) {
+    const searchText = (searchInput?.value || "").trim().toLowerCase();
+    const selectedCategories = selectedValues(categoryInputs);
+    const selectedStatuses = selectedValues(statusInputs);
+    const type = (project.type || "").toLowerCase();
+    const status = (project.status || "").toLowerCase();
+    const stacks = (project.stacks || []).map((stack) => stack.toLowerCase());
+
+    const searchableText = [
+        project.title,
+        project.oneLiner,
+        project.status,
+        project.type,
+        project.gitRepository,
+        project.deployUrl,
+        project.demonstrationUrl,
+        project.detailUrl,
+        ...(project.stacks || []),
+        ...(project.roles || []),
+    ].join(" ").toLowerCase();
+
+    const matchesSearch = !searchText || searchableText.includes(searchText);
+    const matchesCategory = selectedCategories.length === 0
+        || selectedCategories.some((category) => type.includes(category) || stacks.some((value) => value.includes(category)));
+    const matchesStatus = selectedStatuses.length === 0
+        || selectedStatuses.some((selectedStatus) => status.includes(selectedStatus));
+
+    return matchesSearch && matchesCategory && matchesStatus;
 }
 
 function renderFallback(message) {
@@ -243,7 +240,9 @@ async function loadProjects() {
         }
 
         const data = await response.json();
-        projects = Array.isArray(data.projects) ? data.projects : [];
+        projects = Array.isArray(data.projects)
+            ? data.projects.map((project, index) => ({ ...project, sourceOrder: index }))
+            : [];
 
         if (projects.length === 0) {
             renderFallback("No projects to display.");
