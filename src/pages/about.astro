@@ -1,0 +1,44 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import Panel from '../components/Panel.astro';
+import { getArchiveEntries } from '../lib/content';
+
+const archiveEntries = await getArchiveEntries();
+---
+
+<BaseLayout title="About · Junu's Lab">
+  <section class="block-head">
+    <Eyebrow text="About" />
+    <h2>Research-oriented builder profile</h2>
+    <p>Junu's Lab is a portfolio for connecting software projects, machine learning experiments, and research notes around animal behavior analysis.</p>
+  </section>
+
+  <div class="about-grid">
+    <Panel title="Interests">
+      <ul class="plain">
+        <li>Computer vision for wildlife and animal behavior analysis</li>
+        <li>Machine learning systems that turn rough data into usable signal</li>
+        <li>Research tracking workflows that make paper reading operational</li>
+      </ul>
+    </Panel>
+    <Panel title="Stack">
+      <div class="stacklist">
+        {['Python', 'scikit-learn', 'PyTorch', 'Astro', 'MDX', 'FastAPI', 'Notion workflows'].map((item) => <span class="tag">{item}</span>)}
+      </div>
+    </Panel>
+  </div>
+
+  <section class="block-head">
+    <Eyebrow text="Archive" />
+    <h2>Older notes and categories</h2>
+  </section>
+  <div class="grid cols-2">
+    {archiveEntries.map((entry) => (
+      <section class="panel">
+        <h3>{entry.data.category}</h3>
+        <p class="muted">Archived MDX category. Content can be expanded in `src/content/archive/{entry.id}.mdx`.</p>
+      </section>
+    ))}
+  </div>
+</BaseLayout>

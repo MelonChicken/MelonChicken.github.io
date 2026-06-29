@@ -1,0 +1,24 @@
+{
+  "id": "label",
+  "title": "Behavior Labeling Automation",
+  "status": "seed",
+  "statusLabel": "Exploring",
+  "question": "How can we reduce manual labeling cost in animal behavior datasets?",
+  "matters": "Frame-level and segment-level annotation is the biggest bottleneck in supervised behavior recognition. Reducing it unlocks scale.",
+  "methods": [
+    "weak supervision",
+    "pseudo-labeling",
+    "semi-supervised",
+    "active learning",
+    "VLM-assisted tagging"
+  ],
+  "relatedProjects": [
+    "architag-vlm-labeling",
+    "wildlife-metadata-fusion"
+  ],
+  "relatedNotes": [
+    "weekly-lab-brief-2026-06-29",
+    "labeling-automation-idea"
+  ],
+  "featured": true
+}

@@ -1,0 +1,24 @@
+{
+  "id": "sys",
+  "title": "Applied ML Systems",
+  "status": "stable",
+  "statusLabel": "Ongoing",
+  "question": "How do experiments become usable tools, dashboards, and pipelines?",
+  "matters": "A model that only lives in a notebook proves little. Turning it into a dashboard, service, or pipeline makes the work legible and reproducible.",
+  "methods": [
+    "pipeline design",
+    "FastAPI services",
+    "LLM/RAG systems",
+    "dashboards"
+  ],
+  "relatedProjects": [
+    "oulad-at-risk-prediction",
+    "hybridrag",
+    "research-radar-ai",
+    "weathercall119"
+  ],
+  "relatedNotes": [
+    "oulad-retrospective"
+  ],
+  "featured": false
+}

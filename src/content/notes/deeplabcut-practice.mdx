@@ -1,0 +1,43 @@
+---
+title: "DeepLabCut Practice: what I learned from animal pose estimation"
+slug: "deeplabcut-practice"
+type: "experiment-log"
+status: "growing"
+domain:
+  - Animal Behavior
+  - Computer Vision
+date: "2026-06-27"
+readTime: 8
+relatedProject: "be-more-duck"
+relatedNotes:
+  - labeling-automation-idea
+summary: "Notes from running SuperAnimal inference and comparing HRNet vs RTMPose, plus where tracking fails."
+methods: []
+---
+
+> ⚠️ **시드 콘텐츠** — 데모용 초안입니다. 실제 글로 교체 예정.
+
+## Summary
+
+Notes from running SuperAnimal inference and comparing HRNet vs RTMPose, plus where tracking fails.
+
+## Problem / Question
+
+Which backbone gives usable keypoints on real animal clips, and where does it break?
+
+## What I tried
+
+SuperAnimal quadruped inference; HRNet vs RTMPose; video_adapt fine-tuning.
+
+## What I found
+
+RTMPose was faster; HRNet steadier under partial occlusion. Motion blur is the common failure mode.
+
+## Limitation
+
+No behavior labels yet — this is still representation work.
+
+## Next Step
+
+Turn keypoint sequences into behavior features for segmentation.
+

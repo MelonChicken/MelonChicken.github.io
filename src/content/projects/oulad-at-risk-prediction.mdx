@@ -1,0 +1,57 @@
+---
+title: "OULAD Early At-Risk Student Prediction"
+slug: "oulad-at-risk-prediction"
+status: "stable"
+group: "ml"
+domain:
+  - Machine Learning
+  - Data Mining
+  - Behavioral Prediction
+program: "sys"
+stack:
+  - Python
+  - Pandas
+  - scikit-learn
+  - Jupyter Notebook
+roles:
+  - Data Analyst / Modeling
+  - ML Engineer
+dataset: "OULAD (Open University Learning Analytics)"
+output: "multi-cutoff classifier study"
+repo: "https://github.com/MelonChicken/oulad-student-classification"
+notion: "https://www.notion.so/ml-c/OULAD-Early-At-Risk-Student-Prediction-38814b84a0f280909f1ec58e5c19c638"
+relatedNotes:
+  - oulad-retrospective
+featured: true
+summary: "multi-cutoff classifier study"
+problem: "VLE에서 수집하는 학생 데이터를 토대로 학습 어려움이 있는 학생을 조기 탐지"
+---
+
+## Problem
+
+VLE에서 수집하는 학생 데이터를 토대로 학습 어려움이 있는 학생을 조기 탐지
+
+## Motivation
+
+Behavioral prediction from interaction logs — the 'behavior as signal' idea applied to learners.
+
+## Method
+
+Leak-free active-at-cutoff cohort; behavioral + demographic features; classifiers @ weeks 5/7/10; benchmarked vs Staneviciene et al. (2024).
+
+## System / Pipeline
+
+VLE logs → leakage-controlled features → models @ W5/W7/W10 → evaluation
+
+## Result
+
+Best F1 0.593 (DecisionTree, W7); best AUC 0.739 (NaiveBayes, W10).
+
+## Limitation
+
+Class imbalance; snapshot features plateau without richer temporal signal.
+
+## Next Step
+
+Reframe as a temporal sequence problem rather than snapshot features.
+

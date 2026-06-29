@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Card from '../../components/Card.astro';
+import Eyebrow from '../../components/Eyebrow.astro';
+import { getProjectsByGroup } from '../../lib/content';
+
+const grouped = await getProjectsByGroup();
+const labels: Record<string, string> = {
+  research: 'Research projects',
+  ml: 'ML · Data systems',
+  product: 'Product · Portfolio systems',
+  archived: 'Archived work',
+};
+---
+
+<BaseLayout title="Projects · Junu's Lab">
+  <section class="block-head">
+    <Eyebrow text="Projects" />
+    <h2>Project archive</h2>
+    <p>Projects are maintained as MDX files. Add or edit `src/content/projects/*.mdx` and the list/detail pages update automatically.</p>
+  </section>
+
+  {grouped.map(({ group, projects }) => (
+    projects.length > 0 && (
+      <section>
+        <div class="group-label">{labels[group]}</div>
+        <div class="grid cols-3">
+          {projects.map((project) => (
+            <Card href={`/projects/${project.data.slug}/`} title={project.data.title} status={project.data.status} summary={project.data.problem ?? project.data.summary} tags={project.data.domain} meta={project.data.output ?? project.data.group} />
+          ))}
+        </div>
+      </section>
+    )
+  ))}
+</BaseLayout>

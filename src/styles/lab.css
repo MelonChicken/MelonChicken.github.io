@@ -1,0 +1,380 @@
+/* Ported VERBATIM from junus-lab-demo (existing Junu's Lab design system).
+   Do NOT redesign. Both themes live here; default theme is set to `lab` (dark)
+   via <html data-theme="lab"> in BaseLayout + theme.js. */
+
+/* =============================================================================
+   THEME PALETTE  —  copied verbatim from the existing themePalatte.css.
+   Default = "normal" (LIGHT). "lab" = dark. Codex can drop this straight in.
+   ============================================================================= */
+:root{
+  --color-bg:#f1f5f9;
+  --color-surface:#ffffff;
+  --color-text-primary:#1e293b;
+  --color-text-secondary:#64748b;
+  --color-text-inverse:#ffffff;
+  --color-accent:#0f4c75;
+  --color-accent-hover:#0a3350;
+  --color-accent-soft:#e2e8f0;
+  --color-border:#cbd5e1;
+  --color-divider:#cbd5e1;
+  --color-card-shadow:rgba(15,23,42,0.06);
+  --color-button-primary-bg:var(--color-accent);
+  --color-button-primary-bg-hover:var(--color-accent-hover);
+  --color-button-primary-text:var(--color-text-inverse);
+  --color-button-secondary-bg:var(--color-surface);
+  --color-button-secondary-bg-hover:#f8fafc;
+  --color-button-secondary-text:var(--color-text-primary);
+  --color-button-secondary-border:var(--color-border);
+  --color-badge-bg:var(--color-accent-soft);
+  --color-badge-text:var(--color-accent);
+  --color-link:var(--color-accent);
+  --color-link-hover:var(--color-accent-hover);
+  --radius-sm:8px;
+  --radius-md:12px;
+  --radius-lg:20px;
+  --shadow-sm:0 2px 8px var(--color-card-shadow);
+  --shadow-md:0 8px 24px var(--color-card-shadow);
+  --shadow-lg:0 14px 36px rgba(15,23,42,0.5);
+}
+html[data-theme="lab"]{
+  --color-bg:#071118;
+  --color-surface:#0f1c24;
+  --color-text-primary:#d8f3ff;
+  --color-text-secondary:#8abfd6;
+  --color-text-inverse:#041014;
+  --color-accent:#23f5b2;
+  --color-accent-hover:#56f7c8;
+  --color-accent-soft:#12343a;
+  --color-border:#294954;
+  --color-divider:#1a313a;
+  --color-card-shadow:rgba(0,255,200,0.10);
+  --color-button-primary-bg:var(--color-accent);
+  --color-button-primary-bg-hover:var(--color-accent-hover);
+  --color-button-primary-text:#041014;
+  --color-button-secondary-bg:#0d1820;
+  --color-button-secondary-bg-hover:#13242d;
+  --color-button-secondary-border:var(--color-border);
+  --color-badge-bg:#112b31;
+  --color-badge-text:#63e8c1;
+  --color-link:#7fffd4;
+  --color-link-hover:#b8ffec;
+  --shadow-sm:0 2px 8px var(--color-card-shadow);
+  --shadow-md:0 8px 24px var(--color-card-shadow);
+  --shadow-lg:0 14px 36px rgba(0,255,200,0.5);
+}
+
+/* =============================================================================
+   BASE
+   ============================================================================= */
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:"SUIT","Apple SD Gothic Neo",sans-serif;
+  background:var(--color-bg);
+  color:var(--color-text-primary);
+  line-height:1.6;
+}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+.wrap{max-width:1160px;margin:0 auto;padding:0 24px}
+
+/* terminal-style eyebrow label (kept in SUIT, like the existing "> STD_MODE") */
+.eyebrow{
+  font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--color-accent);font-weight:600;display:inline-block;
+}
+.eyebrow::before{content:"> ";color:var(--color-text-secondary)}
+.muted{color:var(--color-text-secondary)}
+
+/* =============================================================================
+   HEADER  (matches existing: solid bg, border-bottom, flask brand)
+   ============================================================================= */
+header{
+  background:var(--color-surface);
+  border-bottom:1px solid var(--color-border);
+  position:sticky;top:0;z-index:40;
+}
+header .wrap{display:flex;align-items:center;justify-content:space-between;height:62px;gap:16px}
+.brand{display:flex;align-items:center;gap:9px;font-size:1.4rem;font-weight:800;white-space:nowrap}
+.brand .fa{color:var(--color-accent)}
+.brand b{font-weight:800}
+.headright{display:flex;align-items:center;gap:14px}
+nav.nav{display:flex;gap:2px;flex-wrap:wrap}
+nav.nav a{
+  font-size:.86rem;font-weight:500;color:var(--color-text-secondary);
+  padding:7px 11px;border-radius:var(--radius-sm);
+}
+nav.nav a:hover{background:var(--color-button-primary-bg-hover);color:var(--color-button-primary-text)}
+nav.nav a.active{background:var(--color-accent-soft);color:var(--color-text-primary)}
+
+/* theme switch — same idea/label as the existing .themeSwitch (> STD_MODE) */
+.themeSwitch{
+  font-size:.78rem;letter-spacing:.06em;
+  background:var(--color-button-secondary-bg);
+  color:var(--color-text-secondary);
+  border:1px solid var(--color-border);
+  border-radius:var(--radius-sm);padding:7px 11px;white-space:nowrap;
+}
+.themeSwitch:hover{border-color:var(--color-accent);color:var(--color-accent)}
+.navtoggle{display:none;background:var(--color-button-secondary-bg);border:1px solid var(--color-border);
+  color:var(--color-text-primary);border-radius:var(--radius-sm);padding:7px 11px;font-size:.8rem}
+
+/* status strip — thin, dry, no animation */
+.statusstrip{background:var(--color-surface);border-bottom:1px solid var(--color-divider)}
+.statusstrip .wrap{display:flex;gap:22px;align-items:center;height:32px;overflow-x:auto;white-space:nowrap;
+  font-size:.74rem;color:var(--color-text-secondary)}
+.statusstrip b{color:var(--color-text-primary);font-weight:600}
+.statusstrip .live{color:var(--color-accent)}
+.statusstrip .dot{width:7px;height:7px;border-radius:50%;background:var(--color-accent);display:inline-block;margin-right:6px}
+
+/* =============================================================================
+   GENERIC SECTION + PANELS + CARDS  (flat, bordered — matches existing)
+   ============================================================================= */
+main{padding:30px 0 70px;min-height:60vh}
+.block-head{margin:34px 0 16px}
+.block-head:first-child{margin-top:6px}
+.block-head h2{font-size:1.5rem;margin:.3rem 0 .2rem}
+.block-head p{margin:0;color:var(--color-text-secondary);max-width:64ch}
+.section-divider{margin:6px 0 0}
+
+.panel{
+  background:var(--color-surface);
+  border:1px solid var(--color-border);
+  border-radius:var(--radius-md);
+  box-shadow:var(--shadow-sm);
+  padding:20px;
+}
+.panel h3{margin:.1rem 0 12px;font-size:1.08rem}
+
+.grid{display:grid;gap:14px}
+.cols-2{grid-template-columns:repeat(2,1fr)}
+.cols-3{grid-template-columns:repeat(3,1fr)}
+
+/* card — flat surface, thin border, thin left rule (no gradient, no transform) */
+.card{
+  background:var(--color-surface);
+  border:1px solid var(--color-border);
+  border-left:3px solid var(--color-border);
+  border-radius:var(--radius-md);
+  box-shadow:var(--shadow-sm);
+  padding:17px 18px;display:flex;flex-direction:column;gap:11px;cursor:pointer;
+}
+.card:hover{border-color:var(--color-accent);border-left-color:var(--color-accent)}
+.card .ctop{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.card h3{margin:0;font-size:1.04rem;line-height:1.3}
+.card .qline{margin:0;font-size:.82rem;color:var(--color-accent);font-weight:500}
+.card p.body{margin:0;font-size:.9rem;color:var(--color-text-secondary)}
+.card .cfoot{margin-top:auto;display:flex;justify-content:space-between;align-items:center;gap:10px;padding-top:4px}
+.kv{font-size:.74rem;color:var(--color-text-secondary)}
+.openhint{font-size:.74rem;color:var(--color-text-secondary)}
+.card:hover .openhint{color:var(--color-accent)}
+
+/* badges & tags (existing badge tokens; status via dot — palette only) */
+.badge{
+  font-size:.7rem;letter-spacing:.03em;padding:3px 9px;border-radius:999px;
+  background:var(--color-badge-bg);color:var(--color-badge-text);border:1px solid transparent;
+  display:inline-flex;align-items:center;gap:6px;white-space:nowrap;
+}
+.badge .d{width:6px;height:6px;border-radius:50%;background:var(--color-accent)}
+.st-seed .d{background:var(--color-text-secondary)}
+.st-archived{background:transparent;color:var(--color-text-secondary);border-color:var(--color-border)}
+.st-archived .d{background:var(--color-text-secondary)}
+.tag{font-size:.72rem;color:var(--color-text-secondary);padding:2px 8px;border:1px solid var(--color-border);
+  border-radius:var(--radius-sm);background:var(--color-bg)}
+.taglist{display:flex;flex-wrap:wrap;gap:6px}
+
+/* buttons (existing button system) */
+.btn{font-size:.86rem;padding:9px 15px;border-radius:var(--radius-sm);
+  border:1px solid var(--color-button-secondary-border);
+  background:var(--color-button-secondary-bg);color:var(--color-button-secondary-text)}
+.btn:hover{background:var(--color-button-secondary-bg-hover);border-color:var(--color-accent)}
+.btn.primary{background:var(--color-button-primary-bg);color:var(--color-button-primary-text);
+  border-color:var(--color-button-primary-bg)}
+.btn.primary:hover{background:var(--color-button-primary-bg-hover);border-color:var(--color-button-primary-bg-hover)}
+.cta-row{display:flex;gap:10px;flex-wrap:wrap}
+
+/* =============================================================================
+   HOME
+   ============================================================================= */
+.hero h1{font-size:2.1rem;margin:.2rem 0 .35rem;letter-spacing:-.01em}
+.hero .sub{color:var(--color-accent);font-weight:600;font-size:.92rem;margin-bottom:12px}
+.hero p.lede{color:var(--color-text-secondary);max-width:60ch;margin:0 0 16px}
+.hashrow{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 18px}
+.hashrow span{font-size:.78rem;color:var(--color-text-secondary)}
+
+.home-row{display:grid;grid-template-columns:1.5fr 1fr;gap:14px;margin-top:14px}
+
+/* Research Radar panel — the emphasized new system */
+.radar .radar-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:8px 0 16px}
+.radar .col h4{margin:0 0 7px;font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-secondary)}
+.radar .col ul{margin:0;padding-left:16px;font-size:.86rem;color:var(--color-text-primary)}
+.radar .col ul li{margin-bottom:3px}
+.pipeline{display:flex;flex-wrap:wrap;align-items:center;gap:6px;
+  border:1px dashed var(--color-border);border-radius:var(--radius-sm);padding:11px 13px;margin-bottom:14px}
+.pipeline .step{font-size:.8rem;font-weight:600;color:var(--color-text-primary)}
+.pipeline .step.raw{color:var(--color-text-secondary);font-weight:500}
+.pipeline .arr{color:var(--color-accent)}
+.sourcebox{font-size:.84rem;color:var(--color-text-secondary);
+  border-left:3px solid var(--color-accent);padding:4px 0 4px 12px;margin:0}
+
+/* lab status rows */
+.status-rows{display:flex;flex-direction:column;gap:0;font-size:.86rem}
+.status-rows .row{display:flex;justify-content:space-between;gap:12px;padding:9px 0;
+  border-bottom:1px solid var(--color-divider)}
+.status-rows .row:last-child{border-bottom:0}
+.status-rows .k{color:var(--color-text-secondary)}
+.status-rows .v{color:var(--color-text-primary);text-align:right;font-weight:500}
+.status-rows .v.on{color:var(--color-accent)}
+
+/* focus list with simple bars (no animation) */
+.focus-grid{display:flex;flex-direction:column;gap:8px}
+.focus-item{display:flex;align-items:center;gap:10px;font-size:.88rem}
+.focus-item .lvl{font-size:.7rem;color:var(--color-text-secondary);width:38px;text-align:right}
+.bar{flex:1;height:6px;background:var(--color-accent-soft);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--color-accent)}
+
+/* compact list (mini) used in dashboard featured blocks */
+.mini-item{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;
+  padding:11px 0;border-top:1px solid var(--color-divider);cursor:pointer}
+.mini-item:first-child{border-top:0}
+.mini-item:hover .mini-title{color:var(--color-accent)}
+.mini-title{font-weight:600;font-size:.94rem}
+.mini-desc{color:var(--color-text-secondary);font-size:.8rem;margin-top:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46ch}
+.mini-meta{display:flex;gap:8px;align-items:center;flex-shrink:0}
+.mini-arrow{color:var(--color-text-secondary);font-size:.8rem}
+
+/* group label inside projects */
+.group-label{font-size:.76rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--color-text-secondary);font-weight:600;margin:26px 0 12px;display:flex;align-items:center;gap:10px}
+.group-label::after{content:"";flex:1;height:1px;background:var(--color-divider)}
+
+/* =============================================================================
+   FILTER BAR (lab notes)
+   ============================================================================= */
+.filterbar{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;
+  background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);
+  box-shadow:var(--shadow-sm);padding:14px 16px;margin-bottom:16px}
+.fgroup{display:flex;flex-direction:column;gap:7px}
+.flabel{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-secondary)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:.78rem;color:var(--color-text-secondary);border:1px solid var(--color-border);
+  background:var(--color-bg);padding:5px 11px;border-radius:var(--radius-sm)}
+.chip:hover{border-color:var(--color-accent);color:var(--color-accent)}
+.chip.on{background:var(--color-accent-soft);border-color:var(--color-accent);color:var(--color-text-primary)}
+.search{margin-left:auto;display:flex;flex-direction:column;gap:7px;min-width:210px}
+.search input{font-size:.84rem;background:var(--color-bg);color:var(--color-text-primary);
+  border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:8px 11px;outline:none}
+.search input:focus{border-color:var(--color-accent)}
+.result-count{font-size:.76rem;color:var(--color-text-secondary);margin:-2px 0 14px}
+
+/* =============================================================================
+   DETAIL DRAWER (Notion-style: narrow sidebar -> expandable wide panel)
+   ============================================================================= */
+.scrim{position:fixed;inset:0;background:rgba(15,23,42,.45);opacity:0;pointer-events:none;
+  transition:opacity .18s;z-index:100}
+.scrim.open{opacity:1;pointer-events:auto}
+.drawer{
+  position:fixed;top:0;right:0;height:100%;width:min(560px,94vw);z-index:101;
+  background:var(--color-surface);border-left:1px solid var(--color-border);
+  transform:translateX(100%);transition:transform .22s ease, width .22s ease;
+  overflow-y:auto;
+}
+.drawer.open{transform:translateX(0)}
+/* expanded = wide centered reading panel (Notion full-width feel) */
+.drawer.wide{
+  top:32px;height:calc(100% - 64px);right:50%;transform:translateX(50%);
+  width:min(960px,94vw);border:1px solid var(--color-border);
+  border-radius:var(--radius-md);box-shadow:var(--shadow-lg);
+}
+.drawer-inner{padding:22px 26px 60px}
+.drawer.wide .drawer-inner{max-width:760px;margin:0 auto}
+.drawer-bar{position:sticky;top:0;display:flex;justify-content:flex-end;gap:8px;
+  background:var(--color-surface);padding:4px 0 10px;margin:-4px 0 6px;z-index:2}
+.drawer-btn{font-size:.74rem;letter-spacing:.04em;background:var(--color-button-secondary-bg);
+  border:1px solid var(--color-border);color:var(--color-text-secondary);
+  border-radius:var(--radius-sm);padding:6px 10px}
+.drawer-btn:hover{border-color:var(--color-accent);color:var(--color-accent)}
+.drawer h2{font-size:1.4rem;margin:.2rem 0 14px;line-height:1.28}
+.metabox{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;font-size:.84rem;
+  background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius-md);
+  padding:14px 16px;margin-bottom:20px}
+.metabox dt{color:var(--color-text-secondary)}
+.metabox dd{margin:0;color:var(--color-text-primary)}
+.dblock{margin:0 0 18px}
+.dblock h4{font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--color-accent);margin:0 0 6px}
+.dblock p{margin:0;color:var(--color-text-primary);font-size:.94rem}
+.dblock ul{margin:6px 0 0;padding-left:18px;color:var(--color-text-primary);font-size:.92rem}
+.dblock ul li{margin-bottom:4px}
+.related{display:flex;flex-direction:column;gap:8px}
+.related a{display:flex;justify-content:space-between;gap:10px;align-items:center;
+  border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:10px 12px;background:var(--color-bg)}
+.related a:hover{border-color:var(--color-accent)}
+.related .rt{font-weight:600;font-size:.9rem}
+.related .rk{font-size:.72rem;color:var(--color-text-secondary)}
+.linkrow{display:flex;gap:8px;flex-wrap:wrap}
+.linkrow a{font-size:.78rem;padding:7px 11px;border:1px solid var(--color-border);
+  border-radius:var(--radius-sm);color:var(--color-text-secondary)}
+.linkrow a:hover{border-color:var(--color-accent);color:var(--color-accent)}
+.selected-note{background:var(--color-accent-soft);border:1px solid var(--color-accent);
+  border-radius:var(--radius-sm);padding:10px 12px;font-size:.88rem;color:var(--color-text-primary)}
+
+/* =============================================================================
+   ABOUT / TIMELINE / CONTACT / WORKFLOW TABLE
+   ============================================================================= */
+.about-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:14px}
+.panel ul.plain{margin:0;padding-left:18px;color:var(--color-text-secondary)}
+.panel ul.plain li{margin-bottom:5px}
+.stacklist{display:flex;flex-wrap:wrap;gap:7px}
+.timeline{position:relative;padding-left:20px}
+.timeline::before{content:"";position:absolute;left:4px;top:4px;bottom:4px;width:1px;background:var(--color-border)}
+.tl-item{position:relative;padding:0 0 16px 6px}
+.tl-item::before{content:"";position:absolute;left:-20px;top:5px;width:9px;height:9px;border-radius:50%;
+  background:var(--color-surface);border:2px solid var(--color-accent)}
+.tl-item .when{font-size:.74rem;color:var(--color-text-secondary)}
+.tl-item .what{font-weight:600;margin:1px 0 2px}
+.tl-item .desc{color:var(--color-text-secondary);font-size:.88rem}
+.contact-row{display:flex;justify-content:space-between;gap:12px;padding:12px 0;
+  border-bottom:1px solid var(--color-divider);font-size:.9rem}
+.contact-row:last-child{border-bottom:0}
+.contact-row .lbl{color:var(--color-text-secondary)}
+.contact-row a{color:var(--color-accent)}
+
+.wftable{width:100%;border-collapse:collapse;font-size:.86rem;margin-top:4px}
+.wftable th,.wftable td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--color-divider);vertical-align:top}
+.wftable th{color:var(--color-text-secondary);font-weight:600;font-size:.76rem;letter-spacing:.04em;text-transform:uppercase}
+.wftable td.where{color:var(--color-accent);white-space:nowrap;font-weight:600}
+
+.cadence{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.cadence .c{border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:12px;background:var(--color-bg)}
+.cadence .c .when{font-size:.74rem;color:var(--color-accent);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.cadence .c .act{font-size:.86rem;margin-top:4px}
+
+/* =============================================================================
+   FOOTER
+   ============================================================================= */
+footer{border-top:1px solid var(--color-border);background:var(--color-surface)}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;
+  padding-top:20px;padding-bottom:20px;font-size:.8rem;color:var(--color-text-secondary)}
+footer a:hover{color:var(--color-accent)}
+
+/* =============================================================================
+   RESPONSIVE
+   ============================================================================= */
+@media (max-width:920px){
+  .home-row{grid-template-columns:1fr}
+  .radar .radar-grid{grid-template-columns:1fr}
+  .cols-3{grid-template-columns:repeat(2,1fr)}
+  .about-grid{grid-template-columns:1fr}
+  .cadence{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:640px){
+  .cols-2,.cols-3{grid-template-columns:1fr}
+  nav.nav{display:none;position:absolute;top:62px;left:0;right:0;flex-direction:column;gap:4px;
+    background:var(--color-surface);border-bottom:1px solid var(--color-border);padding:12px 24px}
+  nav.nav.show{display:flex}
+  .navtoggle{display:block}
+  .hero h1{font-size:1.7rem}
+  .wrap{padding:0 16px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}

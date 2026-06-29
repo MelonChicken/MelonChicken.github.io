@@ -1,0 +1,19 @@
+{
+  "id": "video",
+  "title": "Long Video Understanding",
+  "status": "seed",
+  "statusLabel": "Reading phase",
+  "question": "How do we find behavior segments and transitions in long animal videos?",
+  "matters": "Real footage is long and sparse. Modeling temporal structure — repetition, transition, anomaly — is where behavior analysis becomes useful in the field.",
+  "methods": [
+    "temporal modeling",
+    "sequence modeling",
+    "behavior segmentation",
+    "video representation"
+  ],
+  "relatedProjects": [],
+  "relatedNotes": [
+    "behaviorvlm-reading-guide"
+  ],
+  "featured": true
+}

@@ -1,0 +1,16 @@
+---
+interface Props {
+  steps: string[];
+}
+
+const { steps } = Astro.props;
+---
+
+<div class="pipeline">
+  {steps.map((step, index) => (
+    <>
+      <span class:list={['step', { raw: index === 0 }]}>{step}</span>
+      {index < steps.length - 1 && <span class="arr">→</span>}
+    </>
+  ))}
+</div>

@@ -1,0 +1,33 @@
+---
+import Badge from './Badge.astro';
+import Tag from './Tag.astro';
+
+interface Props {
+  href: string;
+  title: string;
+  status?: string;
+  statusLabel?: string;
+  summary?: string;
+  meta?: string;
+  tags?: string[];
+}
+
+const { href, title, status, statusLabel, summary, meta, tags = [] } = Astro.props;
+---
+
+<a class="card" href={href}>
+  <div class="ctop">
+    <h3>{title}</h3>
+    {status && <Badge status={status} label={statusLabel ?? status} />}
+  </div>
+  {summary && <p class="body">{summary}</p>}
+  {tags.length > 0 && (
+    <div class="taglist">
+      {tags.slice(0, 4).map((tag) => <Tag label={tag} />)}
+    </div>
+  )}
+  <div class="cfoot">
+    <span class="kv">{meta}</span>
+    <span class="openhint">Open</span>
+  </div>
+</a>

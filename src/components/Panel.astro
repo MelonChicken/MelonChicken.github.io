@@ -1,0 +1,10 @@
+---
+interface Props {
+  title?: string;
+}
+---
+
+<section class="panel">
+  {Astro.props.title && <h3>{Astro.props.title}</h3>}
+  <slot />
+</section>

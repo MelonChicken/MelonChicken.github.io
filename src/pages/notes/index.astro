@@ -1,0 +1,97 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Card from '../../components/Card.astro';
+import Eyebrow from '../../components/Eyebrow.astro';
+import { formatDate, getAllNotes } from '../../lib/content';
+
+const notes = await getAllNotes();
+const types = [...new Set(notes.map((note) => note.data.type))];
+const domains = [...new Set(notes.flatMap((note) => note.data.domain))];
+const statuses = [...new Set(notes.map((note) => note.data.status))];
+---
+
+<BaseLayout title="Lab Notes · Junu's Lab">
+  <section class="block-head">
+    <Eyebrow text="Lab Notes" />
+    <h2>Research notes and weekly briefs</h2>
+    <p>Notes are MDX entries. Weekly Lab Brief remains a note type and represents the research tracking routine.</p>
+  </section>
+
+  <section class="filterbar" data-note-filter>
+    <div class="fgroup">
+      <span class="flabel">Type</span>
+      <div class="chips">
+        <button class="chip on" data-filter="type" data-value="all">All</button>
+        {types.map((type) => <button class="chip" data-filter="type" data-value={type}>{type}</button>)}
+      </div>
+    </div>
+    <div class="fgroup">
+      <span class="flabel">Domain</span>
+      <div class="chips">
+        <button class="chip on" data-filter="domain" data-value="all">All</button>
+        {domains.map((domain) => <button class="chip" data-filter="domain" data-value={domain}>{domain}</button>)}
+      </div>
+    </div>
+    <div class="fgroup">
+      <span class="flabel">Status</span>
+      <div class="chips">
+        <button class="chip on" data-filter="status" data-value="all">All</button>
+        {statuses.map((status) => <button class="chip" data-filter="status" data-value={status}>{status}</button>)}
+      </div>
+    </div>
+    <label class="search">
+      <span class="flabel">Search</span>
+      <input type="search" data-search placeholder="title, summary, domain" />
+    </label>
+  </section>
+  <div class="result-count" data-count>{notes.length} notes</div>
+
+  <div class="grid cols-2">
+    {notes.map((note) => (
+      <div data-note data-type={note.data.type} data-domain={note.data.domain.join('|')} data-status={note.data.status} data-text={`${note.data.title} ${note.data.summary ?? ''} ${note.data.domain.join(' ')}`.toLowerCase()}>
+        <Card href={`/notes/${note.data.slug}/`} title={note.data.title} status={note.data.status} summary={note.data.summary} tags={[note.data.type, ...note.data.domain]} meta={formatDate(note.data.date)} />
+      </div>
+    ))}
+  </div>
+
+  <script>
+    /** @type {{ type: string; domain: string; status: string; q: string }} */
+    const state = { type: 'all', domain: 'all', status: 'all', q: '' };
+    const root = document.querySelector('[data-note-filter]');
+    const cards = Array.from(document.querySelectorAll('[data-note]'));
+    const count = document.querySelector('[data-count]');
+
+    function apply() {
+      let visible = 0;
+      for (const card of cards) {
+        const matchType = state.type === 'all' || card.getAttribute('data-type') === state.type;
+        const matchDomain = state.domain === 'all' || card.getAttribute('data-domain')?.split('|').includes(state.domain);
+        const matchStatus = state.status === 'all' || card.getAttribute('data-status') === state.status;
+        const matchSearch = !state.q || card.getAttribute('data-text')?.includes(state.q);
+        const show = Boolean(matchType && matchDomain && matchStatus && matchSearch);
+        card.toggleAttribute('hidden', !show);
+        if (show) visible += 1;
+      }
+      if (count) count.textContent = `${visible} notes`;
+    }
+
+    root?.addEventListener('click', (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement) || !target.matches('[data-filter]')) return;
+      const key = target.dataset.filter;
+      const value = target.dataset.value ?? 'all';
+      if (key !== 'type' && key !== 'domain' && key !== 'status') return;
+      state[key] = value;
+      root.querySelectorAll(`[data-filter="${key}"]`).forEach((chip) => chip.classList.toggle('on', chip === target));
+      apply();
+    });
+
+    document.querySelector('[data-search]')?.addEventListener('input', (event) => {
+      const target = event.target;
+      if (target instanceof HTMLInputElement) {
+        state.q = target.value.trim().toLowerCase();
+        apply();
+      }
+    });
+  </script>
+</BaseLayout>

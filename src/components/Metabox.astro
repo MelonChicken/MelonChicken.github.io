@@ -1,0 +1,25 @@
+---
+interface Item {
+  label: string;
+  value?: string | string[] | boolean;
+}
+
+interface Props {
+  items: Item[];
+}
+
+const { items } = Astro.props;
+const visible = items.filter((item) => item.value !== undefined && item.value !== '' && item.value !== false);
+const format = (value: Item['value']) => Array.isArray(value) ? value.join(', ') : String(value);
+---
+
+{visible.length > 0 && (
+  <dl class="metabox">
+    {visible.map((item) => (
+      <>
+        <dt>{item.label}</dt>
+        <dd>{format(item.value)}</dd>
+      </>
+    ))}
+  </dl>
+)}

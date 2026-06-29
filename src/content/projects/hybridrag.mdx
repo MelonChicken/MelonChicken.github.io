@@ -1,0 +1,45 @@
+---
+title: "HybridRAG — 벡터 + 그래프 기반 RAG"
+slug: "hybridrag"
+status: "stable"
+group: "ml"
+domain:
+  - Machine Learning
+  - NLP
+  - RAG
+program: "sys"
+stack:
+  - Python
+  - Ollama
+  - Llama
+  - OpenAI API
+  - RAG
+roles:
+  - Back End
+  - ML Engineer
+  - Data Analyst / Modeling
+dataset: "ai-arxiv"
+output: "RAG comparison study"
+repo: "https://github.com/no-glass-otacku/Hybrid-RAG-Replication"
+notion: "https://www.notion.so/ml-c/HybridRAG-RAG-32414b84a0f280bd9a6fd6e11bef1c45"
+relatedNotes: []
+summary: "RAG comparison study"
+problem: "벡터 검색과 그래프 검색을 결합한 하이브리드 구조가 단일 방식보다 더 정확한 응답을 생성할 수 있는가"
+---
+
+## Problem
+
+벡터 검색과 그래프 검색을 결합한 하이브리드 구조가 단일 방식보다 더 정확한 응답을 생성할 수 있는가
+
+## Method
+
+Compared Vector / Graph / Hybrid RAG with RAGAS metrics against the ARAGOG reference.
+
+## System / Pipeline
+
+corpus → index → retrieve → generate → RAGAS eval
+
+## Result
+
+Documented performance gaps and root-cause analysis vs the reference paper.
+

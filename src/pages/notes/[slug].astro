@@ -1,0 +1,74 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Badge from '../../components/Badge.astro';
+import Eyebrow from '../../components/Eyebrow.astro';
+import Metabox from '../../components/Metabox.astro';
+import RelatedList from '../../components/RelatedList.astro';
+import { formatDate, resolveNotes, resolveProject } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const notes = await getCollection('notes');
+  return notes.map((note) => ({ params: { slug: note.data.slug }, props: { note } }));
+}
+
+const { note } = Astro.props;
+const { Content } = await render(note);
+const [project, relatedNotes] = await Promise.all([
+  resolveProject(note.data.relatedProject),
+  resolveNotes(note.data.relatedNotes),
+]);
+const isWeeklyBrief = note.data.type === 'weekly-brief';
+---
+
+<BaseLayout title={`${note.data.title} · Junu's Lab`}>
+  <section class="block-head">
+    <Eyebrow text={isWeeklyBrief ? 'Weekly Lab Brief' : 'Lab Note'} />
+    <h2>{note.data.title}</h2>
+    <p>{note.data.summary}</p>
+  </section>
+
+  <div class="home-row">
+    <article class="panel">
+      <Badge status={note.data.status} />
+      <Metabox items={[
+        { label: 'Type', value: note.data.type },
+        { label: 'Date', value: formatDate(note.data.date) },
+        { label: 'Read time', value: note.data.readTime ? `${note.data.readTime} min` : undefined },
+        { label: 'Domain', value: note.data.domain },
+        { label: 'Methods', value: note.data.methods },
+      ]} />
+      {isWeeklyBrief && (
+        <div class="selected-note">
+          <b>Research tracking routine</b><br />
+          <span class="muted">Selected for review: {note.data.selectedForReview}</span>
+        </div>
+      )}
+      <div class="dblock">
+        <Content />
+      </div>
+    </article>
+    <aside class="panel">
+      <h3>Connections</h3>
+      {project && (
+        <RelatedList items={[{
+          href: `/projects/${project.data.slug}/`,
+          title: project.data.title,
+          kind: 'Related project',
+        }]} />
+      )}
+      <RelatedList items={relatedNotes.map((related) => ({
+        href: `/notes/${related.data.slug}/`,
+        title: related.data.title,
+        kind: related.data.type,
+      }))} />
+      {isWeeklyBrief && (
+        <Metabox items={[
+          { label: 'Tracked fields', value: note.data.trackedFields },
+          { label: 'Outputs', value: note.data.outputs },
+          { label: 'Next', value: note.data.next },
+        ]} />
+      )}
+    </aside>
+  </div>
+</BaseLayout>

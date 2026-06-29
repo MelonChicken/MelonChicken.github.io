@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import Panel from '../components/Panel.astro';
+---
+
+<BaseLayout title="Contact · Junu's Lab">
+  <section class="block-head">
+    <Eyebrow text="Contact" />
+    <h2>Contact and links</h2>
+    <p>For project details, the MDX pages link out to repositories, demos, and Notion pages where available.</p>
+  </section>
+
+  <div class="about-grid">
+    <Panel title="Channels">
+      <div class="contact-row"><span class="lbl">GitHub</span><a href="https://github.com/MelonChicken">github.com/MelonChicken</a></div>
+      <div class="contact-row"><span class="lbl">Portfolio repo</span><a href="https://github.com/MelonChicken/MelonChicken.github.io">MelonChicken.github.io</a></div>
+      <div class="contact-row"><span class="lbl">Lab Notes</span><a href="/notes/">MDX notes archive</a></div>
+    </Panel>
+    <Panel title="Scope">
+      <ul class="plain">
+        <li>Animal behavior analysis and wildlife vision projects</li>
+        <li>Machine learning baselines and research systems</li>
+        <li>Portfolio and content collection maintenance</li>
+      </ul>
+    </Panel>
+  </div>
+</BaseLayout>

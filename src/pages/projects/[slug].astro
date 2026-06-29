@@ -1,0 +1,76 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Badge from '../../components/Badge.astro';
+import Eyebrow from '../../components/Eyebrow.astro';
+import Metabox from '../../components/Metabox.astro';
+import RelatedList from '../../components/RelatedList.astro';
+import { resolveNotes, resolveProgram } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map((project) => ({ params: { slug: project.data.slug }, props: { project } }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+const [program, relatedNotes] = await Promise.all([
+  resolveProgram(project.data.program),
+  resolveNotes(project.data.relatedNotes),
+]);
+const links = [
+  { label: 'Repository', href: project.data.repo },
+  { label: 'Deploy', href: project.data.deploy },
+  { label: 'Demo', href: project.data.demo },
+  { label: 'Notion', href: project.data.notion },
+].filter((link) => link.href);
+---
+
+<BaseLayout title={`${project.data.title} · Junu's Lab`}>
+  <section class="block-head">
+    <Eyebrow text="Project Detail" />
+    <h2>{project.data.title}</h2>
+    <p>{project.data.problem ?? project.data.summary}</p>
+  </section>
+
+  <div class="home-row">
+    <article class="panel">
+      <div class="ctop">
+        <Badge status={project.data.status} />
+      </div>
+      <Metabox items={[
+        { label: 'Group', value: project.data.group },
+        { label: 'Program', value: program?.data.title },
+        { label: 'Domain', value: project.data.domain },
+        { label: 'Stack', value: project.data.stack },
+        { label: 'Roles', value: project.data.roles },
+        { label: 'Dataset', value: project.data.dataset },
+        { label: 'Output', value: project.data.output },
+        { label: 'Private repo', value: project.data.repoPrivate ? 'yes' : undefined },
+      ]} />
+      <div class="dblock">
+        <Content />
+      </div>
+      {links.length > 0 && (
+        <div class="linkrow">
+          {links.map((link) => <a href={link.href} target="_blank" rel="noreferrer">{link.label}</a>)}
+        </div>
+      )}
+    </article>
+    <aside class="panel">
+      <h3>Related</h3>
+      {program && (
+        <div class="selected-note">
+          <b>{program.data.title}</b><br />
+          <span class="muted">{program.data.question}</span>
+        </div>
+      )}
+      <div class="section-divider"></div>
+      <RelatedList items={relatedNotes.map((note) => ({
+        href: `/notes/${note.data.slug}/`,
+        title: note.data.title,
+        kind: note.data.type,
+      }))} />
+    </aside>
+  </div>
+</BaseLayout>

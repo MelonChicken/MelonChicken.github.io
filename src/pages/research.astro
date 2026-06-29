@@ -1,0 +1,60 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Badge from '../components/Badge.astro';
+import Card from '../components/Card.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import Panel from '../components/Panel.astro';
+import Pipeline from '../components/Pipeline.astro';
+import { getAllPrograms } from '../lib/content';
+
+const programs = await getAllPrograms();
+---
+
+<BaseLayout title="Research · Junu's Lab">
+  <section class="block-head">
+    <Eyebrow text="Research Agenda" />
+    <h2>From wildlife video to behavioral signal</h2>
+    <p>Junu's Lab tracks computer vision and machine learning questions that support animal behavior analysis, labeling automation, long video understanding, and research systems.</p>
+  </section>
+
+  <div class="grid cols-2">
+    {programs.map((program) => (
+      <section class="card">
+        <div class="ctop">
+          <h3>{program.data.title}</h3>
+          <Badge status={program.data.status} label={program.data.statusLabel ?? program.data.status} />
+        </div>
+        <p class="qline">{program.data.question}</p>
+        <p class="body">{program.data.matters}</p>
+        <div class="taglist">
+          {program.data.methods.map((method) => <span class="tag">{method}</span>)}
+        </div>
+      </section>
+    ))}
+  </div>
+
+  <section class="block-head">
+    <Eyebrow text="Tracking System" />
+    <h2>Weekly research workflow</h2>
+    <p>Research Radar is the operating routine. The Research Radar AI project is a separate ML/product-style dashboard and is listed under projects.</p>
+  </section>
+  <Panel>
+    <Pipeline steps={['Question', 'Weekly tracking', 'Selected paper', 'Experiment', 'Project update']} />
+    <div class="cadence">
+      <div class="c"><div class="when">Mon</div><div class="act">Scan papers, repos, datasets, and field notes.</div></div>
+      <div class="c"><div class="when">Midweek</div><div class="act">Select only items that connect to the agenda.</div></div>
+      <div class="c"><div class="when">Fri</div><div class="act">Write paper reviews or experiment logs in MDX.</div></div>
+      <div class="c"><div class="when">Weekly</div><div class="act">Publish one Weekly Lab Brief note as a curated trace.</div></div>
+    </div>
+  </Panel>
+
+  <section class="block-head">
+    <Eyebrow text="Linked Work" />
+    <h2>Program-to-project connections</h2>
+  </section>
+  <div class="grid cols-3">
+    {programs.map((program) => (
+      <Card href="/projects/" title={program.data.title} status={program.data.status} summary={`${program.data.relatedProjects.length} projects · ${program.data.relatedNotes.length} notes`} tags={program.data.methods} meta="Program links" />
+    ))}
+  </div>
+</BaseLayout>

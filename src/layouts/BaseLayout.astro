@@ -1,0 +1,86 @@
+---
+import '../styles/lab.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "Junu's Lab",
+  description = 'Computer Vision, Machine Learning, and Animal Behavior Analysis portfolio.',
+} = Astro.props;
+
+const currentPath = Astro.url.pathname;
+const navItems = [
+  { href: '/', label: 'Home' },
+  { href: '/research/', label: 'Research' },
+  { href: '/projects/', label: 'Projects' },
+  { href: '/notes/', label: 'Lab Notes' },
+  { href: '/about/', label: 'About' },
+  { href: '/contact/', label: 'Contact' },
+];
+
+const isActive = (href: string) =>
+  href === '/' ? currentPath === '/' : currentPath.startsWith(href);
+---
+
+<!doctype html>
+<html lang="en" data-theme="lab">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <header>
+      <div class="wrap">
+        <a class="brand" href="/" aria-label="Junu's Lab home">
+          <span class="fa">⚗</span>
+          <b>Junu's Lab</b>
+        </a>
+        <div class="headright">
+          <nav class="nav" id="siteNav" aria-label="Primary navigation">
+            {navItems.map((item) => (
+              <a class:list={[{ active: isActive(item.href) }]} href={item.href}>{item.label}</a>
+            ))}
+          </nav>
+          <button class="themeSwitch" id="themeSwitch" type="button">&gt; LAB_MODE</button>
+          <button class="navtoggle" id="navToggle" type="button" aria-expanded="false" aria-controls="siteNav">MENU</button>
+        </div>
+      </div>
+    </header>
+    <div class="statusstrip">
+      <div class="wrap">
+        <span><i class="dot"></i><b class="live">LAB ONLINE</b></span>
+        <span><b>Focus</b> Computer Vision / ML / Animal Behavior</span>
+        <span><b>Routine</b> Weekly Lab Brief</span>
+        <span><b>Mode</b> Astro + MDX</span>
+      </div>
+    </div>
+    <main>
+      <div class="wrap">
+        <slot />
+      </div>
+    </main>
+    <footer>
+      <div class="wrap">
+        <span>Junu's Lab · research-oriented portfolio</span>
+        <span><a href="/projects/">Projects</a> · <a href="/notes/">Lab Notes</a> · <a href="/contact/">Contact</a></span>
+      </div>
+    </footer>
+    <script>
+      import { initTheme } from '../scripts/theme.js';
+
+      initTheme();
+
+      const nav = document.querySelector('#siteNav');
+      const toggle = document.querySelector('#navToggle');
+      toggle?.addEventListener('click', () => {
+        const open = nav?.classList.toggle('show') ?? false;
+        toggle.setAttribute('aria-expanded', String(open));
+      });
+    </script>
+  </body>
+</html>
