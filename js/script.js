@@ -78,6 +78,49 @@ function projectMatchesFilters(project) {
     return matchesSearch && matchesCategory && matchesStatus;
 }
 
+function includesAny(value, keywords) {
+    const normalizedValue = String(value || "").toLowerCase();
+    return keywords.some((keyword) => normalizedValue.includes(keyword));
+}
+
+function projectSortPriority(project) {
+    const status = project.status || "";
+    const type = project.type || "";
+    const isOngoing = includesAny(status, ["work in progress", "working in progress", "wip", "진행", "작업"]);
+    const isDoneOrArchived = includesAny(status, ["completed", "complete", "archived", "완료", "아카이브"]);
+    const isIdea = includesAny(status, ["idea", "아이디어"]);
+    const isMlOrCv = includesAny(type, ["ml", "cv", "machine learning", "computer vision"]);
+    const isWebOrApp = includesAny(type, ["web", "app"]);
+
+    if (isOngoing) {
+        return 1;
+    }
+
+    if (isDoneOrArchived && isMlOrCv) {
+        return 2;
+    }
+
+    if (isDoneOrArchived && isWebOrApp) {
+        return 3;
+    }
+
+    if (isIdea) {
+        return 4;
+    }
+
+    return 5;
+}
+
+function compareProjects(projectA, projectB) {
+    const priorityDiff = projectSortPriority(projectA) - projectSortPriority(projectB);
+
+    if (priorityDiff !== 0) {
+        return priorityDiff;
+    }
+
+    return String(projectA.title || "").localeCompare(String(projectB.title || ""));
+}
+
 function renderFallback(message) {
     if (!projectContainer) {
         return;
@@ -90,21 +133,29 @@ function renderBadge(value, className) {
     return value ? `<span class="${className}">${escapeHtml(value)}</span>` : "";
 }
 
-function renderPills(values, emptyText) {
+function renderLimitedPills(values, limit, emptyText) {
     if (!Array.isArray(values) || values.length === 0) {
-        return `<p>${escapeHtml(emptyText)}</p>`;
+        return `<span class="chip chipEmpty">${escapeHtml(emptyText)}</span>`;
     }
 
-    return values.map((value) => `<p>${escapeHtml(value)}</p>`).join("");
+    const visibleValues = values.slice(0, limit);
+    const hiddenValues = values.slice(limit);
+    const visibleChips = visibleValues.map((value) => `<span class="chip">${escapeHtml(value)}</span>`).join("");
+
+    if (hiddenValues.length === 0) {
+        return visibleChips;
+    }
+
+    return `${visibleChips}<span class="chip chipMore" title="${escapeHtml(values.join(", "))}">+${hiddenValues.length}</span>`;
 }
 
-function renderAction(url, label, icon) {
+function renderAction(url, label, icon, variant = "secondary") {
     if (!url) {
         return "";
     }
 
     return `
-        <a class="projectAction" href="${escapeHtml(safeUrl(url))}" target="_blank" rel="noopener noreferrer">
+        <a class="projectAction ${escapeHtml(variant)}" href="${escapeHtml(safeUrl(url))}" target="_blank" rel="noopener noreferrer">
             <i class="fa-solid ${escapeHtml(icon)}"></i>
             ${escapeHtml(label)}
         </a>
@@ -116,7 +167,7 @@ function renderProjects() {
         return;
     }
 
-    const visibleProjects = projects.filter(projectMatchesFilters);
+    const visibleProjects = projects.filter(projectMatchesFilters).sort(compareProjects);
 
     if (visibleProjects.length === 0) {
         renderFallback("No projects to display.");
@@ -131,42 +182,47 @@ function renderProjects() {
         return `
             <div class="cardDeck">
                 <div class="card">
-                    <div class="cardContent">
-                        <span class="cardTitleLine">
-                            <h3>${escapeHtml(project.title || "Untitled Project")}</h3>
-                            <span>
-                                <i class="fa-solid ${escapeHtml(iconForProject(project))}"></i>
-                            </span>
-                        </span>
-
-                        <div class="metaGroup">
+                    <div class="cardTop">
+                        <div class="badgeGroup">
                             ${renderBadge(project.status, "statusBadge")}
                             ${renderBadge(project.type, "typeBadge")}
+                        </div>
+                        <span class="cardIcon">
+                            <i class="fa-solid ${escapeHtml(iconForProject(project))}"></i>
+                        </span>
+                    </div>
+
+                    <div class="cardBody">
+                        <div class="cardTitleLine">
+                            <h3>${escapeHtml(project.title || "Untitled Project")}</h3>
                         </div>
 
                         <p class="description">
                             ${escapeHtml(project.oneLiner || "No one-liner available.")}
                         </p>
+                    </div>
 
+                    <div class="cardMeta">
                         <div class="projectField">
                             <p class="fieldLabel">Stack</p>
-                            <span class="stacks">
-                                ${renderPills(stacks, "No stack listed")}
+                            <span class="chipGroup stacks">
+                                ${renderLimitedPills(stacks, 5, "No stack listed")}
                             </span>
                         </div>
 
                         <div class="projectField">
                             <p class="fieldLabel">Role</p>
-                            <span class="roles">
-                                ${renderPills(roles, "No role listed")}
+                            <span class="chipGroup roles">
+                                ${renderLimitedPills(roles, 2, "No role listed")}
                             </span>
                         </div>
                     </div>
+
                     <div class="projectActions">
+                        ${renderAction(detailUrl, "Details", "fa-arrow-right", "primary")}
                         ${renderAction(project.gitRepository, "Git Repository", "fa-code-branch")}
                         ${renderAction(project.deployUrl, "Deploy", "fa-up-right-from-square")}
                         ${renderAction(project.demonstrationUrl, "Demonstration", "fa-circle-play")}
-                        ${renderAction(detailUrl, "Details", "fa-arrow-right")}
                     </div>
                 </div>
             </div>
