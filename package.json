@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "sync:notion": "node scripts/fetch-notion-projects.js"
+  },
+  "dependencies": {
+    "@notionhq/client": "^2.3.0"
+  }
+}
