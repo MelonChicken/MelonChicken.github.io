@@ -13,9 +13,11 @@ const projects = defineCollection({
   schema: z.object({
     title: z.string(),
     slug: z.string(),
+    generated: z.boolean().optional(),
     status,                                   // seed | growing | stable | archived
     group: z.enum(['research', 'ml', 'product', 'archived']),
     domain: z.array(z.string()).default([]),
+    tags: z.array(z.string()).default([]),
     program: z.string().optional(),           // research-program id (abx, pose, label, video, sys)
     stack: z.array(z.string()).default([]),
     roles: z.array(z.string()).default([]),
@@ -38,17 +40,21 @@ const notes = defineCollection({
   schema: z.object({
     title: z.string(),
     slug: z.string(),
+    generated: z.boolean().optional(),
     type: z.enum([
       'weekly-brief', 'paper-review', 'experiment-log',
       'implementation-note', 'learning-note', 'retrospective',
     ]),
     status,
     domain: z.array(z.string()).default([]),
+    tags: z.array(z.string()).default([]),
     methods: z.array(z.string()).default([]),
     date: z.coerce.date(),
     readTime: z.number().optional(),
     relatedProject: z.string().optional().or(z.literal('')),
     relatedNotes: z.array(z.string()).default([]),
+    sourceNotes: z.array(z.string()).default([]),
+    notion: url,
     summary: z.string().optional(),
     // weekly-brief only:
     trackedFields: z.array(z.string()).optional(),

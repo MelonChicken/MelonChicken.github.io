@@ -9,13 +9,18 @@
     "check": "astro check",
     "build": "astro build",
     "preview": "astro preview",
-    "sync:notion": "node scripts/fetch-notion-projects.js"
+    "sync:notion": "tsx scripts/sync-notion.ts",
+    "sync:notion:projects": "tsx scripts/sync-notion.ts --projects",
+    "sync:notion:notes": "tsx scripts/sync-notion.ts --notes",
+    "sync:notion:blog": "tsx scripts/sync-notion.ts --blog",
+    "notion:debug": "tsx scripts/notion-debug.ts"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
     "@astrojs/mdx": "^4.3.0",
     "@notionhq/client": "^2.3.0",
     "astro": "^5.11.0",
+    "tsx": "^4.20.6",
     "typescript": "^5.8.3"
   }
 }

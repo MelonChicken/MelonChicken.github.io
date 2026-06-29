@@ -301,11 +301,25 @@ main{padding:30px 0 70px;min-height:60vh}
   padding:14px 16px;margin-bottom:20px}
 .metabox dt{color:var(--color-text-secondary)}
 .metabox dd{margin:0;color:var(--color-text-primary)}
-.dblock{margin:0 0 18px}
+.detail-layout{grid-template-columns:minmax(0,1fr) minmax(240px,320px);align-items:start}
+.detail-layout > .panel{min-width:0;overflow:hidden}
+.detail-layout > article.panel{max-width:100%}
+.dblock{margin:0 0 18px;max-width:74ch;overflow-wrap:anywhere}
 .dblock h4{font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--color-accent);margin:0 0 6px}
-.dblock p{margin:0;color:var(--color-text-primary);font-size:.94rem}
-.dblock ul{margin:6px 0 0;padding-left:18px;color:var(--color-text-primary);font-size:.92rem}
+.dblock h1{font-size:1.45rem;line-height:1.28;margin:1.1rem 0 .7rem}
+.dblock h2{font-size:1.2rem;line-height:1.32;margin:1rem 0 .55rem}
+.dblock h3{font-size:1.05rem;line-height:1.35;margin:.9rem 0 .45rem}
+.dblock p{margin:.65rem 0;color:var(--color-text-primary);font-size:.94rem}
+.dblock ul,.dblock ol{margin:8px 0 12px;padding-left:20px;color:var(--color-text-primary);font-size:.92rem}
 .dblock ul li{margin-bottom:4px}
+.dblock figure{margin:16px 0;max-width:100%}
+.dblock img{display:block;max-width:100%;max-height:70vh;width:auto;height:auto;border-radius:var(--radius-sm);border:1px solid var(--color-border);object-fit:contain}
+.dblock figcaption{margin-top:6px;color:var(--color-text-secondary);font-size:.78rem}
+.dblock pre{max-width:100%;overflow-x:auto;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);padding:12px 14px;font-size:.82rem}
+.dblock code{font-size:.88em}
+.dblock table{display:block;max-width:100%;overflow-x:auto;border-collapse:collapse;font-size:.84rem}
+.dblock th,.dblock td{padding:8px 10px;border:1px solid var(--color-divider);vertical-align:top}
+.dblock blockquote{margin:12px 0;padding:2px 0 2px 14px;border-left:3px solid var(--color-accent);color:var(--color-text-secondary)}
 .related{display:flex;flex-direction:column;gap:8px}
 .related a{display:flex;justify-content:space-between;gap:10px;align-items:center;
   border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:10px 12px;background:var(--color-bg)}

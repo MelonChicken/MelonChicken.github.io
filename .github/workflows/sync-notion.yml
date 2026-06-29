@@ -1,4 +1,4 @@
-name: Sync Notion Projects
+name: Sync Notion Content
 
 on:
   workflow_dispatch:
@@ -8,29 +8,53 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: notion-content-sync
+  cancel-in-progress: false
+
 jobs:
   sync:
     runs-on: ubuntu-latest
+    env:
+      NOTION_API_TOKEN: ${{ secrets.NOTION_API_TOKEN }}
+      NOTION_PROJECTS_DATABASE_ID: ${{ secrets.NOTION_PROJECTS_DATABASE_ID }}
+      NOTION_NOTES_DATABASE_ID: ${{ secrets.NOTION_NOTES_DATABASE_ID }}
+      NOTION_PROJECTS_DATA_SOURCE_ID: ${{ secrets.NOTION_PROJECTS_DATA_SOURCE_ID }}
+      NOTION_NOTES_DATA_SOURCE_ID: ${{ secrets.NOTION_NOTES_DATA_SOURCE_ID }}
+      ASTRO_TELEMETRY_DISABLED: "1"
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Sync projects from Notion
+      - name: Verify Notion access
+        run: npm run notion:debug
+
+      - name: Sync Notion MDX and assets
         run: npm run sync:notion
-        env:
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          NOTION_DATA_SOURCE_ID: ${{ secrets.NOTION_DATA_SOURCE_ID }}
 
-      - name: Commit updated projects
+      - name: Check content schema
+        run: npm run check
+
+      - name: Build site
+        run: npm run build
+
+      - name: Commit synced content
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "chore: sync notion projects"
-          file_pattern: data/projects.json
+          commit_message: "chore: sync notion content"
+          file_pattern: |
+            src/content/projects/*.mdx
+            src/content/notes/*.mdx
+            public/notion-assets/**

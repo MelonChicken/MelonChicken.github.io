@@ -8,12 +8,6 @@ const statusRank: Record<string, number> = {
 };
 
 const groupOrder = ['research', 'ml', 'product', 'archived'];
-const featuredOrder = [
-  'wildlifevision-baseline',
-  'be-more-duck',
-  'architag-vlm-labeling',
-  'oulad-at-risk-prediction',
-];
 
 export async function getAllProjects() {
   const projects = await getCollection('projects');
@@ -35,16 +29,18 @@ export async function getProjectsByGroup() {
 }
 
 export async function getFeaturedProjects() {
-  const projects = await getCollection('projects');
+  const projects = await getAllProjects();
   const featured = projects
     .filter((project) => project.data.featured)
-    .sort((a, b) => featuredOrder.indexOf(a.data.slug) - featuredOrder.indexOf(b.data.slug));
+    .sort((a, b) => a.data.title.localeCompare(b.data.title));
 
-  if (featured.length !== 4 || featured.some((project, index) => project.data.slug !== featuredOrder[index])) {
-    throw new Error(`Home featured projects must be exactly: ${featuredOrder.join(', ')}`);
+  const filled = [...featured];
+  for (const project of projects) {
+    if (filled.length >= 4) break;
+    if (!filled.some((item) => item.data.slug === project.data.slug)) filled.push(project);
   }
 
-  return featured;
+  return filled.slice(0, 4);
 }
 
 export async function getAllNotes() {
@@ -99,10 +95,9 @@ export async function resolveNotes(slugs: string[] = []) {
 }
 
 export async function validateContentLinks() {
-  const [projects, notes, programs] = await Promise.all([
+  const [projects, notes] = await Promise.all([
     getCollection('projects'),
     getCollection('notes'),
-    getCollection('researchPrograms'),
   ]);
 
   const projectSlugs = new Set(projects.map((project) => project.data.slug));
@@ -124,15 +119,6 @@ export async function validateContentLinks() {
     }
     for (const slug of note.data.relatedNotes) {
       if (!noteSlugs.has(slug)) errors.push(`${note.data.slug}: missing related note ${slug}`);
-    }
-  }
-
-  for (const program of programs) {
-    for (const slug of program.data.relatedProjects) {
-      if (!projectSlugs.has(slug)) errors.push(`${program.data.id}: missing related project ${slug}`);
-    }
-    for (const slug of program.data.relatedNotes) {
-      if (!noteSlugs.has(slug)) errors.push(`${program.data.id}: missing related note ${slug}`);
     }
   }
 
