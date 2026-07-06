@@ -1,0 +1,13 @@
+{
+  "id": "annotation",
+  "slug": "annotation-efficient-learning",
+  "title": "Annotation-efficient learning",
+  "status": "work-in-progress",
+  "statusLabel": "active",
+  "question": "How can labeling cost be reduced when building animal behavior datasets?",
+  "matters": "Animal behavior datasets are expensive to label, so weak supervision, pseudo-labeling, semi-supervised learning, and active learning can make experiments more scalable.",
+  "methods": ["weak supervision", "semi-supervised learning", "pseudo-labeling", "active learning", "labeling automation"],
+  "relatedProjects": ["architag-ai", "wildlife-metadata-fusion"],
+  "relatedNotes": ["animal-behaviour-analysis-weekly-brief-2026-06-29"],
+  "featured": true
+}

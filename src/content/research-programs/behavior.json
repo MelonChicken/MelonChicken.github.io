@@ -1,0 +1,13 @@
+{
+  "id": "behavior",
+  "slug": "behavior-recognition",
+  "title": "Behavior recognition from animal video",
+  "status": "work-in-progress",
+  "statusLabel": "active",
+  "question": "How can short and long animal behaviors be classified from video, pose sequences, or multimodal features?",
+  "matters": "Behavior recognition connects low-level visual signals to interpretable animal behavior analysis.",
+  "methods": ["video understanding", "action recognition", "temporal modeling", "sequence classification"],
+  "relatedProjects": ["be-more-duck-vision-language-embodied-agent"],
+  "relatedNotes": ["animal-behaviour-analysis-weekly-brief-20260706"],
+  "featured": true
+}

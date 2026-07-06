@@ -5,56 +5,83 @@ import Card from '../components/Card.astro';
 import Eyebrow from '../components/Eyebrow.astro';
 import Panel from '../components/Panel.astro';
 import Pipeline from '../components/Pipeline.astro';
-import { getAllPrograms } from '../lib/content';
+import { getAllPrograms, getAllProjects, getProjectsForTrack, getResearchTrackSlug } from '../lib/content';
 
-const programs = await getAllPrograms();
+const trackOrder = ['pose', 'behavior', 'annotation'];
+const tracks = (await getAllPrograms()).sort((a, b) => trackOrder.indexOf(a.data.id) - trackOrder.indexOf(b.data.id));
+const projects = await getAllProjects();
+
+const projectCountLabel = (trackSlug: string) => {
+  const count = getProjectsForTrack(projects, trackSlug).length;
+  return `${count} ${count === 1 ? 'project' : 'projects'}`;
+};
 ---
 
-<BaseLayout title="Research · Junu's Lab">
+<BaseLayout title="Research - Junu's Lab">
   <section class="block-head">
     <Eyebrow text="Research Agenda" />
-    <h2>From wildlife video to behavioral signal</h2>
-    <p>Junu's Lab tracks computer vision and machine learning questions that support animal behavior analysis, labeling automation, long video understanding, and research systems.</p>
+    <h2>From raw animal video to behavior understanding</h2>
+    <p>This page organizes the research questions behind Junu's Lab: animal pose estimation, behavior recognition, video understanding, and annotation-efficient learning for animal behavior analysis.</p>
   </section>
 
-  <div class="grid cols-2">
-    {programs.map((program) => (
+  <section class="block-head">
+    <Eyebrow text="Research Tracks" />
+    <h2>Core research tracks</h2>
+  </section>
+  <div class="grid cols-3">
+    {tracks.map((track) => (
       <section class="card">
         <div class="ctop">
-          <h3>{program.data.title}</h3>
-          <Badge status={program.data.status} label={program.data.statusLabel ?? program.data.status} />
+          <h3>{track.data.title}</h3>
+          <Badge status={track.data.status} label={track.data.statusLabel ?? track.data.status} />
         </div>
-        <p class="qline">{program.data.question}</p>
-        <p class="body">{program.data.matters}</p>
+        <p class="qline">{track.data.question}</p>
+        <p class="body">{track.data.matters}</p>
         <div class="taglist">
-          {program.data.methods.map((method) => <span class="tag">{method}</span>)}
+          {track.data.methods.map((method) => <span class="tag">{method}</span>)}
         </div>
       </section>
     ))}
   </div>
 
   <section class="block-head">
-    <Eyebrow text="Tracking System" />
-    <h2>Weekly research workflow</h2>
-    <p>Research Radar is the operating routine. The Research Radar AI project is a separate ML/product-style dashboard and is listed under projects.</p>
+    <Eyebrow text="Research Workflow" />
+    <h2>From paper tracking to experiment logs</h2>
+    <p>Research Radar is the weekly workflow that turns broad scans of papers, repositories, datasets, and benchmarks into selected reviews, experiment ideas, and project updates.</p>
   </section>
   <Panel>
-    <Pipeline steps={['Question', 'Weekly tracking', 'Selected paper', 'Experiment', 'Project update']} />
+    <Pipeline steps={['Research question', 'Paper / repo scan', 'Agenda filter', 'Selected review', 'Experiment note', 'Project update']} />
     <div class="cadence">
-      <div class="c"><div class="when">Mon</div><div class="act">Scan papers, repos, datasets, and field notes.</div></div>
-      <div class="c"><div class="when">Midweek</div><div class="act">Select only items that connect to the agenda.</div></div>
-      <div class="c"><div class="when">Fri</div><div class="act">Write paper reviews or experiment logs in MDX.</div></div>
-      <div class="c"><div class="when">Weekly</div><div class="act">Publish one Weekly Lab Brief note as a curated trace.</div></div>
+      <div class="c"><div class="when">MON</div><div class="act">Scan papers, repositories, datasets, and benchmarks.</div></div>
+      <div class="c"><div class="when">Midweek</div><div class="act">Filter items by fit to the research tracks.</div></div>
+      <div class="c"><div class="when">FRI</div><div class="act">Write one selected review, baseline plan, or experiment log.</div></div>
+      <div class="c"><div class="when">Weekly</div><div class="act">Publish one Weekly Lab Brief with selected papers, decisions, and next experiment ideas.</div></div>
     </div>
   </Panel>
 
   <section class="block-head">
-    <Eyebrow text="Linked Work" />
-    <h2>Program-to-project connections</h2>
+    <Eyebrow text="Current Status" />
+    <h2>Current research status</h2>
+  </section>
+  <Panel>
+    <div class="status-rows">
+      <div class="row"><span class="k">Reading</span><span class="v">Semi-supervised behavior recognition and annotation-efficient video learning</span></div>
+      <div class="row"><span class="k">Experimenting</span><span class="v on">Wildlife vision and annotation workflow prototypes</span></div>
+      <div class="row"><span class="k">Next</span><span class="v">Labeling automation prototype for animal behavior video clips</span></div>
+    </div>
+  </Panel>
+
+  <section class="block-head">
+    <Eyebrow text="Linked Outputs" />
+    <h2>Research tracks linked to projects and notes</h2>
+    <p>Each track connects the research agenda to project artifacts, lab notes, paper reviews, and small experiments.</p>
   </section>
   <div class="grid cols-3">
-    {programs.map((program) => (
-      <Card href="/projects/" title={program.data.title} status={program.data.status} summary={`${program.data.relatedProjects.length} projects · ${program.data.relatedNotes.length} notes`} tags={program.data.methods} meta="Program links" />
-    ))}
+    {tracks.map((track) => {
+      const trackSlug = getResearchTrackSlug(track);
+      return (
+        <Card href={`/projects/track/${trackSlug}/`} title={track.data.title} status={track.data.status} statusLabel={track.data.statusLabel} summary={projectCountLabel(trackSlug)} tags={track.data.methods} meta="Track outputs" />
+      );
+    })}
   </div>
 </BaseLayout>

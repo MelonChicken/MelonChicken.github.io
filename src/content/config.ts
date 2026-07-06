@@ -20,6 +20,7 @@ const projects = defineCollection({
     domain: z.array(z.string()).default([]),
     tags: z.array(z.string()).default([]),
     program: z.string().optional(),           // research-program id (abx, pose, label, video, sys)
+    tracks: z.array(z.string()).default([]),   // research track slugs used by /projects/track/[slug]
     stack: z.array(z.string()).default([]),
     roles: z.array(z.string()).default([]),
     dataset: z.string().optional(),
@@ -69,6 +70,7 @@ const researchPrograms = defineCollection({
   loader: glob({ pattern: '**/*.json', base: './src/content/research-programs' }),
   schema: z.object({
     id: z.string(),
+    slug: z.string().optional(),
     title: z.string(),
     status,
     statusLabel: z.string().optional(),
@@ -81,12 +83,4 @@ const researchPrograms = defineCollection({
   }),
 });
 
-const archive = defineCollection({
-  loader: glob({ pattern: '**/*.mdx', base: './src/content/archive' }),
-  schema: z.object({
-    category: z.string(),
-    order: z.number().default(0),
-  }),
-});
-
-export const collections = { projects, notes, researchPrograms, archive };
+export const collections = { projects, notes, researchPrograms };

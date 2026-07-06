@@ -2,43 +2,30 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Eyebrow from '../components/Eyebrow.astro';
 import Panel from '../components/Panel.astro';
-import { getArchiveEntries } from '../lib/content';
-
-const archiveEntries = await getArchiveEntries();
 ---
 
-<BaseLayout title="About · Junu's Lab">
+<BaseLayout title="About - Junu's Lab">
   <section class="block-head">
-    <Eyebrow text="About" />
+    <Eyebrow text="ABOUT" />
     <h2>Research-oriented builder profile</h2>
-    <p>Junu's Lab is a portfolio for connecting software projects, machine learning experiments, and research notes around animal behavior analysis.</p>
+    <p>Junu's Lab is my research-oriented portfolio for computer vision, machine learning, and animal behavior analysis.</p>
+    <p>I am an undergraduate student in IT Management at SeoulTech. My long-term interest is to build systems that can understand animal behavior from raw video, moving from pose estimation to behavior recognition and eventually behavior prediction.</p>
   </section>
 
-  <div class="about-grid">
-    <Panel title="Interests">
+  <div class="grid cols-3">
+    <Panel title="Current focus">
       <ul class="plain">
-        <li>Computer vision for wildlife and animal behavior analysis</li>
-        <li>Machine learning systems that turn rough data into usable signal</li>
-        <li>Research tracking workflows that make paper reading operational</li>
+        <li>Animal pose estimation and keypoint-based behavior analysis</li>
+        <li>Video understanding for long animal behavior videos</li>
+        <li>Weak / semi-supervised learning for annotation-efficient labeling</li>
       </ul>
     </Panel>
-    <Panel title="Stack">
-      <div class="stacklist">
-        {['Python', 'scikit-learn', 'PyTorch', 'Astro', 'MDX', 'FastAPI', 'Notion workflows'].map((item) => <span class="tag">{item}</span>)}
-      </div>
+    <Panel title="How I work">
+      <ul class="plain">
+        <li>Build small reproducible ML/CV experiments</li>
+        <li>Track recent papers, datasets, tools, and benchmarks</li>
+        <li>Turn research reading into lab notes, project ideas, and portfolio artifacts</li>
+      </ul>
     </Panel>
-  </div>
-
-  <section class="block-head">
-    <Eyebrow text="Archive" />
-    <h2>Older notes and categories</h2>
-  </section>
-  <div class="grid cols-2">
-    {archiveEntries.map((entry) => (
-      <section class="panel">
-        <h3>{entry.data.category}</h3>
-        <p class="muted">Archived MDX category. Content can be expanded in `src/content/archive/{entry.id}.mdx`.</p>
-      </section>
-    ))}
   </div>
 </BaseLayout>

@@ -4,13 +4,12 @@ import Card from '../components/Card.astro';
 import Eyebrow from '../components/Eyebrow.astro';
 import Panel from '../components/Panel.astro';
 import Pipeline from '../components/Pipeline.astro';
-import { formatDate, getFeaturedPrograms, getFeaturedProjects, getLatestWeeklyBrief, getRecentNotes, validateContentLinks } from '../lib/content';
+import { formatDate, getFeaturedProjects, getLatestWeeklyBrief, getRecentNotes, validateContentLinks } from '../lib/content';
 
 await validateContentLinks();
 
-const [featuredProjects, featuredPrograms, recentNotes, weeklyBrief] = await Promise.all([
+const [featuredProjects, recentNotes, weeklyBrief] = await Promise.all([
   getFeaturedProjects(),
-  getFeaturedPrograms(),
   getRecentNotes(4),
   getLatestWeeklyBrief(),
 ]);
@@ -18,22 +17,27 @@ const [featuredProjects, featuredPrograms, recentNotes, weeklyBrief] = await Pro
 
 <BaseLayout title="Junu's Lab">
   <section class="hero">
-    <Eyebrow text="Lab Dashboard" />
-    <h1>Junu's Lab</h1>
-    <div class="sub">Computer Vision · Machine Learning · Animal Behavior Analysis</div>
+    <Eyebrow text="Interested in CV / ML Research Collaboration" />
+    <h1>Computer Vision</h1>
+    <div class="sub">Research-oriented Builder</div>
     <p class="lede">
-      A working portfolio for research systems, wildlife vision experiments, and lab notes that connect ideas to reproducible projects.
+      I am an undergraduate student in IT Management at SeoulTech.
+    </p>
+    <p class="lede">
+      I build projects and research notes around computer vision, machine learning, and animal behavior analysis, with a long-term interest in understanding animal behavior from raw video.
     </p>
     <div class="hashrow">
-      <span>#camera-trap</span>
-      <span>#behavior-recognition</span>
-      <span>#labeling-automation</span>
-      <span>#mdx-lab-notes</span>
+      <span># Computer Vision</span>
+      <span># Machine Learning</span>
+      <span># Animal Behavior Analysis</span>
+      <span># Pose Estimation</span>
+      <span># Video Understanding</span>
+      <span># Annotation Automation</span>
     </div>
     <div class="cta-row">
-      <a class="btn primary" href="/projects/">Browse Projects</a>
-      <a class="btn" href="/research/">Research Agenda</a>
-      <a class="btn btn-icon" href="mailto:junu_kim@outlook.com"><span class="mail-icon" aria-hidden="true"></span>Contact</a>
+      <a class="btn primary" href="/projects/">View Projects</a>
+      <a class="btn" href="/notes/">Read Lab Notes</a>
+      <a class="btn btn-icon" href="/contact/"><span class="mail-icon" aria-hidden="true"></span>Contact</a>
     </div>
   </section>
 
@@ -41,14 +45,14 @@ const [featuredProjects, featuredPrograms, recentNotes, weeklyBrief] = await Pro
     <Panel title="Current Focus">
       <div class="focus-grid">
         <div class="focus-item"><span>Animal behavior video understanding</span><div class="bar"><i style="width:86%"></i></div><span class="lvl">active</span></div>
-        <div class="focus-item"><span>Weak supervision for labeling</span><div class="bar"><i style="width:72%"></i></div><span class="lvl">active</span></div>
-        <div class="focus-item"><span>Applied ML portfolio systems</span><div class="bar"><i style="width:64%"></i></div><span class="lvl">steady</span></div>
+        <div class="focus-item"><span>Weak / semi-supervised labeling</span><div class="bar"><i style="width:72%"></i></div><span class="lvl">active</span></div>
+        <div class="focus-item"><span>Reproducible ML project workflow</span><div class="bar"><i style="width:64%"></i></div><span class="lvl">steady</span></div>
       </div>
     </Panel>
     <Panel title="Lab Status">
       <div class="status-rows">
         <div class="row"><span class="k">Reading</span><span class="v">semi-supervised behavior recognition</span></div>
-        <div class="row"><span class="k">Experimenting</span><span class="v on">Be MOre Duck · ArchiTag</span></div>
+        <div class="row"><span class="k">Experimenting</span><span class="v on">Be MOre Duck / ArchiTag<br /><span class="muted">wildlife vision and annotation workflow prototypes</span></span></div>
         <div class="row"><span class="k">Next</span><span class="v">labeling automation prototype</span></div>
       </div>
     </Panel>
@@ -57,16 +61,17 @@ const [featuredProjects, featuredPrograms, recentNotes, weeklyBrief] = await Pro
   <section class="block-head">
     <Eyebrow text="Research Radar" />
     <h2>Weekly Lab Brief routine</h2>
-    <p>Weekly Lab Brief is a curation and tracking routine, not an AI-generated article stream. Raw scans are filtered into selected reviews, experiments, and project links.</p>
+    <p>Weekly Lab Brief is a research tracking workflow that filters raw paper scans into selected reviews, experiment ideas, and project links.</p>
   </section>
   <section class="panel radar">
-    <Pipeline steps={['Raw field scan', 'Notion inbox', 'Agenda filter', 'Selected review', 'Experiment log']} />
+    <Pipeline steps={['Raw scan', 'Notion inbox', 'Agenda filter', 'Selected review', 'Experiment log']} />
     <div class="radar-grid">
       <div class="col">
         <h4>Tracked Fields</h4>
         <ul>
           <li>Animal behavior analysis</li>
           <li>Pose and keypoint methods</li>
+          <li>Video understanding</li>
           <li>Labeling automation</li>
         </ul>
       </div>
@@ -76,52 +81,57 @@ const [featuredProjects, featuredPrograms, recentNotes, weeklyBrief] = await Pro
           <li>Selected paper reviews</li>
           <li>Experiment logs</li>
           <li>Mini project candidates</li>
+          <li>Project links</li>
         </ul>
       </div>
       <div class="col">
-        <h4>Latest Brief</h4>
-        {weeklyBrief ? (
-          <p class="sourcebox"><a href={`/notes/${weeklyBrief.data.slug}/`}>{weeklyBrief.data.title}</a><br />{weeklyBrief.data.summary}</p>
-        ) : (
-          <p class="sourcebox">No weekly brief yet.</p>
-        )}
+        <h4>Research Direction</h4>
+        <p class="sourcebox">Raw animal video -> pose estimation -> behavior recognition -> behavior prediction.</p>
       </div>
     </div>
   </section>
 
   <section class="block-head">
-    <Eyebrow text="Programs" />
-    <h2>Featured research programs</h2>
+    <Eyebrow text="Latest Outputs" />
+    <h2>Featured Projects</h2>
+    <p>Projects from Notion, selected with the Featured property and sorted by project date.</p>
   </section>
-  <div class="grid cols-3">
-    {featuredPrograms.map((program) => (
-      <Card href="/research/" title={program.data.title} status={program.data.status} statusLabel={program.data.statusLabel} summary={program.data.question} tags={program.data.methods} meta="Research program" />
-    ))}
-  </div>
+  {featuredProjects.length > 0 ? (
+    <div class="grid cols-2">
+      {featuredProjects.map((project) => (
+        <Card href={`/projects/${project.data.slug}/`} title={project.data.title} status={project.data.status} summary={project.data.problem ?? project.data.summary} tags={project.data.domain} meta={project.data.group} />
+      ))}
+    </div>
+  ) : (
+    <section class="panel"><p class="muted">No featured projects selected yet.</p></section>
+  )}
 
-  <section class="block-head">
-    <Eyebrow text="Projects" />
-    <h2>Projects from Notion</h2>
+  <section class="home-row">
+    <Panel title="Latest Brief">
+      <p class="muted">Latest Weekly Lab Brief</p>
+      {weeklyBrief ? (
+        <a class="mini-item" href={`/notes/${weeklyBrief.data.slug}/`}>
+          <span>
+            <span class="mini-title">{weeklyBrief.data.title}</span>
+            <span class="mini-desc">{weeklyBrief.data.summary}</span>
+          </span>
+          <span class="mini-meta"><span class="kv">{formatDate(weeklyBrief.data.date)}</span><span class="mini-arrow">Open</span></span>
+        </a>
+      ) : (
+        <p class="sourcebox">No weekly brief yet.</p>
+      )}
+    </Panel>
+    <Panel title="Recent Lab Notes">
+      <p class="muted">Recent Notion Notes</p>
+      {recentNotes.map((note) => (
+        <a class="mini-item" href={`/notes/${note.data.slug}/`}>
+          <span>
+            <span class="mini-title">{note.data.title}</span>
+            <span class="mini-desc">{note.data.summary}</span>
+          </span>
+          <span class="mini-meta"><span class="kv">{formatDate(note.data.date)}</span><span class="mini-arrow">Open</span></span>
+        </a>
+      ))}
+    </Panel>
   </section>
-  <div class="grid cols-2">
-    {featuredProjects.map((project) => (
-      <Card href={`/projects/${project.data.slug}/`} title={project.data.title} status={project.data.status} summary={project.data.problem ?? project.data.summary} tags={project.data.domain} meta={project.data.group} />
-    ))}
-  </div>
-
-  <section class="block-head">
-    <Eyebrow text="Notes" />
-    <h2>Recent Notion Notes</h2>
-  </section>
-  <div class="panel">
-    {recentNotes.map((note) => (
-      <a class="mini-item" href={`/notes/${note.data.slug}/`}>
-        <span>
-          <span class="mini-title">{note.data.title}</span>
-          <span class="mini-desc">{note.data.summary}</span>
-        </span>
-        <span class="mini-meta"><span class="kv">{formatDate(note.data.date)}</span><span class="mini-arrow">→</span></span>
-      </a>
-    ))}
-  </div>
 </BaseLayout>

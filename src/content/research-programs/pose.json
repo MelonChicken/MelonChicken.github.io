@@ -1,0 +1,13 @@
+{
+  "id": "pose",
+  "slug": "animal-pose-estimation",
+  "title": "Animal pose estimation & keypoint trajectories",
+  "status": "work-in-progress",
+  "statusLabel": "active",
+  "question": "How can animal body movement be represented from raw video using pose and keypoint trajectories?",
+  "matters": "Pose and trajectory representations reduce the complexity of raw video and provide a structured basis for behavior analysis.",
+  "methods": ["pose estimation", "keypoints", "trajectory modeling", "temporal features"],
+  "relatedProjects": ["wildlifevision-baseline-scikit-learn", "wildlife-metadata-fusion"],
+  "relatedNotes": [],
+  "featured": true
+}

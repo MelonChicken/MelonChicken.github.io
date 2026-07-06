@@ -1,0 +1,57 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Card from '../../../components/Card.astro';
+import Eyebrow from '../../../components/Eyebrow.astro';
+import Panel from '../../../components/Panel.astro';
+import { getAllPrograms, getAllProjects, getProjectsForTrack, getResearchTrackSlug } from '../../../lib/content';
+
+export async function getStaticPaths() {
+  const [tracks, projects] = await Promise.all([getAllPrograms(), getAllProjects()]);
+
+  return tracks.map((track) => {
+    const trackSlug = getResearchTrackSlug(track);
+
+    return {
+      params: { slug: trackSlug },
+      props: {
+        track,
+        projects: getProjectsForTrack(projects, trackSlug),
+      },
+    };
+  });
+}
+
+const { track, projects } = Astro.props;
+const trackTitle = track.data.title;
+---
+
+<BaseLayout title={`${trackTitle} Projects - Junu's Lab`}>
+  <section class="block-head">
+    <Eyebrow text="Track Projects" />
+    <h2>{trackTitle}</h2>
+    <p>Projects linked to this research track.</p>
+    <div class="taglist">
+      {track.data.methods.map((method) => <span class="tag">{method}</span>)}
+    </div>
+  </section>
+
+  {projects.length > 0 ? (
+    <div class="grid cols-3">
+      {projects.map((project) => (
+        <Card
+          href={`/projects/${project.data.slug}/`}
+          title={project.data.title}
+          status={project.data.status}
+          summary={project.data.problem ?? project.data.summary}
+          tags={project.data.domain.length > 0 ? project.data.domain : project.data.tags}
+          meta={project.data.output ?? 'Project'}
+        />
+      ))}
+    </div>
+  ) : (
+    <Panel>
+      <h3>No projects linked to this track yet.</h3>
+      <p class="body">This track is currently being developed through reading notes, experiments, or future project plans.</p>
+    </Panel>
+  )}
+</BaseLayout>

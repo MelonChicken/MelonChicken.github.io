@@ -1,6 +1,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 
 type ProjectEntry = CollectionEntry<'projects'>;
+type ProgramEntry = CollectionEntry<'researchPrograms'>;
 
 const statusRank: Record<string, number> = {
   'work-in-progress': 0,
@@ -78,9 +79,12 @@ export async function getFeaturedPrograms() {
   return programs.filter((program) => program.data.featured);
 }
 
-export async function getArchiveEntries() {
-  const archive = await getCollection('archive');
-  return archive.sort((a, b) => a.data.order - b.data.order);
+export function getResearchTrackSlug(program: ProgramEntry) {
+  return program.data.slug ?? program.data.id ?? program.id;
+}
+
+export function getProjectsForTrack(projects: ProjectEntry[], trackSlug: string) {
+  return projects.filter((project) => project.data.tracks.includes(trackSlug));
 }
 
 export async function resolveProject(slug?: string) {

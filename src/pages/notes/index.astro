@@ -41,7 +41,10 @@ const statuses = [...new Set(notes.map((note) => note.data.status))];
     </div>
     <label class="search">
       <span class="flabel">Search</span>
-      <input type="search" data-search placeholder="title, summary, domain" />
+      <span class="searchbox">
+        <span class="search-icon" aria-hidden="true"></span>
+        <input type="search" data-search placeholder="Search title, summary, domain" />
+      </span>
     </label>
   </section>
   <div class="result-count" data-count>{notes.length} notes</div>

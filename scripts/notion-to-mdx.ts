@@ -7,6 +7,33 @@ type Frontmatter = Record<string, unknown>;
 const statusValues = ['idea', 'work-in-progress', 'completed', 'archived'] as const;
 const projectGroups = ['research', 'ml', 'product', 'archived'] as const;
 const noteTypes = ['weekly-brief', 'paper-review', 'experiment-log', 'implementation-note', 'learning-note', 'retrospective'] as const;
+const trackSlugAliases: Record<string, string> = {
+  'animal-pose-estimation': 'animal-pose-estimation',
+  'animal-pose-estimation-keypoint-trajectories': 'animal-pose-estimation',
+  'animal-pose-estimation-and-keypoint-trajectories': 'animal-pose-estimation',
+  'pose': 'animal-pose-estimation',
+  'pose-estimation': 'animal-pose-estimation',
+  'keypoints': 'animal-pose-estimation',
+  'keypoint-trajectories': 'animal-pose-estimation',
+  'behavior-recognition': 'behavior-recognition',
+  'behaviour-recognition': 'behavior-recognition',
+  'behavior-recognition-from-animal-video': 'behavior-recognition',
+  'animal-behavior-recognition': 'behavior-recognition',
+  'animal-behaviour-recognition': 'behavior-recognition',
+  'annotation-efficient-learning': 'annotation-efficient-learning',
+  'annotation-efficient': 'annotation-efficient-learning',
+  'labeling-automation': 'annotation-efficient-learning',
+  'labelling-automation': 'annotation-efficient-learning',
+  'weak-supervision': 'annotation-efficient-learning',
+  'semi-supervised-learning': 'annotation-efficient-learning',
+};
+
+const fallbackProjectTracks: Record<string, string[]> = {
+  'architag-ai': ['annotation-efficient-learning', 'behavior-recognition'],
+  'be-more-duck-vision-language-embodied-agent': ['animal-pose-estimation', 'behavior-recognition'],
+  'wildlife-metadata-fusion': ['animal-pose-estimation', 'annotation-efficient-learning'],
+  'wildlifevision-baseline-scikit-learn': ['animal-pose-estimation'],
+};
 
 export async function pageToMdx(page: AnyNotionObject, target: SyncTargetKey) {
   const title = getTitle(page.properties);
@@ -205,6 +232,7 @@ async function buildFrontmatter(page: AnyNotionObject, target: SyncTargetKey, ti
       date: getProjectDate(properties) || page.last_edited_time?.slice(0, 10) || page.created_time?.slice(0, 10),
       group: normalizeProjectGroup(getPropertyText(properties, ['Group', 'Type', '타입'])),
       program: emptyToUndefined(getPropertyText(properties, ['Program', 'Research Program'])),
+      tracks: getProjectTracks(properties, slug),
       stack: getPropertyList(properties, ['Stack', 'Stacks', 'Tech Stack', 'Technologies', '스택 stack']),
       roles: getPropertyList(properties, ['Roles', 'Role', '역할 role']),
       dataset: emptyToUndefined(getPropertyText(properties, ['Dataset', 'Period', '시작일 종료일'])),
@@ -369,6 +397,28 @@ function normalizeStatus(value: string) {
   return 'idea';
 }
 
+function getProjectTracks(properties: AnyNotionObject, slug: string) {
+  const fromNotion = getPropertyList(properties, [
+    'Tracks',
+    'Track',
+    'Research Tracks',
+    'Research Track',
+    '연구 트랙',
+    '연구 트랙 Research Tracks',
+    '연구트랙',
+  ])
+    .map(normalizeTrackSlug)
+    .filter(Boolean);
+
+  const tracks = fromNotion.length > 0 ? fromNotion : fallbackProjectTracks[slug] || [];
+  return unique(tracks);
+}
+
+function normalizeTrackSlug(value: string) {
+  const slug = slugify(value);
+  return trackSlugAliases[slug] || slug;
+}
+
 function normalizeProjectGroup(value: string) {
   const normalized = slugify(value);
   if (projectGroups.includes(normalized as any)) return normalized;
@@ -407,6 +457,10 @@ function splitList(value: string) {
 
 function emptyToUndefined(value: string) {
   return value || undefined;
+}
+
+function unique(values: string[]) {
+  return [...new Set(values)];
 }
 
 function yamlValue(value: unknown): string {
