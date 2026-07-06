@@ -7,7 +7,10 @@ This site treats Notion as the source CMS and Astro as the static renderer. The 
 1. Create a Notion integration at <https://www.notion.so/my-integrations>.
 2. Copy the internal integration token.
 3. Open each source database in Notion and share it with the integration.
-4. Copy each database ID from its URL.
+4. For the default `data-source` mode, copy each source's Data Source ID.
+
+For `NOTION_API_MODE=data-source`, use Data Source IDs, not Database IDs.
+Do not paste a Data Source ID into `NOTION_PROJECTS_DATABASE_ID` or `NOTION_NOTES_DATABASE_ID`.
 
 ## Environment
 
@@ -15,13 +18,26 @@ Copy `.env.example` to `.env` and fill the values:
 
 ```bash
 NOTION_API_TOKEN=
-NOTION_PROJECTS_DATABASE_ID=
-NOTION_NOTES_DATABASE_ID=
+NOTION_VERSION=2026-03-11
+NOTION_API_MODE=data-source
+
+# Data Source IDs for Notion API 2025-09-03+
+NOTION_PROJECTS_DATA_SOURCE_ID=
+NOTION_NOTES_DATA_SOURCE_ID=
+
+# Optional legacy database mode only
+# NOTION_PROJECTS_DATABASE_ID=
+# NOTION_NOTES_DATABASE_ID=
 # later
-NOTION_BLOG_DATABASE_ID=
+NOTION_BLOG_DATA_SOURCE_ID=
 ```
 
 The token is only read by local Node scripts. It is not used in browser code.
+
+The sync scripts keep legacy database mode for older integrations:
+
+- `NOTION_API_MODE=data-source`: uses `NOTION_*_DATA_SOURCE_ID`
+- `NOTION_API_MODE=database`: uses `NOTION_*_DATABASE_ID`
 
 ## Required properties
 
@@ -49,12 +65,13 @@ npm run sync:notion
 npm run sync:notion:projects
 npm run sync:notion:notes
 npm run sync:notion:blog
+npm run notion:debug
 ```
 
 Default sync targets:
 
-- Projects DB -> `src/content/projects/*.mdx`
-- Lab Notes DB -> `src/content/notes/*.mdx`
+- Projects data source -> `src/content/projects/*.mdx`
+- Lab Notes data source -> `src/content/notes/*.mdx`
 
 Generated MDX includes `generated: true` and:
 
@@ -89,7 +106,7 @@ The converter supports paragraphs, headings, bulleted and numbered lists, to-do 
 
 ## Adding Blog later
 
-1. Add `NOTION_BLOG_DATABASE_ID` to `.env`.
+1. Add `NOTION_BLOG_DATA_SOURCE_ID` to `.env`.
 2. Add an Astro `blog` content collection in `src/content/config.ts`.
 3. Run `npm run sync:notion:blog`.
 4. Review generated files in `src/content/blog/*.mdx` and commit them with any downloaded assets.
@@ -100,15 +117,17 @@ The converter supports paragraphs, headings, bulleted and numbered lists, to-do 
 
 ```bash
 NOTION_API_TOKEN
+NOTION_PROJECTS_DATA_SOURCE_ID
+NOTION_NOTES_DATA_SOURCE_ID
+```
+
+For legacy database mode only, use `NOTION_API_MODE=database` and provide:
+
+```bash
 NOTION_PROJECTS_DATABASE_ID
 NOTION_NOTES_DATABASE_ID
 ```
 
-Optional secrets are supported when you want to skip automatic data source resolution:
-
-```bash
-NOTION_PROJECTS_DATA_SOURCE_ID
-NOTION_NOTES_DATA_SOURCE_ID
-```
+The GitHub Actions workflow sets `NOTION_VERSION=2026-03-11` and `NOTION_API_MODE=data-source`.
 
 The workflow runs `notion:debug`, syncs Notion MDX/assets, runs `check` and `build`, then commits changes under `src/content/projects`, `src/content/notes`, and `public/notion-assets`.

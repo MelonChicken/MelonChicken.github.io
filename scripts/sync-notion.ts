@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { getDatabaseId, printLoadedEnv, queryPublishedPages, syncTargets, type SyncTarget, type SyncTargetKey } from './notion-client';
+import { assertRequiredNotionIds, getDiagnostics, getDatabaseId, printLoadedEnv, queryPublishedPages, syncTargets, type SyncTarget, type SyncTargetKey } from './notion-client';
 import { pageToMdx, shouldSyncPage } from './notion-to-mdx';
 
 const debug = process.argv.includes('--debug');
@@ -13,6 +13,7 @@ main().catch((error) => {
 
 async function main() {
   if (debug) printLoadedEnv(requestedTargets);
+  assertRequiredNotionIds(requestedTargets);
 
   for (const target of requestedTargets) {
     await syncTarget(target);
@@ -20,8 +21,7 @@ async function main() {
 }
 
 async function syncTarget(target: SyncTarget) {
-  const databaseId = getDatabaseId(target);
-  if (!databaseId) {
+  if (getDiagnostics().mode === 'database' && !getDatabaseId(target)) {
     console.warn(`Skipping ${target.label}: ${target.databaseEnv} is not set.`);
     return;
   }

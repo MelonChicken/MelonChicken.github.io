@@ -1,10 +1,13 @@
 import {
+  assertRequiredNotionIds,
   getDatabaseId,
   getDataSourceIdFromEnv,
+  getDiagnostics,
   printLoadedEnv,
   queryDataSource,
   resolveDataSourceId,
   retrieveDatabase,
+  retrieveDataSource,
   syncTargets,
   verifyToken,
   type SyncTarget,
@@ -21,6 +24,7 @@ main().catch((error) => {
 
 async function main() {
   printLoadedEnv(requestedTargets);
+  assertRequiredNotionIds(requestedTargets);
 
   console.log('[notion] verifyToken()');
   const user = await verifyToken();
@@ -36,10 +40,34 @@ async function main() {
 }
 
 async function debugTarget(target: SyncTarget) {
+  console.log(`[notion] ${target.label}`);
+
+  if (getDiagnostics().mode === 'data-source') {
+    await debugDataSourceTarget(target);
+    return;
+  }
+
+  await debugDatabaseTarget(target);
+}
+
+async function debugDataSourceTarget(target: SyncTarget) {
+  const dataSourceId = getDataSourceIdFromEnv(target);
+
+  console.log('  retrieveDataSource(dataSourceId)');
+  const dataSource = await retrieveDataSource(dataSourceId);
+  console.log(`    ok: ${dataSource.name || dataSource.id}`);
+  console.log(`    properties: ${Object.keys(dataSource.properties || {}).join(', ') || '<none>'}`);
+
+  console.log('  queryDataSource(dataSourceId)');
+  const response = await queryDataSource(dataSourceId, { page_size: 1 });
+  console.log(`    ok: ${response.results?.length || 0} sample page(s), has_more=${Boolean(response.has_more)}`);
+  await listPagesIfRequested(dataSourceId);
+}
+
+async function debugDatabaseTarget(target: SyncTarget) {
   const databaseId = getDatabaseId(target);
   const explicitDataSourceId = getDataSourceIdFromEnv(target);
 
-  console.log(`[notion] ${target.label}`);
   if (!databaseId) {
     console.log(`  skipped: ${target.databaseEnv} is not set`);
     return;
@@ -51,10 +79,6 @@ async function debugTarget(target: SyncTarget) {
     database = await retrieveDatabase(databaseId);
   } catch (error) {
     console.log(`    failed: ${getErrorHeadline(error)}`);
-    console.log('  probe queryDataSource(databaseId)');
-    const response = await queryDataSource(databaseId, { page_size: 1 });
-    console.log(`    ok: env id works as data_source_id; ${response.results?.length || 0} sample page(s), has_more=${Boolean(response.has_more)}`);
-    await listPagesIfRequested(databaseId);
     return;
   }
 

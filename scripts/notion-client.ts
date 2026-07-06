@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 export type AnyNotionObject = Record<string, any>;
-export type NotionApiMode = 'legacy' | 'data-source';
+export type NotionApiMode = 'database' | 'data-source';
 export type SyncTargetKey = 'projects' | 'notes' | 'blog';
 
 export type SyncTarget = {
@@ -58,18 +58,18 @@ if (!token) {
 
 export const notionMode = getNotionMode();
 export const notionVersion = process.env.NOTION_VERSION
-  || (notionMode === 'legacy' ? LEGACY_NOTION_VERSION : DATA_SOURCE_NOTION_VERSION);
+  || (notionMode === 'database' ? LEGACY_NOTION_VERSION : DATA_SOURCE_NOTION_VERSION);
 
 export const notion = new Client({
   auth: token,
-  notionVersion: LEGACY_NOTION_VERSION,
+  notionVersion,
 });
 
 export function getDiagnostics(): NotionDiagnostics {
   return {
     mode: notionMode,
     notionVersion,
-    endpointKind: notionMode === 'legacy' ? 'databases.query' : 'dataSources.query',
+    endpointKind: notionMode === 'database' ? 'databases.query' : 'dataSources.query',
     tokenPreview: maskToken(token || ''),
   };
 }
@@ -82,6 +82,33 @@ export function getDatabaseId(target: SyncTarget) {
 export function getDataSourceIdFromEnv(target: SyncTarget) {
   const raw = process.env[target.dataSourceEnv];
   return raw ? extractNotionId(raw) : '';
+}
+
+export function getTargetQueryId(target: SyncTarget) {
+  if (notionMode === 'data-source') {
+    const dataSourceId = getDataSourceIdFromEnv(target);
+    if (!dataSourceId) throw missingDataSourceEnvError([target]);
+    return {
+      id: dataSourceId,
+      envName: target.dataSourceEnv,
+      kind: 'data_source' as const,
+    };
+  }
+
+  const databaseId = getDatabaseId(target);
+  if (!databaseId) throw new Error(`${target.databaseEnv} is not set.`);
+  return {
+    id: databaseId,
+    envName: target.databaseEnv,
+    kind: 'database' as const,
+  };
+}
+
+export function assertRequiredNotionIds(targets: SyncTarget[]) {
+  if (notionMode !== 'data-source') return;
+
+  const missingTargets = targets.filter((target) => !getDataSourceIdFromEnv(target));
+  if (missingTargets.length) throw missingDataSourceEnvError(missingTargets);
 }
 
 export async function verifyToken() {
@@ -113,7 +140,7 @@ export async function resolveDataSourceId(databaseId: string, explicitDataSource
     throw new Error(`Multiple data sources found for database ${databaseId}. Set the matching data source id in .env.\n${candidates}`);
   }
 
-  throw new Error(`No data_sources array was returned for database ${databaseId}. Use NOTION_API_MODE=legacy, or set NOTION_PROJECTS_DATA_SOURCE_ID / NOTION_NOTES_DATA_SOURCE_ID explicitly.`);
+  throw new Error(`No data_sources array was returned for database ${databaseId}. Use NOTION_API_MODE=database, or set NOTION_PROJECTS_DATA_SOURCE_ID / NOTION_NOTES_DATA_SOURCE_ID explicitly.`);
 }
 
 export async function queryDataSource(dataSourceId: string, body: AnyNotionObject) {
@@ -127,12 +154,8 @@ export async function queryPublishedPages(
   target: SyncTarget,
   options: { requirePublishFilter?: boolean; debug?: boolean } = {},
 ) {
-  const databaseId = getDatabaseId(target);
-  if (!databaseId) throw new Error(`${target.databaseEnv} is not set.`);
-
-  const explicitDataSourceId = getDataSourceIdFromEnv(target);
-  const resolvedSource = await resolveQuerySource(databaseId, explicitDataSourceId, options.debug);
-  const filter = getPublishFilter(resolvedSource.schemaSource);
+  const querySource = await resolveQuerySource(target);
+  const filter = getPublishFilter(querySource.schemaSource);
   if (!filter && options.requirePublishFilter) {
     throw new Error(`${target.label} database must have a Published/Public checkbox or Status/Visibility property for safe sync.`);
   }
@@ -141,9 +164,8 @@ export async function queryPublishedPages(
   let startCursor: string | undefined;
 
   if (options.debug) {
-    console.log(`[notion] ${target.label}: endpoint=${notionMode === 'legacy' ? 'databases.query' : 'dataSources.query'}`);
-    console.log(`[notion] ${target.label}: database_id=${databaseId}`);
-    if (resolvedSource.dataSourceId) console.log(`[notion] ${target.label}: data_source_id=${resolvedSource.dataSourceId} (${resolvedSource.source})`);
+    console.log(`[notion] ${target.label}: endpoint=${notionMode === 'database' ? 'databases.query' : 'dataSources.query'}`);
+    console.log(`[notion] ${target.label}: ${querySource.kind}_id=${maskNotionId(querySource.id)}`);
   }
 
   do {
@@ -152,9 +174,9 @@ export async function queryPublishedPages(
       start_cursor: startCursor,
       ...(filter ? { filter } : {}),
     };
-    const response = notionMode === 'legacy'
-      ? await queryDatabase(databaseId, body)
-      : await queryDataSource(resolvedSource.dataSourceId, body);
+    const response = querySource.kind === 'database'
+      ? await queryDatabase(querySource.id, body)
+      : await queryDataSource(querySource.id, body);
 
     pages.push(...response.results.filter((item: AnyNotionObject) => item.object === 'page'));
     startCursor = response.has_more ? response.next_cursor || undefined : undefined;
@@ -163,39 +185,16 @@ export async function queryPublishedPages(
   return pages.filter(isPublishedPage);
 }
 
-async function resolveQuerySource(databaseId: string, explicitDataSourceId: string, debug = false) {
-  if (notionMode === 'legacy') {
-    return {
-      database: await retrieveDatabase(databaseId),
-      dataSourceId: '',
-      schemaSource: await retrieveDatabase(databaseId),
-      source: 'legacy database' as const,
-    };
-  }
+async function resolveQuerySource(target: SyncTarget) {
+  const queryId = getTargetQueryId(target);
+  const schemaSource = queryId.kind === 'database'
+    ? await retrieveDatabase(queryId.id)
+    : await retrieveDataSource(queryId.id);
 
-  try {
-    const database = await retrieveDatabase(databaseId);
-    const dataSourceId = await resolveDataSourceId(databaseId, explicitDataSourceId);
-    return {
-      database,
-      dataSourceId,
-      schemaSource: database,
-      source: explicitDataSourceId ? 'env' as const : 'resolved from database' as const,
-    };
-  } catch (error) {
-    if (!isObjectNotFound(error) || explicitDataSourceId) throw error;
-    if (debug) {
-      console.warn(`[notion] retrieveDatabase failed for ${databaseId}; probing the same id as a data_source_id.`);
-    }
-
-    const dataSource = await retrieveDataSource(databaseId);
-    return {
-      database: undefined,
-      dataSourceId: databaseId,
-      schemaSource: dataSource,
-      source: 'database env treated as data_source_id' as const,
-    };
-  }
+  return {
+    ...queryId,
+    schemaSource,
+  };
 }
 
 export async function listBlockChildren(blockId: string): Promise<AnyNotionObject[]> {
@@ -225,8 +224,11 @@ export function printLoadedEnv(targets: SyncTarget[]) {
   console.log(`  endpoint=${diagnostics.endpointKind}`);
 
   for (const target of targets) {
-    console.log(`  ${target.databaseEnv}=${getEnvPreview(target.databaseEnv)}`);
-    console.log(`  ${target.dataSourceEnv}=${getEnvPreview(target.dataSourceEnv)}`);
+    if (diagnostics.mode === 'data-source') {
+      console.log(`  ${target.dataSourceEnv}=${getEnvPreview(target.dataSourceEnv)}`);
+    } else {
+      console.log(`  ${target.databaseEnv}=${getEnvPreview(target.databaseEnv)}`);
+    }
   }
 }
 
@@ -303,7 +305,8 @@ function enrichNotionError(endpoint: string, status: number, body: AnyNotionObje
     `token preview: ${diagnostics.tokenPreview}`,
     'possible causes:',
     '- token is invalid or belongs to a different workspace',
-    '- this Notion API version requires data_source_id instead of database_id',
+    '- NOTION_API_MODE=data-source requires NOTION_*_DATA_SOURCE_ID values',
+    '- NOTION_API_MODE=database requires NOTION_*_DATABASE_ID values',
     '- the env value is a linked database view id rather than the original database id',
     '- the id loaded from .env differs from the id shown in Notion UI',
     '- a relation target database is not shared with the integration',
@@ -320,8 +323,16 @@ function enrichNotionError(endpoint: string, status: number, body: AnyNotionObje
   return error;
 }
 
-function isObjectNotFound(error: unknown) {
-  return Boolean(error && typeof error === 'object' && (error as { code?: string }).code === 'object_not_found');
+function missingDataSourceEnvError(targets: SyncTarget[]) {
+  const names = targets.map((target) => target.dataSourceEnv);
+  const required = formatEnvList(names);
+  return new Error(`NOTION_API_MODE=data-source requires ${required}.\nDo not put data source IDs into NOTION_*_DATABASE_ID.`);
+}
+
+function formatEnvList(names: string[]) {
+  if (names.length <= 1) return names[0] || 'NOTION_*_DATA_SOURCE_ID';
+  if (names.length === 2) return `${names[0]} and ${names[1]}`;
+  return `${names.slice(0, -1).join(', ')}, and ${names[names.length - 1]}`;
 }
 
 function diagnosticsHints(body: AnyNotionObject) {
@@ -357,18 +368,23 @@ function hasOption(property: AnyNotionObject, optionName: string) {
 
 function getNotionMode(): NotionApiMode {
   const raw = String(process.env.NOTION_API_MODE || process.env.NOTION_MODE || '').toLowerCase();
-  if (raw === 'legacy' || raw === 'database' || raw === 'databases') return 'legacy';
+  if (raw === 'legacy' || raw === 'database' || raw === 'databases') return 'database';
   return 'data-source';
 }
 
 function getEnvPreview(key: string) {
   const value = process.env[key];
-  return value ? extractNotionId(value) : '<unset>';
+  return value ? maskNotionId(extractNotionId(value)) : '<unset>';
 }
 
 function maskToken(value: string) {
   if (!value) return '<unset>';
   return `${value.slice(0, 10)}...`;
+}
+
+function maskNotionId(value: string) {
+  if (!value) return '<unset>';
+  return `${value.slice(0, 8)}...${value.slice(-4)}`;
 }
 
 function normalizePropertyName(value: string) {
