@@ -1,0 +1,172 @@
+---
+title: "WeatherCall119"
+slug: "weathercall119"
+generated: true
+status: "seed"
+summary: "기상데이터를 활용한 119 신고수 예측"
+group: "ml"
+stack: 
+  - "Python"
+  - "scikit-learn"
+  - "Pandas"
+roles: 
+  - "🔢 Data Analyst Modeling"
+  - "🛠️ ML Engineer"
+output: "🧠 ML"
+repo: "https://github.com/MelonChicken/weather119Forecast"
+deploy: "https://colab.research.google.com/drive/1YndCx4zefZTr2MQ7XmwPbTHq4UpvoLf1?usp=sharing"
+notion: "https://app.notion.com/p/WeatherCall119-25f14b84a0f280158651dcb937391df5"
+featured: false
+problem: "기상데이터를 활용한 119 신고수 예측"
+---
+
+{/* This file is generated from Notion. Do not edit directly. */}
+
+<figure>
+  <img src="/notion-assets/weathercall119/25f14b84a0f2801fa6d3fcd4baff590f.png" alt="Source: author's Notion note" />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+# WeatherCall119 – 날씨 빅데이터 기반 119 신고 건수 예측 시스템
+
+> "기상 데이터로 응급상황을 예측하다"
+
+> 2025 날씨 빅데이터 콘테스트 \(2025\.05\.07 ~ 06\.27\)
+
+> **개발 기간** 2025-06-20 ~ 2025-06-27 \(7 일\)
+> 
+> **주제** 119 구급·화재 신고건수 일별 예측\(연속값 → RMSE 평가\)
+> 
+> **최종 LB** _1\.15_ \(RMSE, 6 월 25 일 20:37 제출 – 이미지 참고\)
+> 
+> **개발 환경** Win-11 노트북\(i7-12700H / 32 GB RAM\)·Python 3\.11·scikit-learn 1\.4·xgboost 2\.0
+
+> 🎯 Executive Summary
+> 
+> - 문제: 기상청이 119 신고 건수 예측을 통한 응급의료 자원 배치 최적화 필요
+> 
+> - 해결: 날씨 빅데이터와 머신러닝 앙상블을 통한 지역별 119 신고 건수 예측 시스템
+> 
+> - 결과: XGBoost 모델 RMSE 0\.5479, Ridge 모델 RMSE 0\.7256, 스태킹 앙상블 최적화 완료
+> 
+> - 다음 단계: N/A
+> 
+> ### ⏱ 일정·마일스톤 요약
+> 
+> | --- | --- | --- |
+> | Day | 주요 산출 | 내부 RMSE |
+> | ① 6 / 20 | Ridge baseline, 전처리 함수화 | 1\.39 |
+> | ② 6 / 21 | 주소 merge rule·lag feature | 1\.30 |
+> | ③ 6 / 22 | XGB \(one-hot\) | 1\.27 |
+> | ④ 6 / 23 | RF \+ 결측 Imputer | 1\.25 |
+> | ⑤ 6 / 24 | 모델별 리더보드 제출 · 스태킹 설계 | LB 1\.30/1\.27 |
+> | ⑥ 6 / 25 | Manual Stacking\(RidgeCV\) 완성 | 1\.18 → LB **1\.15** |
+> | ⑦ 6 / 27 | 코드 리팩터링·최종 보고 | LB 1\.39 \(실험\) |
+
+## 1\. 배경·목표
+
+- 사용자/페르소나: 기상청, 소방청, 119 구급대 관제센터 운영진
+
+- 성공 기준\(KPI\): RMSE 기반 예측 정확도 최소화
+
+- 범위\(Out of scope\): 실시간 예측 시스템 구축, 웹 인터페이스 개발 제외
+
+## 2\. 핵심 기능
+
+> 날씨 데이터 전처리
+> 
+> - 지역난방 열수요와 날씨 빅데이터 통합 분석
+> 
+> - 결측치 보간 및 이상치 처리 시스템
+> 
+> - 시계열 특성 추출\(주말, 계절성 등\)
+
+> 머신러닝 앙상블 모델
+> 
+> - Ridge, XGBoost, RandomForest 다중 모델 훈련
+> 
+> - 스태킹 앙상블로 모델 결합 및 성능 향상
+> 
+> - Cross-validation 기반 하이퍼파라미터 최적화
+
+> 예측 및 제출 시스템
+> 
+> - 지역별 119 신고 건수 예측 생성
+> 
+> - 다양한 모델별 제출 파일 자동 생성
+> 
+> - 2023년 홀드아웃 검증 및 성능 평가
+
+## 3\. 기술 스택
+
+- 언어: Python 3\.10
+
+- ML 라이브러리: scikit-learn, XGBoost, TensorFlow
+
+- 데이터 처리: pandas, numpy, category-encoders
+
+- 통계 분석: statsmodels, scipy
+
+- 시각화: matplotlib, seaborn, folium
+
+## 4\. 아키텍처
+
+N/A
+
+## 5\. 성과 지표
+
+- Ridge 모델: RMSE 0\.7256 \(2023년 홀드아웃\)
+
+- XGBoost 모델: RMSE 0\.5479 \(2023년 홀드아웃\)
+
+- 스태킹 앙상블: 메타모델 학습 완료, 최종 성능 최적화
+
+## 6\. 데이터
+
+- 훈련 데이터: 2020-2023년 지역난방 열수요 \+ AWS 기상관측 데이터
+
+- 테스트 데이터: 2024년 5-10월 기간 예측 대상
+
+- 특징 변수: 기온, 습도, 풍속, 강수량, 지역 정보 등
+
+## 7\. 배포 현황
+
+N/A
+
+## 8\. 사용량 분석
+
+N/A
+
+## 9\. 회고 & 개선
+
+잘된 점 3가지:
+
+- 다양한 ML 모델 구현 및 앙상블 최적화 완료
+
+- 체계적인 데이터 전처리 파이프라인 구축
+
+- 모델별 성능 비교 및 검증 체계 확립
+
+아쉬운 점 3가지:
+
+- 실시간 예측 시스템 미구현 / 시간 제약 / 향후 웹 API 개발 계획 필요
+
+- 지역별 세부 분석 부족 / 데이터 집계 수준 제약 / 더 세분화된 지역 분석 필요
+
+- 시각화 및 분석 리포트 미완성 / 개발 우선순위 / 결과 해석 도구 보완 필요
+
+기술부채 목록과 상환 계획:
+
+- 코드 모듈화 및 문서화 개선 \(우선순위: 중, 2주 소요\)
+
+- 모델 성능 모니터링 시스템 구축 \(우선순위: 저, 1개월 소요\)
+
+- 실시간 데이터 처리 파이프라인 구축 \(우선순위: 고, 2개월 소요\)
+
+필요 자료
+
+- 대회 최종 순위 및 성적 증빙 자료 \(공식 결과 발표 대기\)
+
+- 모델 성능 비교 시각화 차트 및 분석 리포트
+
+- 실제 119 신고 건수 예측 정확도 검증 데이터
