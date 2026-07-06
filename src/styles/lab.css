@@ -193,6 +193,12 @@ main{padding:30px 0 70px;min-height:60vh}
 .btn.primary{background:var(--color-button-primary-bg);color:var(--color-button-primary-text);
   border-color:var(--color-button-primary-bg)}
 .btn.primary:hover{background:var(--color-button-primary-bg-hover);border-color:var(--color-button-primary-bg-hover)}
+.btn-icon{display:inline-flex;align-items:center;gap:8px}
+.mail-icon{width:18px;height:13px;border:1px solid var(--color-accent);border-radius:3px;position:relative;
+  display:inline-block;flex:0 0 auto;background:var(--color-bg)}
+.mail-icon::before,.mail-icon::after{content:"";position:absolute;top:1px;width:10px;height:10px;border-top:1px solid var(--color-accent)}
+.mail-icon::before{left:1px;transform:rotate(38deg);transform-origin:top left}
+.mail-icon::after{right:1px;transform:rotate(-38deg);transform-origin:top right}
 .cta-row{display:flex;gap:10px;flex-wrap:wrap}
 
 /* =============================================================================
@@ -371,8 +377,16 @@ main{padding:30px 0 70px;min-height:60vh}
 .contact-row{display:flex;justify-content:space-between;gap:12px;padding:12px 0;
   border-bottom:1px solid var(--color-divider);font-size:.9rem}
 .contact-row:last-child{border-bottom:0}
-.contact-row .lbl{color:var(--color-text-secondary)}
+.contact-row .lbl{color:var(--color-text-secondary);display:inline-flex;align-items:center;gap:8px}
 .contact-row a{color:var(--color-accent)}
+.platform-icon{width:22px;height:22px;border:1px solid var(--color-border);border-radius:var(--radius-sm);
+  display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;
+  background:var(--color-bg);color:var(--color-accent);font-size:.68rem;font-weight:800;line-height:1}
+.linkedin-icon{font-size:.82rem;text-transform:lowercase}
+.email-icon{width:22px;height:16px;border-color:var(--color-accent);border-radius:3px;position:relative}
+.email-icon::before,.email-icon::after{content:"";position:absolute;top:2px;width:11px;height:11px;border-top:1px solid var(--color-accent)}
+.email-icon::before{left:2px;transform:rotate(38deg);transform-origin:top left}
+.email-icon::after{right:2px;transform:rotate(-38deg);transform-origin:top right}
 
 .wftable{width:100%;border-collapse:collapse;font-size:.86rem;margin-top:4px}
 .wftable th,.wftable td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--color-divider);vertical-align:top}

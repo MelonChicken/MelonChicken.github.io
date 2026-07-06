@@ -4,8 +4,13 @@
 node_modules/
 dist/
 .astro/
+.idea/
 .codex-files/
 .codex-astro-scaffold/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
 
 # Local logs and package-manager diagnostics
 *.log
