@@ -1,0 +1,236 @@
+---
+title: "BMOD Labeler"
+slug: "bmod-labeler"
+generated: true
+status: "work-in-progress"
+date: "2025-08-28"
+group: "product"
+stack: 
+  - "CSS"
+output: "🌐 Web"
+notion: "https://app.notion.com/p/BMOD-Labeler-39514b84a0f28038bc9ee82efefd934e"
+featured: false
+---
+
+{/* This file is generated from Notion. Do not edit directly. */}
+
+{/* Unsupported Notion block type: child_database (39514b84-a0f2-8093-b445-d15a06b5dc65) */}
+
+# BMOD Labeler – 오리 행동 비디오 구간 라벨링을 빠르게 수행하는 브라우저 기반 도구
+
+> 라벨링 병목을 줄여 동물 행동 분석 실험까지 빠르게 이어주는 초경량 비디오 라벨러
+
+> Be-MOre Duck Vision-Language Embodied Agent 프로젝트 보조 도구
+> 
+> 개인 미니 프로젝트 / 진행 중
+> 
+> 성취도: 프로토타입 구현 완료, GitHub Repo 및 GitHub Pages 배포 예정
+
+---
+
+> 🎯 Executive Summary
+
+- 문제: 오리 행동 분석 프로젝트에서 원본 영상을 학습 데이터로 사용하려면 구간별 행동 라벨이 필요한데, 일반 영상 플레이어와 스프레드시트를 오가며 라벨링하는 과정이 반복적이고 비효율적이었다\.
+
+- 해결: 로컬 브라우저에서 영상을 불러오면 5초 단위로 자동 분할하고, 단축키로 `feeding / resting / exploring / uncertain` 라벨을 부여한 뒤 CSV로 저장할 수 있는 정적 웹 도구를 만들었다\.
+
+- 결과:
+  - 5초 단위 자동 세그먼트 분할 구현
+  
+  - 4개 행동 라벨 체계 구현: feeding, resting, exploring, uncertain
+  
+  - 브라우저 localStorage 기반 진행상황 자동 저장 구현
+  
+  - CSV export 구현
+  
+  - 영상 파일 서버 업로드 없이 로컬 브라우저에서만 처리
+  
+  - 라벨링 시간 단축률: 측정 예정
+  
+  - 생성 라벨 수: 측정 예정
+
+- 다음 단계:
+  - 2주: GitHub Repo 정리, README 작성, GitHub Pages 데모 배포, sample CSV 추가
+  
+  - 2개월: 라벨링한 데이터를 기반으로 간단한 행동 분류 baseline 모델 학습
+  
+  - 2분기: pose/keypoint sequence 또는 video foundation model 기반 pseudo-labeling / active learning 흐름과 연결
+
+## 1\. 배경·목표
+
+- 사용자/페르소나:
+  - 동물 행동 분석 프로젝트를 진행하는 학부 연구자
+  
+  - 오리 또는 소형 동물 행동 영상을 직접 라벨링해 소규모 학습 데이터를 만들고 싶은 사람
+  
+  - CVAT, Label Studio 같은 범용 annotation platform까지는 필요 없지만, 영상 구간별 행동 라벨 CSV가 필요한 사람
+
+- 성공 기준\(KPI\):
+  - 라벨링 완료 구간 수
+  
+  - 영상 1분당 라벨링 소요 시간
+  
+  - `uncertain` 비율
+  
+  - 라벨링 결과 CSV가 후속 학습 파이프라인에서 바로 사용 가능한 비율
+  
+  - 동일 영상 재라벨링 시 라벨 일관성
+  
+  - baseline 행동 분류 모델 성능: accuracy, macro-F1, class별 F1
+
+- 범위\(Out of scope\):
+  - 서버 업로드 기반 라벨링 플랫폼
+  
+  - 다중 사용자 협업 기능
+  
+  - 로그인/회원 관리
+  
+  - bounding box, segmentation mask, keypoint annotation
+  
+  - 자동 라벨링 모델 내장
+  
+  - 대규모 annotation 운영 시스템
+  
+  - CVAT/Label Studio 대체 목적의 범용 annotation tool
+
+## 2\. 역할·스택·기간
+
+- 역할/기여:
+  - 기획: 100%
+  
+  - FE: 100%
+  
+  - BE: 0%
+  
+  - 데이터 라벨링 설계: 100%
+  
+  - 후속 ML 파이프라인 연결: 예정
+
+- 스택:
+  - HTML
+  
+  - CSS
+  
+  - Vanilla JavaScript
+  
+  - Browser Video API
+  
+  - localStorage
+  
+  - CSV export
+  
+  - GitHub Pages 예정
+
+- 기간:
+  - YYYY-MM-DD ~ YYYY-MM-DD
+  
+  - 현재 상태: 프로토타입 구현 완료, 문서화 및 배포 준비 중
+
+## 3\. 데모 & 링크
+
+- Demo:
+  - GitHub Pages 배포 예정
+
+- Repo:
+  - GitHub Repository 생성 예정
+
+- 문서:
+  - README\.md 예정
+  
+  - labeling\_guideline\.md 예정
+  
+  - csv\_schema\.md 예정
+  
+  - sample\_labels\.csv 예정
+
+- 시연영상:
+  - 짧은 GIF 또는 30초 데모 영상 제작 예정
+
+## 4\. 아키텍처 요약
+
+- 다이어그램:
+
+```plaintext
+Local MP4 Video
+      ↓
+Browser Video Player
+      ↓
+5-second Segment Generator
+      ↓
+Keyboard/Button Labeling
+      ↓
+localStorage Auto Save
+      ↓
+CSV Export
+      ↓
+Behavior Classification Dataset
+```
+
+- 데이터 흐름/외부 의존성:
+  - 사용자가 로컬 mp4 파일을 브라우저에서 선택한다\.
+  
+  - 영상은 서버로 업로드되지 않고 브라우저 내부에서만 재생된다\.
+  
+  - 영상 길이를 기준으로 5초 단위 세그먼트를 생성한다\.
+  
+  - 각 세그먼트에 대해 행동 라벨과 선택 메모를 저장한다\.
+  
+  - 진행상황은 localStorage에 저장되어 같은 파일을 다시 열었을 때 이어서 작업할 수 있다\.
+  
+  - CSV export 시 `segment_id`, `start_sec`, `end_sec`, `label`, `notes` 컬럼으로 저장된다\.
+  
+  - 외부 의존성은 없다\. 별도 서버, DB, API 없이 동작한다\.
+
+- 배포/CI·CD/롤백:
+  - 배포: GitHub Pages 예정
+  
+  - CI/CD: 정적 HTML이므로 초기에는 GitHub Pages 기본 배포만 사용
+  
+  - 롤백: Git commit history 기반으로 이전 버전 복구
+  
+  - 비용: public repository \+ GitHub Pages 기준 0원으로 운영 가능
+
+## 5\. 핵심 기능\(스크린샷/GIF 포함\)
+
+1. 로컬 영상 열기 — 서버 업로드 없이 안전하게 라벨링 가능
+  - 사용자가 로컬 mp4 파일을 선택하면 브라우저에서 바로 재생한다\.
+  
+  - 영상 파일이 외부 서버로 전송되지 않으므로 개인 실험 영상이나 원본 데이터 관리에 적합하다\.
+  
+  - 엣지 케이스: 브라우저에서 재생할 수 없는 코덱의 경우 H\.264 mp4 변환 안내 메시지를 표시한다\.
+
+1. 5초 단위 자동 세그먼트 분할 — 행동 분류 데이터셋 생성 단위 표준화
+  - 영상 길이를 기준으로 5초 단위 세그먼트를 생성한다\.
+  
+  - 자투리 구간은 기본적으로 버리는 방식으로 설정되어 학습 파이프라인의 segment 길이를 일정하게 유지한다\.
+  
+  - 엣지 케이스: 마지막 5초 미만 구간은 제외하여 불균형한 segment를 줄인다\.
+
+1. 행동 라벨 단축키 입력 — 반복 라벨링 피로 감소
+  - `1`: feeding
+  
+  - `2`: resting
+  
+  - `3`: exploring
+  
+  - `U`: uncertain
+  
+  - 버튼 클릭뿐 아니라 키보드 입력으로 라벨링할 수 있어 반복 작업을 줄인다\.
+  
+  - 엣지 케이스: 판단이 애매한 구간은 `uncertain`으로 분리하여 학습 데이터에서 제외하거나 별도로 검토할 수 있다\.
+
+1. 진행상황 자동 저장 — 라벨링 중단 후 이어하기 가능
+  - 파일명과 영상 길이를 기준으로 localStorage에 라벨 진행상황을 저장한다\.
+  
+  - 같은 영상을 다시 열면 첫 미라벨 구간부터 이어서 작업할 수 있다\.
+  
+  - 엣지 케이스: 브라우저 저장공간이 초기화되면 진행상황이 사라질 수 있으므로 CSV를 주기적으로 export해야 한다\.
+
+1. CSV export — 후속 ML 파이프라인과 연결
+  - 라벨링된 구간만 CSV로 내보낸다\.
+  
+  - 컬럼은 `segment_id`, `start_sec`, `end_sec`, `label`, `notes`로 구성된다\.
+  
+  - 후속 단계에서 segment crop, feature extraction, behavior classification 모델 학습에 연결할 수 있다\.
+  
+  - 엣지 케이스: 미라벨 구간은 export에서 제외되어 불완전한 라벨이 학습 데이터에 섞이는 것을 줄인다\.
