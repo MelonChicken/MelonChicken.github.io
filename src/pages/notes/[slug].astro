@@ -21,7 +21,7 @@ const [project, relatedNotes] = await Promise.all([
 const isWeeklyBrief = note.data.type === 'weekly-brief';
 ---
 
-<BaseLayout title={`${note.data.title} · Junu's Lab`}>
+<BaseLayout title={`${note.data.title} - Junu's Lab`}>
   <section class="block-head">
     <Eyebrow text={isWeeklyBrief ? 'Weekly Lab Brief' : 'Lab Note'} />
     <h2>{note.data.title}</h2>
@@ -48,7 +48,12 @@ const isWeeklyBrief = note.data.type === 'weekly-brief';
         <Content />
       </div>
     </article>
-    <aside class="panel">
+    <aside class="panel detail-side">
+      <nav class="toc" id="noteToc" aria-label="Lab note sections" hidden>
+        <h3>On this page</h3>
+        <div class="toc-list" id="noteTocList"></div>
+        <div class="section-divider"></div>
+      </nav>
       <h3>Connections</h3>
       {project && (
         <RelatedList items={[{
@@ -71,4 +76,51 @@ const isWeeklyBrief = note.data.type === 'weekly-brief';
       )}
     </aside>
   </div>
+  <script>
+    const content = document.querySelector('.dblock');
+    const toc = document.querySelector('#noteToc');
+    const tocList = document.querySelector('#noteTocList');
+    const headings = Array.from(content?.querySelectorAll('h1, h2') ?? []);
+
+    const slugCounts = new Map();
+    const slugify = (value: string | null) => {
+      const base = String(value || '')
+        .normalize('NFKD')
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, '')
+        .trim()
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-') || 'section';
+      const count = slugCounts.get(base) || 0;
+      slugCounts.set(base, count + 1);
+      return count ? `${base}-${count + 1}` : base;
+    };
+
+    if (toc && tocList && headings.length > 0) {
+      toc.removeAttribute('hidden');
+
+      for (const heading of headings) {
+        if (!heading.id) heading.id = slugify(heading.textContent);
+        const link = document.createElement('a');
+        link.href = `#${heading.id}`;
+        link.textContent = heading.textContent || 'Section';
+        link.className = heading.tagName === 'H2' ? 'toc-link toc-h2' : 'toc-link toc-h1';
+        tocList.append(link);
+      }
+
+      const links = Array.from(tocList.querySelectorAll('a'));
+      const byId = new Map(links.map((link) => [link.getAttribute('href')?.slice(1), link]));
+      const observer = new IntersectionObserver((entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+        if (!visible) return;
+
+        links.forEach((link) => link.classList.remove('active'));
+        byId.get(visible.target.id)?.classList.add('active');
+      }, { rootMargin: '-96px 0px -65% 0px', threshold: 0.01 });
+
+      headings.forEach((heading) => observer.observe(heading));
+    }
+  </script>
 </BaseLayout>

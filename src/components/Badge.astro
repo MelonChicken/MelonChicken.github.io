@@ -1,10 +1,17 @@
 ---
 interface Props {
-  status: 'seed' | 'growing' | 'stable' | 'archived' | string;
+  status: 'idea' | 'work-in-progress' | 'completed' | 'archived' | string;
   label?: string;
 }
 
-const { status, label = status } = Astro.props;
+const labels: Record<string, string> = {
+  idea: 'Idea',
+  'work-in-progress': 'Work In Progress',
+  completed: 'Completed',
+  archived: 'Archived',
+};
+
+const { status, label = labels[Astro.props.status] ?? Astro.props.status } = Astro.props;
 ---
 
 <span class:list={['badge', `st-${status}`]}><i class="d"></i>{label}</span>

@@ -19,14 +19,14 @@ const [program, relatedNotes] = await Promise.all([
   resolveNotes(project.data.relatedNotes),
 ]);
 const links = [
-  { label: 'Repository', href: project.data.repo },
-  { label: 'Deploy', href: project.data.deploy },
-  { label: 'Demo', href: project.data.demo },
-  { label: 'Notion', href: project.data.notion },
+  { label: 'Repository', href: project.data.repo, icon: '{}' },
+  { label: 'Deploy', href: project.data.deploy, icon: '>>' },
+  { label: 'Demo', href: project.data.demo, icon: 'play' },
+  { label: 'Notion', href: project.data.notion, icon: 'N' },
 ].filter((link) => link.href);
 ---
 
-<BaseLayout title={`${project.data.title} · Junu's Lab`}>
+<BaseLayout title={`${project.data.title} - Junu's Lab`}>
   <section class="block-head">
     <Eyebrow text="Project Detail" />
     <h2>{project.data.title}</h2>
@@ -51,13 +51,26 @@ const links = [
       <div class="dblock">
         <Content />
       </div>
-      {links.length > 0 && (
-        <div class="linkrow">
-          {links.map((link) => <a href={link.href} target="_blank" rel="noreferrer">{link.label}</a>)}
-        </div>
-      )}
     </article>
-    <aside class="panel">
+    <aside class="panel project-side">
+      {links.length > 0 && (
+        <>
+          <h3>Links</h3>
+          <div class="linkrow side-links">
+            {links.map((link) => (
+              <a href={link.href} target="_blank" rel="noreferrer">
+                <span class="link-main"><span class="link-icon" aria-hidden="true">{link.icon}</span>{link.label}</span>
+              </a>
+            ))}
+          </div>
+          <div class="section-divider"></div>
+        </>
+      )}
+      <nav class="toc" id="projectToc" aria-label="Project page sections" hidden>
+        <h3>On this page</h3>
+        <div class="toc-list" id="projectTocList"></div>
+        <div class="section-divider"></div>
+      </nav>
       <h3>Related</h3>
       {program && (
         <div class="selected-note">
@@ -73,4 +86,51 @@ const links = [
       }))} />
     </aside>
   </div>
+  <script>
+    const content = document.querySelector('.dblock');
+    const toc = document.querySelector('#projectToc');
+    const tocList = document.querySelector('#projectTocList');
+    const headings = Array.from(content?.querySelectorAll('h1, h2') ?? []);
+
+    const slugCounts = new Map();
+    const slugify = (value: string | null) => {
+      const base = String(value || '')
+        .normalize('NFKD')
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, '')
+        .trim()
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-') || 'section';
+      const count = slugCounts.get(base) || 0;
+      slugCounts.set(base, count + 1);
+      return count ? `${base}-${count + 1}` : base;
+    };
+
+    if (toc && tocList && headings.length > 0) {
+      toc.removeAttribute('hidden');
+
+      for (const heading of headings) {
+        if (!heading.id) heading.id = slugify(heading.textContent);
+        const link = document.createElement('a');
+        link.href = `#${heading.id}`;
+        link.textContent = heading.textContent || 'Section';
+        link.className = heading.tagName === 'H2' ? 'toc-link toc-h2' : 'toc-link toc-h1';
+        tocList.append(link);
+      }
+
+      const links = Array.from(tocList.querySelectorAll('a'));
+      const byId = new Map(links.map((link) => [link.getAttribute('href')?.slice(1), link]));
+      const observer = new IntersectionObserver((entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+        if (!visible) return;
+
+        links.forEach((link) => link.classList.remove('active'));
+        byId.get(visible.target.id)?.classList.add('active');
+      }, { rootMargin: '-96px 0px -65% 0px', threshold: 0.01 });
+
+      headings.forEach((heading) => observer.observe(heading));
+    }
+  </script>
 </BaseLayout>

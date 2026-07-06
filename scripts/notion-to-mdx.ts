@@ -4,7 +4,7 @@ import { escapeMarkdownInline, escapeMdxAttribute, richTextToMarkdown, richTextT
 
 type Frontmatter = Record<string, unknown>;
 
-const statusValues = ['seed', 'growing', 'stable', 'archived'] as const;
+const statusValues = ['idea', 'work-in-progress', 'completed', 'archived'] as const;
 const projectGroups = ['research', 'ml', 'product', 'archived'] as const;
 const noteTypes = ['weekly-brief', 'paper-review', 'experiment-log', 'implementation-note', 'learning-note', 'retrospective'] as const;
 
@@ -27,8 +27,6 @@ export function shouldSyncPage(page: AnyNotionObject, target: SyncTargetKey) {
   const properties = page.properties || {};
   const title = getTitle(properties);
   const titleSlug = slugify(title, page.id);
-  const status = getPropertyText(properties, ['Status', 'State']);
-  const type = getPropertyText(properties, ['Group', 'Type', '타입']);
   const summary = getPropertyText(properties, ['Summary', 'Description', 'Problem', 'One-liner', '문제-해결 one-liner']);
   const stack = getPropertyList(properties, ['Stack', 'Stacks', 'Tech Stack', 'Technologies', '스택 stack']);
   const roles = getPropertyList(properties, ['Roles', 'Role', '역할 role']);
@@ -38,10 +36,7 @@ export function shouldSyncPage(page: AnyNotionObject, target: SyncTargetKey) {
     getPropertyUrl(properties, ['Deploy', 'Deployment', '배포 Deploy']),
     getPropertyUrl(properties, ['Demo', 'Demonstration', '시연 및 소개 Demonstration']),
   ];
-  const normalizedMarkers = [status, type].map((value) => slugify(value));
-
   if (!title || title === 'Untitled' || titleSlug.startsWith('notion-')) return false;
-  if (normalizedMarkers.some((value) => value === 'idea')) return false;
 
   return Boolean(
     summary
@@ -197,7 +192,7 @@ async function buildFrontmatter(page: AnyNotionObject, target: SyncTargetKey, ti
     title,
     slug,
     generated: true,
-    status: normalizeStatus(getPropertyText(properties, ['Status', 'State'])),
+    status: normalizeStatus(getPropertyText(properties, ['Status', 'State', '상태', '상태 status'])),
     domain: getPropertyList(properties, ['Domain', 'Domains', 'Tags']),
     tags: getPropertyList(properties, ['Tags']),
     relatedNotes,
@@ -207,6 +202,7 @@ async function buildFrontmatter(page: AnyNotionObject, target: SyncTargetKey, ti
   if (target === 'projects') {
     return {
       ...common,
+      date: getProjectDate(properties) || page.last_edited_time?.slice(0, 10) || page.created_time?.slice(0, 10),
       group: normalizeProjectGroup(getPropertyText(properties, ['Group', 'Type', '타입'])),
       program: emptyToUndefined(getPropertyText(properties, ['Program', 'Research Program'])),
       stack: getPropertyList(properties, ['Stack', 'Stacks', 'Tech Stack', 'Technologies', '스택 stack']),
@@ -219,7 +215,7 @@ async function buildFrontmatter(page: AnyNotionObject, target: SyncTargetKey, ti
       demo: getPropertyUrl(properties, ['Demo', 'Demonstration', '시연 및 소개 Demonstration']),
       notion: page.url || '',
       relatedNotes: common.relatedNotes,
-      featured: getPropertyCheckbox(properties, ['Featured']) || false,
+      featured: getPropertyCheckbox(properties, ['Featured', '주요 프로젝트', '주요 프로젝트 Featured']) || false,
       problem: common.summary,
     };
   }
@@ -333,6 +329,19 @@ function getPropertyDate(properties: AnyNotionObject, names: string[]) {
   return getPropertyText(properties, names);
 }
 
+function getProjectDate(properties: AnyNotionObject) {
+  return getPropertyDate(properties, [
+    'Date',
+    'Start Date',
+    'Started',
+    'Period',
+    '시작일',
+    '시작일 종료일',
+    '시작일-종료일 startDate - endDate',
+    '시작일-종료일  startDate - endDate',
+  ]);
+}
+
 function getPropertyNumber(properties: AnyNotionObject, names: string[]) {
   const property = getProperty(properties, names);
   if (property?.type === 'number') return property.number ?? undefined;
@@ -347,11 +356,17 @@ function getPropertyCheckbox(properties: AnyNotionObject, names: string[]) {
 
 function normalizeStatus(value: string) {
   const normalized = slugify(value);
+  const raw = value.trim();
   if (statusValues.includes(normalized as any)) return normalized;
-  if (['done', 'complete', 'completed', 'published', 'public'].includes(normalized)) return 'stable';
-  if (['active', 'progress', 'wip'].includes(normalized)) return 'growing';
+  if (['done', 'complete', 'completed', 'published', 'public', 'deployed', 'ship', 'shipped', 'deployment-complete'].includes(normalized)) return 'completed';
+  if (['active', 'progress', 'in-progress', 'wip', 'work-in-progress', 'working', 'ongoing'].includes(normalized)) return 'work-in-progress';
+  if (['idea', 'ideation', 'backlog', 'planned', 'planning', 'draft'].includes(normalized)) return 'idea';
   if (['archive', 'old'].includes(normalized)) return 'archived';
-  return 'seed';
+  if (['배포완료', '완료'].includes(raw)) return 'completed';
+  if (['작업 중', '작업중', '진행중', '진행 중'].includes(raw)) return 'work-in-progress';
+  if (['아이디어'].includes(raw)) return 'idea';
+  if (['아카이브', '보관'].includes(raw)) return 'archived';
+  return 'idea';
 }
 
 function normalizeProjectGroup(value: string) {

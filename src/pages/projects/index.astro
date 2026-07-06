@@ -2,27 +2,38 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Card from '../../components/Card.astro';
 import Eyebrow from '../../components/Eyebrow.astro';
-import { getProjectsByGroup } from '../../lib/content';
+import { getProjectArchiveSections } from '../../lib/content';
 
-const grouped = await getProjectsByGroup();
+const { ongoing, archivedGroups } = await getProjectArchiveSections();
 const labels: Record<string, string> = {
   research: 'Research projects',
-  ml: 'ML · Data systems',
-  product: 'Product · Portfolio systems',
+  ml: 'ML / Data systems',
+  product: 'Product / Portfolio systems',
   archived: 'Archived work',
 };
 ---
 
-<BaseLayout title="Projects · Junu's Lab">
+<BaseLayout title="Projects - Junu's Lab">
   <section class="block-head">
     <Eyebrow text="Projects" />
     <h2>Project archive</h2>
     <p>Projects are synced from Notion. Database properties drive the cards, and page blocks become the detail content.</p>
   </section>
 
-  {grouped.map(({ group, projects }) => (
+  {ongoing.length > 0 && (
+    <section class="project-section project-section-ongoing">
+      <div class="group-label group-label-live">On going</div>
+      <div class="grid cols-3">
+        {ongoing.map((project) => (
+          <Card href={`/projects/${project.data.slug}/`} title={project.data.title} status={project.data.status} summary={project.data.problem ?? project.data.summary} tags={project.data.domain} meta={project.data.output ?? project.data.group} />
+        ))}
+      </div>
+    </section>
+  )}
+
+  {archivedGroups.map(({ group, projects }) => (
     projects.length > 0 && (
-      <section>
+      <section class="project-section">
         <div class="group-label">{labels[group]}</div>
         <div class="grid cols-3">
           {projects.map((project) => (

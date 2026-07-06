@@ -5,7 +5,7 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
-const status = z.enum(['seed', 'growing', 'stable', 'archived']);
+const status = z.enum(['idea', 'work-in-progress', 'completed', 'archived']);
 const url = z.string().url().or(z.literal('')).optional();
 
 const projects = defineCollection({
@@ -14,7 +14,8 @@ const projects = defineCollection({
     title: z.string(),
     slug: z.string(),
     generated: z.boolean().optional(),
-    status,                                   // seed | growing | stable | archived
+    status,                                   // idea | work-in-progress | completed | archived
+    date: z.coerce.date().optional(),
     group: z.enum(['research', 'ml', 'product', 'archived']),
     domain: z.array(z.string()).default([]),
     tags: z.array(z.string()).default([]),

@@ -1,9 +1,11 @@
-import { getCollection } from 'astro:content';
+import { getCollection, type CollectionEntry } from 'astro:content';
+
+type ProjectEntry = CollectionEntry<'projects'>;
 
 const statusRank: Record<string, number> = {
-  growing: 0,
-  stable: 1,
-  seed: 2,
+  'work-in-progress': 0,
+  completed: 1,
+  idea: 2,
   archived: 3,
 };
 
@@ -16,7 +18,7 @@ export async function getAllProjects() {
     if (groupDelta !== 0) return groupDelta;
     const statusDelta = statusRank[a.data.status] - statusRank[b.data.status];
     if (statusDelta !== 0) return statusDelta;
-    return a.data.title.localeCompare(b.data.title);
+    return compareProjectsByLatest(a, b);
   });
 }
 
@@ -28,19 +30,27 @@ export async function getProjectsByGroup() {
   }));
 }
 
+export async function getProjectArchiveSections() {
+  const projects = await getAllProjects();
+  const ongoing = projects
+    .filter((project) => project.data.status === 'work-in-progress')
+    .sort(compareProjectsByLatest);
+  const archivedGroups = groupOrder.map((group) => ({
+    group,
+    projects: projects
+      .filter((project) => project.data.group === group && project.data.status !== 'work-in-progress')
+      .sort(compareProjectsByLatest),
+  }));
+
+  return { ongoing, archivedGroups };
+}
+
 export async function getFeaturedProjects() {
   const projects = await getAllProjects();
-  const featured = projects
+  return projects
     .filter((project) => project.data.featured)
-    .sort((a, b) => a.data.title.localeCompare(b.data.title));
-
-  const filled = [...featured];
-  for (const project of projects) {
-    if (filled.length >= 4) break;
-    if (!filled.some((item) => item.data.slug === project.data.slug)) filled.push(project);
-  }
-
-  return filled.slice(0, 4);
+    .sort(compareProjectsByLatest)
+    .slice(0, 4);
 }
 
 export async function getAllNotes() {
@@ -133,4 +143,14 @@ export function formatDate(date: Date) {
     month: 'short',
     day: '2-digit',
   }).format(date);
+}
+
+function compareProjectsByLatest(a: ProjectEntry, b: ProjectEntry) {
+  const dateDelta = getProjectTime(b) - getProjectTime(a);
+  if (dateDelta !== 0) return dateDelta;
+  return a.data.title.localeCompare(b.data.title);
+}
+
+function getProjectTime(project: ProjectEntry) {
+  return project.data.date?.getTime() ?? 0;
 }
