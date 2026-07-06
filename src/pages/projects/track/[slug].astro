@@ -22,7 +22,7 @@ export async function getStaticPaths() {
 }
 
 const { track, projects } = Astro.props;
-const trackTitle = track.data.title;
+const trackTitle = track.title;
 ---
 
 <BaseLayout title={`${trackTitle} Projects - Junu's Lab`}>
@@ -31,7 +31,7 @@ const trackTitle = track.data.title;
     <h2>{trackTitle}</h2>
     <p>Projects linked to this research track.</p>
     <div class="taglist">
-      {track.data.methods.map((method) => <span class="tag">{method}</span>)}
+      {track.methods.map((method) => <span class="tag">{method}</span>)}
     </div>
   </section>
 

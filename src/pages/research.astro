@@ -7,8 +7,7 @@ import Panel from '../components/Panel.astro';
 import Pipeline from '../components/Pipeline.astro';
 import { getAllPrograms, getAllProjects, getProjectsForTrack, getResearchTrackSlug } from '../lib/content';
 
-const trackOrder = ['pose', 'behavior', 'annotation'];
-const tracks = (await getAllPrograms()).sort((a, b) => trackOrder.indexOf(a.data.id) - trackOrder.indexOf(b.data.id));
+const tracks = await getAllPrograms();
 const projects = await getAllProjects();
 
 const projectCountLabel = (trackSlug: string) => {
@@ -32,13 +31,13 @@ const projectCountLabel = (trackSlug: string) => {
     {tracks.map((track) => (
       <section class="card">
         <div class="ctop">
-          <h3>{track.data.title}</h3>
-          <Badge status={track.data.status} label={track.data.statusLabel ?? track.data.status} />
+          <h3>{track.title}</h3>
+          <Badge status={track.status} label={track.statusLabel ?? track.status} />
         </div>
-        <p class="qline">{track.data.question}</p>
-        <p class="body">{track.data.matters}</p>
+        <p class="qline">{track.question}</p>
+        <p class="body">{track.matters}</p>
         <div class="taglist">
-          {track.data.methods.map((method) => <span class="tag">{method}</span>)}
+          {track.methods.map((method) => <span class="tag">{method}</span>)}
         </div>
       </section>
     ))}
@@ -80,7 +79,7 @@ const projectCountLabel = (trackSlug: string) => {
     {tracks.map((track) => {
       const trackSlug = getResearchTrackSlug(track);
       return (
-        <Card href={`/projects/track/${trackSlug}/`} title={track.data.title} status={track.data.status} statusLabel={track.data.statusLabel} summary={projectCountLabel(trackSlug)} tags={track.data.methods} meta="Track outputs" />
+        <Card href={`/projects/track/${trackSlug}/`} title={track.title} status={track.status} statusLabel={track.statusLabel} summary={projectCountLabel(trackSlug)} tags={track.methods} meta="Track outputs" />
       );
     })}
   </div>

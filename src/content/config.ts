@@ -66,21 +66,4 @@ const notes = defineCollection({
   }),
 });
 
-const researchPrograms = defineCollection({
-  loader: glob({ pattern: '**/*.json', base: './src/content/research-programs' }),
-  schema: z.object({
-    id: z.string(),
-    slug: z.string().optional(),
-    title: z.string(),
-    status,
-    statusLabel: z.string().optional(),
-    question: z.string(),
-    matters: z.string(),
-    methods: z.array(z.string()).default([]),
-    relatedProjects: z.array(z.string()).default([]),
-    relatedNotes: z.array(z.string()).default([]),
-    featured: z.boolean().default(false),
-  }),
-});
-
-export const collections = { projects, notes, researchPrograms };
+export const collections = { projects, notes };

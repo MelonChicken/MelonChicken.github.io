@@ -40,7 +40,7 @@ const links = [
       </div>
       <Metabox items={[
         { label: 'Group', value: project.data.group },
-        { label: 'Program', value: program?.data.title },
+        { label: 'Program', value: program?.title },
         { label: 'Domain', value: project.data.domain },
         { label: 'Stack', value: project.data.stack },
         { label: 'Roles', value: project.data.roles },
@@ -74,8 +74,8 @@ const links = [
       <h3>Related</h3>
       {program && (
         <div class="selected-note">
-          <b>{program.data.title}</b><br />
-          <span class="muted">{program.data.question}</span>
+          <b>{program.title}</b><br />
+          <span class="muted">{program.question}</span>
         </div>
       )}
       <div class="section-divider"></div>

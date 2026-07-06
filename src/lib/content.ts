@@ -1,7 +1,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
+import { getResearchTrackMeta, type ResearchTrack } from './research-track-meta';
 
 type ProjectEntry = CollectionEntry<'projects'>;
-type ProgramEntry = CollectionEntry<'researchPrograms'>;
 
 const statusRank: Record<string, number> = {
   'work-in-progress': 0,
@@ -69,20 +69,6 @@ export async function getLatestWeeklyBrief() {
   return notes.find((note) => note.data.type === 'weekly-brief');
 }
 
-export async function getAllPrograms() {
-  const programs = await getCollection('researchPrograms');
-  return programs.sort((a, b) => a.data.title.localeCompare(b.data.title));
-}
-
-export async function getFeaturedPrograms() {
-  const programs = await getAllPrograms();
-  return programs.filter((program) => program.data.featured);
-}
-
-export function getResearchTrackSlug(program: ProgramEntry) {
-  return program.data.slug ?? program.data.id ?? program.id;
-}
-
 export function getProjectsForTrack(projects: ProjectEntry[], trackSlug: string) {
   return projects.filter((project) => project.data.tracks.includes(trackSlug));
 }
@@ -93,10 +79,24 @@ export async function resolveProject(slug?: string) {
   return projects.find((project) => project.data.slug === slug);
 }
 
-export async function resolveProgram(id?: string) {
+export async function getAllPrograms() {
+  const projects = await getAllProjects();
+  const trackSlugs = [...new Set(projects.flatMap((project) => project.data.tracks))];
+  return trackSlugs.map((slug) => getResearchTrackMeta(slug));
+}
+
+export async function getFeaturedPrograms() {
+  const programs = await getAllPrograms();
+  return programs.filter((program) => program.featured);
+}
+
+export function getResearchTrackSlug(program: ResearchTrack) {
+  return program.slug;
+}
+
+export function resolveProgram(id?: string) {
   if (!id) return undefined;
-  const programs = await getCollection('researchPrograms');
-  return programs.find((program) => program.data.id === id);
+  return getResearchTrackMeta(id);
 }
 
 export async function resolveNotes(slugs: string[] = []) {
