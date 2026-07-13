@@ -13,6 +13,13 @@ const [featuredProjects, recentNotes, weeklyBrief] = await Promise.all([
   getRecentNotes(4),
   getLatestWeeklyBrief(),
 ]);
+
+function compactSummary(summary?: string, maxLength = 100) {
+  if (!summary) return '';
+  const normalized = summary.replace(/\s+/g, ' ').trim();
+  if (normalized.length <= maxLength) return normalized;
+  return `${normalized.slice(0, maxLength).trimEnd()}...`;
+}
 ---
 
 <BaseLayout title="Junu's Lab">
@@ -113,7 +120,7 @@ const [featuredProjects, recentNotes, weeklyBrief] = await Promise.all([
         <a class="mini-item" href={`/notes/${weeklyBrief.data.slug}/`}>
           <span>
             <span class="mini-title">{weeklyBrief.data.title}</span>
-            <span class="mini-desc">{weeklyBrief.data.summary}</span>
+            {weeklyBrief.data.summary && <span class="mini-desc">{compactSummary(weeklyBrief.data.summary)}</span>}
           </span>
           <span class="mini-meta"><span class="kv">{formatDate(weeklyBrief.data.date)}</span><span class="mini-arrow">Open</span></span>
         </a>
@@ -127,7 +134,7 @@ const [featuredProjects, recentNotes, weeklyBrief] = await Promise.all([
         <a class="mini-item" href={`/notes/${note.data.slug}/`}>
           <span>
             <span class="mini-title">{note.data.title}</span>
-            <span class="mini-desc">{note.data.summary}</span>
+            {note.data.summary && <span class="mini-desc">{compactSummary(note.data.summary)}</span>}
           </span>
           <span class="mini-meta"><span class="kv">{formatDate(note.data.date)}</span><span class="mini-arrow">Open</span></span>
         </a>
