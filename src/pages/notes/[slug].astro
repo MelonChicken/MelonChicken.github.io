@@ -83,6 +83,16 @@ const isWeeklyBrief = note.data.type === 'weekly-brief';
     const headings = Array.from(content?.querySelectorAll('h1, h2') ?? []);
 
     const slugCounts = new Map();
+    const headingLabel = (heading: Element) => {
+      const clone = heading.cloneNode(true) as Element;
+      clone.querySelectorAll('.katex, script, style').forEach((node) => node.remove());
+      return (clone.textContent || heading.textContent || '')
+        .replace(/\$\$[\s\S]*?\$\$/g, '')
+        .replace(/\$[^$]*\$/g, '')
+        .replace(/\\[a-zA-Z]+(?:\{[^}]*\})?/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    };
     const slugify = (value: string | null) => {
       const base = String(value || '')
         .normalize('NFKD')
@@ -100,10 +110,11 @@ const isWeeklyBrief = note.data.type === 'weekly-brief';
       toc.removeAttribute('hidden');
 
       for (const heading of headings) {
-        if (!heading.id) heading.id = slugify(heading.textContent);
+        const label = headingLabel(heading) || 'Section';
+        if (!heading.id) heading.id = slugify(label);
         const link = document.createElement('a');
         link.href = `#${heading.id}`;
-        link.textContent = heading.textContent || 'Section';
+        link.textContent = label;
         link.className = heading.tagName === 'H2' ? 'toc-link toc-h2' : 'toc-link toc-h1';
         tocList.append(link);
       }

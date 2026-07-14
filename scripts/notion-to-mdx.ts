@@ -112,6 +112,8 @@ async function blockToMdx(block: AnyNotionObject, slug: string): Promise<string>
       return calloutBlock(value.rich_text, block, slug);
     case 'code':
       return codeBlock(value);
+    case 'equation':
+      return equationBlock(value);
     case 'divider':
       return '---';
     case 'image':
@@ -169,6 +171,11 @@ async function calloutBlock(richText: AnyNotionObject[] = [], block: AnyNotionOb
 function codeBlock(value: AnyNotionObject) {
   const language = String(value.language || '').replace(/[^a-zA-Z0-9_+-]/g, '');
   return `\`\`\`${language}\n${richTextToPlain(value.rich_text)}\n\`\`\``;
+}
+
+function equationBlock(value: AnyNotionObject) {
+  const expression = String(value.expression || '').trim();
+  return expression ? `$$\n${expression}\n$$` : '';
 }
 
 async function assetBlockToMdx(block: AnyNotionObject, value: AnyNotionObject, slug: string, kind: 'image' | 'file') {

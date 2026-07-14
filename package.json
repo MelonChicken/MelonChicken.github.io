@@ -20,6 +20,9 @@
     "@astrojs/mdx": "^4.3.0",
     "@notionhq/client": "^2.3.0",
     "astro": "^5.11.0",
+    "katex": "^0.17.0",
+    "rehype-katex": "^7.0.1",
+    "remark-math": "^6.0.0",
     "tsx": "^4.20.6",
     "typescript": "^5.8.3"
   }

@@ -1,6 +1,10 @@
 type RichTextItem = {
+  type?: string;
   plain_text?: string;
   href?: string | null;
+  equation?: {
+    expression?: string;
+  };
   annotations?: {
     bold?: boolean;
     italic?: boolean;
@@ -11,12 +15,16 @@ type RichTextItem = {
 };
 
 export function richTextToPlain(richText: RichTextItem[] = []) {
-  return richText.map((item) => item.plain_text || '').join('').trim();
+  return richText.map((item) => item.plain_text || item.equation?.expression || '').join('').trim();
 }
 
 export function richTextToMarkdown(richText: RichTextItem[] = []) {
   return richText
     .map((item) => {
+      if (item.type === 'equation') {
+        return mathInline(item.equation?.expression || item.plain_text || '');
+      }
+
       const rawText = item.plain_text || '';
       if (!rawText) return '';
 
@@ -34,6 +42,11 @@ export function richTextToMarkdown(richText: RichTextItem[] = []) {
     })
     .join('')
     .trim();
+}
+
+function mathInline(expression: string) {
+  const value = expression.trim();
+  return value ? `$${value}$` : '';
 }
 
 export function escapeMarkdownInline(value: string) {
