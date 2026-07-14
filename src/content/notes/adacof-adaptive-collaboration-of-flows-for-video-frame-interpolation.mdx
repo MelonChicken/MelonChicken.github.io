@@ -49,8 +49,6 @@ notion: "https://app.notion.com/p/AdaCoF-Adaptive-Collaboration-of-Flows-for-Vid
 > 
 > 무슨 말인가?
 > 
-> ## 문장을 픽셀 하나의 관점으로 풀면
-> 
 > 출력 중간 프레임의 좌표 \(i,j\)에 픽셀 하나를 만들어야 한다고 하겠습니다\.
 > 
 > 알고리즘이 해결해야 하는 것은 다음과 같습니다\.
@@ -61,9 +59,10 @@ notion: "https://app.notion.com/p/AdaCoF-Adaptive-Collaboration-of-Flows-for-Vid
 > 
 > 1. 그 좌표의 픽셀들을 어떤 비율로 결합할 것인가?
 > 
-> 즉,I\_\{\\text\{out\}\}\(i,j\)
-> =
-> \\sum\_k w\_k I\_\{\\text\{input\}\}\(x\_k,y\_k\)
+> <figure>
+>   <img src="/notion-assets/adacof-adaptive-collaboration-of-flows-for-video-frame-interpolation/39c14b84a0f28030ae27cc1bd2854f99.png" alt="Source: author's Notion note" />
+>   <figcaption>Source: author's Notion note</figcaption>
+> </figure>
 > 
 > 처럼 볼 수 있습니다\.
 > 
@@ -82,10 +81,33 @@ notion: "https://app.notion.com/p/AdaCoF-Adaptive-Collaboration-of-Flows-for-Vid
   
   > 각 방법론은 어떤 한계점이 있는가?
   > 
+  > <figure>
+  >   <img src="/notion-assets/adacof-adaptive-collaboration-of-flows-for-video-frame-interpolation/39c14b84a0f28052aadff89cfdb0d0a4.png" alt="Source: author's Notion note" />
+  >   <figcaption>Source: author's Notion note</figcaption>
+  > </figure>
+  > 
   > 1. kernel-based approach
-  >   -
+  >   : 적응적으로 각각의 픽셀에 대해 큰 규모의 가중치 행렬을 예측하고 입력에 대한 가중치 행렬 \(kernel\)을 합성곱 하여 중간 프레임을 합성하는 기법
+  >   
+  >   → 커널 사이즈보다 큰 움직임 \(motion\)의 경우 위치를 참조할 수 없다 → any location을 참조하지 않는다
+  > 
+  > 1. flow-based approach
+  >   : 각각의 출력 픽셀에 대한 참조 위치를 직접적으로 가리키는 플로우 벡터 \(Flow Vector\)를 예측하는 기법
+  >   
+  >   → 입력 프레임에 대해서 단 하나의 픽셀만을 가리키기 떄문에 복잡한 움직임에 부적합하고 입력 프레임의 질이 좋지 않을때 정보 부족 현상에 시달릴 수 있다 → any number of pixel을 참조하지 않는다
+  > 
+  > 1. Combining kernel-based and flow-based approaches
+  >   : 커널을 플로우 벡터에 의해 가리켜지는 위치와 곱한다
+  >   
+  >   → Kernel과 flow를 결합했지만, flow가 지정한 **한 지점 주변의 작은 영역만 보기 **때문에, 여러 위치를 폭넓게 참고하는 kernel-based 방식보다는 여전히 flow-based 방식에 가깝다\.
+  >   
+  >   \+ Kernel size에 따라 성능이 달라질 수 있기 때문에 DoF에 의한 향상이 가능하다
+
+→ 그래서 AdaCoF를 제안한다
 
 ## 3\. Method
+
+AdaCoF란 무엇인가?
 
 ## 4\. Key Idea
 
@@ -98,3 +120,5 @@ notion: "https://app.notion.com/p/AdaCoF-Adaptive-Collaboration-of-Flows-for-Vid
 ## 8\. What I Can Apply
 
 ## 9\. Next Step
+
+daptively estimates the large-sized kernel for each pixel and synthesizes the intermediate frame by convolving the kernels with the input\.
