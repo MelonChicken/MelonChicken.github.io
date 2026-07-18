@@ -14,10 +14,15 @@ export async function getStaticPaths() {
 
 const { project } = Astro.props;
 const { Content } = await render(project);
-const [program, relatedNotes] = await Promise.all([
+const [program, explicitRelatedNotes, notes] = await Promise.all([
   resolveProgram(project.data.program),
   resolveNotes(project.data.relatedNotes),
+  getCollection('notes'),
 ]);
+const reverseRelatedNotes = notes.filter((note) => note.data.relatedProject === project.data.slug);
+const relatedNotes = [...new Map(
+  [...explicitRelatedNotes, ...reverseRelatedNotes].map((note) => [note.data.slug, note]),
+).values()];
 const links = [
   { label: 'Repository', href: project.data.repo, icon: '{}' },
   { label: 'Deploy', href: project.data.deploy, icon: '>>' },

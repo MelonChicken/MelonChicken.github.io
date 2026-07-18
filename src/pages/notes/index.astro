@@ -4,10 +4,24 @@ import Card from '../../components/Card.astro';
 import Eyebrow from '../../components/Eyebrow.astro';
 import { formatDate, getAllNotes } from '../../lib/content';
 
+const PRIMARY_DOMAINS = [
+  'Animal Behavior',
+  'Video Understanding',
+  'Action Recognition',
+  'Pose Estimation',
+  'Video Interpolation',
+  'Computer Vision',
+  'Machine Learning',
+];
+
 const notes = await getAllNotes();
 const types = [...new Set(notes.map((note) => note.data.type))];
-const domains = [...new Set(notes.flatMap((note) => note.data.domain))];
+const allDomains = [...new Set(notes.flatMap((note) => note.data.domain))].sort((a, b) => a.localeCompare(b));
 const statuses = [...new Set(notes.map((note) => note.data.status))];
+const methods = [...new Set(notes.flatMap((note) => note.data.methods))].sort((a, b) => a.localeCompare(b));
+const existingDomains = new Set(allDomains);
+const primaryDomains = PRIMARY_DOMAINS.filter((domain) => existingDomains.has(domain)).slice(0, 7);
+const pluralizeNotes = (count: number) => `${count} ${count === 1 ? 'note' : 'notes'}`;
 ---
 
 <BaseLayout title="Lab Notes · Junu's Lab">
@@ -18,83 +32,359 @@ const statuses = [...new Set(notes.map((note) => note.data.status))];
   </section>
 
   <section class="filterbar" data-note-filter>
-    <div class="fgroup">
-      <span class="flabel">Type</span>
-      <div class="chips">
-        <button class="chip on" data-filter="type" data-value="all">All</button>
-        {types.map((type) => <button class="chip" data-filter="type" data-value={type}>{type}</button>)}
-      </div>
-    </div>
-    <div class="fgroup">
-      <span class="flabel">Domain</span>
-      <div class="chips">
-        <button class="chip on" data-filter="domain" data-value="all">All</button>
-        {domains.map((domain) => <button class="chip" data-filter="domain" data-value={domain}>{domain}</button>)}
-      </div>
-    </div>
-    <div class="fgroup">
-      <span class="flabel">Status</span>
-      <div class="chips">
-        <button class="chip on" data-filter="status" data-value="all">All</button>
-        {statuses.map((status) => <button class="chip" data-filter="status" data-value={status}>{status}</button>)}
-      </div>
-    </div>
     <label class="search">
       <span class="flabel">Search</span>
       <span class="searchbox">
         <span class="search-icon" aria-hidden="true"></span>
-        <input type="search" data-search placeholder="Search title, summary, domain" />
+        <input type="search" data-search placeholder="Search title, summary, domain, methods" />
       </span>
     </label>
-  </section>
-  <div class="result-count" data-count>{notes.length} notes</div>
 
-  <div class="grid cols-2">
+    <div class="fgroup quick-filter">
+      <span class="flabel">Type</span>
+      <div class="chips">
+        <button class="chip on" type="button" data-filter="types" data-value="all" aria-pressed="true">All</button>
+        {types.map((type) => <button class="chip" type="button" data-filter="types" data-value={type} aria-pressed="false">{type}</button>)}
+      </div>
+    </div>
+
+    <div class="fgroup quick-filter primary-domain-filter">
+      <span class="flabel">Primary Domains</span>
+      <div class="chips">
+        <button class="chip on" type="button" data-filter="domains" data-value="all" aria-pressed="true">All</button>
+        {primaryDomains.map((domain) => <button class="chip" type="button" data-filter="domains" data-value={domain} aria-pressed="false">{domain}</button>)}
+      </div>
+    </div>
+
+    <details class="more-filters">
+      <summary>More Filters</summary>
+      <div class="more-filters-panel">
+        <fieldset class="fgroup filter-fieldset">
+          <legend class="flabel">Status</legend>
+          <div class="checkbox-list">
+            {statuses.map((status) => (
+              <label class="filter-check">
+                <input type="checkbox" data-filter-check="statuses" value={status} />
+                <span>{status}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        <fieldset class="fgroup filter-fieldset">
+          <legend class="flabel">All Domains</legend>
+          <div class="checkbox-list">
+            {allDomains.map((domain) => (
+              <label class="filter-check">
+                <input type="checkbox" data-filter-check="domains" value={domain} />
+                <span>{domain}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        <fieldset class="fgroup filter-fieldset">
+          <legend class="flabel">Methods</legend>
+          <div class="checkbox-list">
+            {methods.map((method) => (
+              <label class="filter-check">
+                <input type="checkbox" data-filter-check="methods" value={method} />
+                <span>{method}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      </div>
+    </details>
+
+    <div class="selected-filters" data-selected-filters hidden>
+      <span class="flabel">Selected</span>
+      <div class="selected-chip-list" data-selected-list></div>
+      <button class="clear-filters" type="button" data-clear-all>Clear all</button>
+    </div>
+  </section>
+  <div class="result-count" data-count aria-live="polite">{pluralizeNotes(notes.length)}</div>
+
+  <div class="empty-results" data-empty-results aria-live="polite" hidden>
+    <p><b>No notes match these filters.</b></p>
+    <p>Try clearing a filter or using a broader search term.</p>
+    <button class="btn" type="button" data-empty-clear>Clear all</button>
+  </div>
+
+  <div class="grid cols-2" data-note-list>
     {notes.map((note) => (
-      <div data-note data-type={note.data.type} data-domain={note.data.domain.join('|')} data-status={note.data.status} data-text={`${note.data.title} ${note.data.summary ?? ''} ${note.data.domain.join(' ')}`.toLowerCase()}>
+      <div
+        data-note
+        data-type={note.data.type}
+        data-status={note.data.status}
+        data-domains={JSON.stringify(note.data.domain)}
+        data-methods={JSON.stringify(note.data.methods)}
+        data-text={`${note.data.title} ${note.data.summary ?? ''} ${note.data.slug} ${note.data.type} ${note.data.status} ${note.data.domain.join(' ')} ${note.data.methods.join(' ')}`}
+      >
         <Card href={`/notes/${note.data.slug}/`} title={note.data.title} status={note.data.status} summary={note.data.summary} tags={[note.data.type, ...note.data.domain]} meta={formatDate(note.data.date)} />
       </div>
     ))}
   </div>
 
   <script>
-    /** @type {{ type: string; domain: string; status: string; q: string }} */
-    const state = { type: 'all', domain: 'all', status: 'all', q: '' };
+    type FilterGroup = 'types' | 'domains' | 'statuses' | 'methods';
+    type HistoryMode = 'push' | 'replace';
+    type FilterState = {
+      q: string;
+      types: string[];
+      domains: string[];
+      statuses: string[];
+      methods: string[];
+    };
+
+    const filterGroups = ['types', 'domains', 'statuses', 'methods'] as const;
+    const state: FilterState = { q: '', types: [], domains: [], statuses: [], methods: [] };
+    const groupLabels: Record<FilterGroup, string> = {
+      types: 'type',
+      domains: 'domain',
+      statuses: 'status',
+      methods: 'method',
+    };
+
+    const validValues: Record<FilterGroup, Set<string>> = {
+      types: new Set(Array.from(document.querySelectorAll('[data-filter="types"]:not([data-value="all"])')).map((item) => item instanceof HTMLElement ? item.dataset.value || '' : '').filter(Boolean)),
+      domains: new Set(Array.from(document.querySelectorAll('[data-filter-check="domains"]')).map((item) => item instanceof HTMLInputElement ? item.value : '').filter(Boolean)),
+      statuses: new Set(Array.from(document.querySelectorAll('[data-filter-check="statuses"]')).map((item) => item instanceof HTMLInputElement ? item.value : '').filter(Boolean)),
+      methods: new Set(Array.from(document.querySelectorAll('[data-filter-check="methods"]')).map((item) => item instanceof HTMLInputElement ? item.value : '').filter(Boolean)),
+    };
+
     const root = document.querySelector('[data-note-filter]');
     const cards = Array.from(document.querySelectorAll('[data-note]'));
     const count = document.querySelector('[data-count]');
+    const search = document.querySelector('[data-search]');
+    const selectedRegion = document.querySelector('[data-selected-filters]');
+    const selectedList = document.querySelector('[data-selected-list]');
+    const clearButtons = Array.from(document.querySelectorAll('[data-clear-all], [data-empty-clear]'));
+    const emptyResults = document.querySelector('[data-empty-results]');
+    const noteList = document.querySelector('[data-note-list]');
+
+    function isFilterGroup(value: string | undefined): value is FilterGroup {
+      return value === 'types' || value === 'domains' || value === 'statuses' || value === 'methods';
+    }
+
+    function normalizeText(value: unknown) {
+      return String(value || '')
+        .normalize('NFKC')
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, ' ');
+    }
+
+    function readJsonList(card: Element, attribute: string) {
+      try {
+        const parsed = JSON.parse(card.getAttribute(attribute) || '[]');
+        return Array.isArray(parsed) ? parsed.map(String) : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function hasIntersection(values: string[], selected: string[]) {
+      if (selected.length === 0) return true;
+      const normalizedValues = new Set(values.map(normalizeText));
+      return selected.some((value) => normalizedValues.has(normalizeText(value)));
+    }
+
+    function setGroupValue(group: FilterGroup, value: string, selected: boolean) {
+      if (value === 'all') {
+        state[group] = [];
+        return;
+      }
+
+      const next = new Set(state[group]);
+      if (selected) next.add(value);
+      else next.delete(value);
+      state[group] = Array.from(next);
+    }
+
+    function sanitizeState(nextState: FilterState) {
+      for (const group of filterGroups) {
+        state[group] = Array.from(new Set(nextState[group].filter((value) => validValues[group].has(value))));
+      }
+      state.q = nextState.q;
+    }
+
+    function readStateFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      sanitizeState({
+        q: params.get('q') || '',
+        types: params.getAll('type'),
+        domains: params.getAll('domain'),
+        statuses: params.getAll('status'),
+        methods: params.getAll('method'),
+      });
+    }
+
+    function urlFromState() {
+      const params = new URLSearchParams();
+      if (state.q.trim()) params.set('q', state.q.trim());
+      for (const type of state.types) params.append('type', type);
+      for (const domain of state.domains) params.append('domain', domain);
+      for (const status of state.statuses) params.append('status', status);
+      for (const method of state.methods) params.append('method', method);
+      const query = params.toString();
+      return `${window.location.pathname}${query ? `?${query}` : ''}`;
+    }
+
+    function syncUrl(mode: HistoryMode) {
+      const nextUrl = urlFromState();
+      const currentUrl = `${window.location.pathname}${window.location.search}`;
+      if (nextUrl === currentUrl) return;
+      if (mode === 'replace') history.replaceState(null, '', nextUrl);
+      else history.pushState(null, '', nextUrl);
+    }
+
+    function updateControls() {
+      if (search instanceof HTMLInputElement && search.value !== state.q) search.value = state.q;
+
+      root?.querySelectorAll('[data-filter]').forEach((button) => {
+        if (!(button instanceof HTMLElement)) return;
+        const group = button.dataset.filter;
+        const value = button.dataset.value || 'all';
+        if (!isFilterGroup(group)) return;
+        const selected = value === 'all' ? state[group].length === 0 : state[group].includes(value);
+        button.classList.toggle('on', selected);
+        button.setAttribute('aria-pressed', String(selected));
+      });
+
+      root?.querySelectorAll('[data-filter-check]').forEach((input) => {
+        if (!(input instanceof HTMLInputElement)) return;
+        const group = input.dataset.filterCheck;
+        if (!isFilterGroup(group)) return;
+        input.checked = state[group].includes(input.value);
+      });
+    }
+
+    function renderSelectedFilters() {
+      if (!selectedRegion || !selectedList) return;
+      selectedList.textContent = '';
+
+      let selectedCount = 0;
+
+      for (const group of filterGroups) {
+        for (const value of state[group]) {
+          selectedCount += 1;
+          const chip = document.createElement('span');
+          chip.className = 'selected-chip';
+          chip.textContent = value;
+
+          const remove = document.createElement('button');
+          remove.type = 'button';
+          remove.dataset.removeFilter = group;
+          remove.dataset.value = value;
+          remove.setAttribute('aria-label', `Remove ${value} ${groupLabels[group]} filter`);
+          remove.textContent = 'x';
+
+          chip.append(remove);
+          selectedList.append(chip);
+        }
+      }
+
+      const hasAnyState = selectedCount > 0 || Boolean(state.q.trim());
+      selectedRegion.toggleAttribute('hidden', !hasAnyState);
+    }
 
     function apply() {
+      const query = normalizeText(state.q);
       let visible = 0;
+
       for (const card of cards) {
-        const matchType = state.type === 'all' || card.getAttribute('data-type') === state.type;
-        const matchDomain = state.domain === 'all' || card.getAttribute('data-domain')?.split('|').includes(state.domain);
-        const matchStatus = state.status === 'all' || card.getAttribute('data-status') === state.status;
-        const matchSearch = !state.q || card.getAttribute('data-text')?.includes(state.q);
-        const show = Boolean(matchType && matchDomain && matchStatus && matchSearch);
+        const type = card.getAttribute('data-type') || '';
+        const status = card.getAttribute('data-status') || '';
+        const domains = readJsonList(card, 'data-domains');
+        const methods = readJsonList(card, 'data-methods');
+        const text = normalizeText(card.getAttribute('data-text'));
+
+        const matchesQuery = !query || text.includes(query);
+        const matchesType = state.types.length === 0 || state.types.includes(type);
+        const matchesDomain = hasIntersection(domains, state.domains);
+        const matchesStatus = state.statuses.length === 0 || state.statuses.includes(status);
+        const matchesMethod = hasIntersection(methods, state.methods);
+        const show = Boolean(matchesQuery && matchesType && matchesDomain && matchesStatus && matchesMethod);
+
         card.toggleAttribute('hidden', !show);
         if (show) visible += 1;
       }
-      if (count) count.textContent = `${visible} notes`;
+
+      if (count) count.textContent = `${visible} ${visible === 1 ? 'note' : 'notes'}`;
+      emptyResults?.toggleAttribute('hidden', visible !== 0);
+      noteList?.toggleAttribute('hidden', visible === 0);
+      updateControls();
+      renderSelectedFilters();
+    }
+
+    function clearAll(mode: HistoryMode = 'push') {
+      state.q = '';
+      state.types = [];
+      state.domains = [];
+      state.statuses = [];
+      state.methods = [];
+      apply();
+      syncUrl(mode);
     }
 
     root?.addEventListener('click', (event) => {
       const target = event.target;
-      if (!(target instanceof HTMLElement) || !target.matches('[data-filter]')) return;
-      const key = target.dataset.filter;
-      const value = target.dataset.value ?? 'all';
-      if (key !== 'type' && key !== 'domain' && key !== 'status') return;
-      state[key] = value;
-      root.querySelectorAll(`[data-filter="${key}"]`).forEach((chip) => chip.classList.toggle('on', chip === target));
+      if (!(target instanceof HTMLElement)) return;
+
+      const filterButton = target.closest('[data-filter]');
+      if (filterButton instanceof HTMLElement) {
+        const group = filterButton.dataset.filter;
+        const value = filterButton.dataset.value || 'all';
+        if (!isFilterGroup(group)) return;
+        const selected = value === 'all' ? true : !state[group].includes(value);
+        setGroupValue(group, value, selected);
+        apply();
+        syncUrl('push');
+        return;
+      }
+
+      const removeButton = target.closest('[data-remove-filter]');
+      if (removeButton instanceof HTMLElement) {
+        const group = removeButton.dataset.removeFilter;
+        const value = removeButton.dataset.value || '';
+        if (!isFilterGroup(group)) return;
+        state[group] = state[group].filter((item) => item !== value);
+        apply();
+        syncUrl('push');
+      }
+    });
+
+    root?.addEventListener('change', (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLInputElement) || !target.matches('[data-filter-check]')) return;
+      const group = target.dataset.filterCheck;
+      if (!isFilterGroup(group)) return;
+      setGroupValue(group, target.value, target.checked);
+      apply();
+      syncUrl('push');
+    });
+
+    search?.addEventListener('input', (event) => {
+      const target = event.target;
+      if (target instanceof HTMLInputElement) {
+        state.q = normalizeText(target.value);
+        apply();
+        syncUrl('replace');
+      }
+    });
+
+    for (const button of clearButtons) {
+      button.addEventListener('click', () => clearAll('push'));
+    }
+
+    window.addEventListener('popstate', () => {
+      readStateFromUrl();
       apply();
     });
 
-    document.querySelector('[data-search]')?.addEventListener('input', (event) => {
-      const target = event.target;
-      if (target instanceof HTMLInputElement) {
-        state.q = target.value.trim().toLowerCase();
-        apply();
-      }
-    });
+    readStateFromUrl();
+    apply();
+    syncUrl('replace');
   </script>
 </BaseLayout>
