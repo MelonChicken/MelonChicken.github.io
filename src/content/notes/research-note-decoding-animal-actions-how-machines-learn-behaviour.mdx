@@ -1,0 +1,200 @@
+---
+title: "[Research Note] Decoding Animal Actions: How Machines Learn Behaviour"
+slug: "research-note-decoding-animal-actions-how-machines-learn-behaviour"
+generated: true
+status: "completed"
+domain: 
+  - "Computer Vision"
+  - "Animal Behavior"
+  - "Deep Learning"
+  - "Pose Estimation"
+  - "Video Understanding"
+relatedNotes: 
+  - "computer-vision-deeplabcut-practice"
+summary: "동물 행동학의 전통적 분석에서 딥러닝 기반 자동 분석으로의 전환을 다룬다. Pose Estimation, Object Tracking, Behaviour Classification을 통해 행동을 정량화하고, 예측·설명 가능한 AI로 확장되는 흐름을 탐구한다."
+type: "learning-note"
+methods: 
+  - "Pose Estimation"
+  - "Keypoint Detection"
+  - "Tracking"
+date: "2025-11-02"
+notion: "https://app.notion.com/p/Research-Note-Decoding-Animal-Actions-How-Machines-Learn-Behaviour-3a114b84a0f280fb8850ff05e8affb3e"
+---
+
+{/* This file is generated from Notion. Do not edit directly. */}
+
+# 들어가며
+
+> 이 글은 제 주요 관심사인 **동물 행동 예측 및 재현 \(Prediction and Reproduction of Animal Behaviours\)**에 대해 개념을 정리하기 위해 쓴 개론식 글이며, 간단하게 왜 행동 분석에 딥러닝이 사용되었는지, 현재는 어떤 방식으로 발전하고 있는지 기록하기 위해 작성된 글입니다\.
+> 
+> **How Machines Learn Behaviour**에서는 딥러닝 도입 이전 행동 분석은 어떤 역할과 방법론이 있었는지 딥러닝이 어떻게 적용되어 행동을 이해하는지에 대해 탐구할 예정입니다\.
+
+---
+
+# Ⅰ\. Introduction
+
+## Ⅰ\. 1\. Concept of Behaviour
+
+> 동물의 모든 움직임은 외부 또는 내부로부터 자극 \(stimulus\)을 받아 이에 대해 반응 \(response\)하는 과정으로 설명할 수 있다\.
+
+동물 행동은 **생명체가 환경 \(environment\), 다른 생명체 \(fellow organisms\), 그리고 내부 자극\(internal stimuli\)에 반응하여 나타내는 일련의 동작 \(actions\), 반응 \(reactions\), 활동 패턴 \(activity patterns\)**을 지칭합니다\.
+
+말이 조금 어렵지만 이미 우리는 모두 행동이란게 무엇인지 알고 있습니다\. 점심 먹기, 수다 떨기, 책 읽기 등 우리가 살아가며 하는 모든 동작, 반응을 행동이라 합니다\. 물론 연구 분야에 따라 행동을 세부적으로 다르게 정의하기도 하나, 이 글에서는 행동이란 조건에 대한 움직임 정도로 놓고 진행하겠습니다\.
+
+<figure>
+  <img src="/notion-assets/research-note-decoding-animal-actions-how-machines-learn-behaviour/3a114b84a0f280d380f1c431a3c65792.png" alt="Source: author's Notion note" />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+Fig\. 1\. 행동은 짧고 정형화된 행동의 기본 요소부터 길고 다양한 구애 행동에 이르기까지 지속 시간과 가변성이
+다양합니다\.
+
+> 행동에 대한 개념을 읽고 이런 질문을 던져볼 수 있습니다\. "만약 자극에 대한 반응을 패턴화할 수 있다면,  특정 개체에게 비슷한 자극이 주어졌을 때의 반응을 예측할 수 있을까?"
+> 
+> 지금은 양자역학에 의해 힘을 잃은 [라플라스의 악마 \(Laplace's demon\)](https://en.wikipedia.org/wiki/Laplace%27s_demon) 처럼 말이죠\. 그렇다면 우리는 어떻게 행동에서 정보를 얻어낼 수 있을까요?
+
+## Ⅰ\. 2\. Analysis of Animal Behaviour
+
+동물 행동 분석은 크게 기계학습을 적용하기 이전과 이후로 나누어서 볼 수 있습니다\. 기계학습 이전에는 주로 인간의 기록과 가설을 통한 행동 분석과 예측이 주류 방법이었습니다\.
+
+### Ⅰ\. 2\. 1\. Traditional Methodology of Animal Behaviour
+
+> 과거 동물의 행동을 연구할 때 어떻게 \(how\)와 왜 \(why\)라는 두가지 질문을 했습니다\. 어떻게는 행동의 요인, 기제, 발달 등을 묻는 **기능**에 관한 질문이고, **왜**는 행동의 궁극적인 목적이나 가치를 묻는 진화적인 질문입니다\.
+> 
+> 따라서 행동학은 어떻게를 설명하기 위해 생리학, 내분비학 등의 기능생물학적 방법이 필요하고 왜를 설명하기 위해서는 진화생물학적 방법론을 사용해왔습니다\.
+
+그렇기에 역사적으로 행동 분석은 관찰자가 **직접 행동을 상세히 기술**하거나, **간단한 실험** 방법 \(예: 좁은 튜브에서의 우열 통행권 측정\)을 통해 이루어졌고, "동물행동학의 역사와 연구 주제들" \(최재천, 1996, p\.19-25\)에서는 아래와 같이 분류하였기에 이를 참고해 볼 수 있습니다\.
+
+> **1\. 가설 검증과 행동 분석 \(Hypothesis Testing and the Analysis of Behaviour\) **
+> : 가장 일반적으로 떠올리는 실험적 방법론
+> 
+> **2\. 비교법 \(Comparative Method\)**
+> : 이 행동 적응이 왜 다른 종에서는 발현이 되지 않았는가 비교하는 방법론
+> 
+> **3\. 적응주의적 강령 \(Adaptationist Program\)**
+> : 이는 모두 자연선택의 산물, 진화의 역사에 의해 최상 수준의 적응을 갖추고 있다는 전제하에 가설을 수립하는 방법론
+> 
+> **4\. 행동의 경제학적 분석 \(Economic Analysis of Behaviour\)**
+> : 최적화 이론 \(optimization theory\)과 게임 이론 \(game theory\) 등과 같은 이론을 통한 특정 행동의 이득과 손실을 분석함으로써 행동을 분석하는 방법론
+
+### Ⅰ\. 2\. 2\. Limitations of Traditional Methodology of Animal Behaviour
+
+그러나 이러한 전통적인 방식은 아무래도 사람이 수작업으로 진행하고, 정량적인 데이터 기반이라 보기 어렵기에, 시간과 노력을 아무리 쏟아넣더라도 다음과 같은 근본적인 한계에 직면했습니다\.
+
+- **주관성 및 노동 집약성:** 수동 관찰은 시간과 노력이 많이 들고, 관찰자 간 또는 동일 관찰자가 시간에 따라 보이는 **분류의 변동성**에 취약하여 실험실 간 결과 비교를 어렵게 만듭니다\.
+
+- **정량적 한계:** 복잡한 행동의 특정 측면을 포착하기 위해 수치 지수로 요약하는 방식은 행동의 근본적인 구조와 세밀한 메커니즘을 **애매하게 만들 위험**이 있습니다\.
+
+<figure>
+  <img src="/notion-assets/research-note-decoding-animal-actions-how-machines-learn-behaviour/3a114b84a0f28069a52df15c3521a3fc.png" alt="Source: author's Notion note" />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+세상은 우리가 생각하고 관찰했던 것과 많이 다를수도\.\.\.
+
+# Ⅱ\. Adaption of Deep Learning
+
+> **딥러닝\(Deep Learning, DL\)**의 통합은 이러한 행동 연구 환경에 큰 변화를 가져왔습니다\. 먼저 고해상도 카메라, GPS 추적 장치, 센서 등을 통해 수집된 방대한 데이터셋으로부터 패턴과 특징을 알고리즘을 통해 **자율적으로 식별**할 수 있게 해줍니다\. 이를 통해 연구자들은 노동 집약적인 수동 데이터 주석 작업에서 벗어나 결과 해석에 집중할 수 있게 됩니다\.
+
+<figure>
+  <img src="/notion-assets/research-note-decoding-animal-actions-how-machines-learn-behaviour/3a114b84a0f280639f48e343f6ef1ed6.png" alt="Source: author's Notion note" />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+Fig\. 2\. "머신 러닝을 이용한 실험동물 분석"에서
+
+**비디오 기반 행동 분석\(video-based behaviour analysis\)**은 고해상도 영상, GPS 추적 장치, 그리고 센서 데이터 등을 통해 수집된 **대규모 행동 시계열 데이터**를 처리하기 위해 등장한 방법론입니다\. 이와 같은 방법론에서 딥러닝은 방대한 데이터셋으로부터 패턴과 특징을 자율적으로 식별할 수 있는 역량을 연구자들에게 제공합니다\.
+
+> 다시 말해 이전에는 사람이 직접 일일이 기록해야 했던 일들이 이제는 자동으로 기록 및 분류가 가능해지는 겁니다\. 이로 인해 시간적, 자원적 비용은 획기적으로 줄어들게 되겠죠\.
+
+실제로 논문에서 제시된 바와 같이, 딥러닝 기반 동물 행동 분석은 다음 기술들의 결합을 통해 동물의 세밀한 움직임을 정량적으로 분석합니다\.
+
+## Pose Estimation
+
+: 객체의 **위치와 방향**을 식별하고 찾아내는 과정\.
+
+[DeepLabCut \(DLC\)](https://www.mackenziemathislab.org/deeplabcut/)이나 [Social LEAP Estimates Animal Poses \(SLEAP\)](https://github.com/talmolab/sleap) 과 같은 도구는 카메라 영상 속 개별 신체 **키포인트\(keypoint\)**를 탐지하고, 이를 시간축으로 추적하여, 동물의 자세나 동작의 형태학적 특징을 수치화합니다
+
+<figure>
+  <img src="/notion-assets/research-note-decoding-animal-actions-how-machines-learn-behaviour/3a114b84a0f2801ab22cf281124737fc.gif" alt="Source: author's Notion note" />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+Fig\. 3\. 실제 DeepLapCut에서 제공하는 활용 예시\. 각 마우스의 신체 키포인트를 추적한다\.
+
+## Object Detection and Tracking
+
+: 객체를 **식별**하고 그 **궤적을 연결**하는 과정\.
+
+[YOLO](https://arxiv.org/pdf/1506.02640)와 같은 **객체 탐지 아키텍처**나 [DeepSort](https://github.com/nwojke/deep_sort) 같은 **추적 알고리즘**을 사용하여, 여러 개체의 위치, 속도, 그리고 사회적 상호작용의 궤적을 프레임 단위로 연결합니다\.
+
+<figure>
+  <img src="/notion-assets/research-note-decoding-animal-actions-how-machines-learn-behaviour/3a114b84a0f2808d89aadb7acdab37b9.png" alt="Source: author's Notion note" />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+Fig\. 4\.1\., Fig 4\.2\. SORT 활용 예시\. 실제 사람을 구별하고 추적하는 것을 좌우 사진을 통해 알 수 있다\.
+
+## Behaviour Classification
+
+: 얻은 특징들을 학습하여 특정 행동 범주로 분류하는 과정\.
+
+**Pose Estimation**과 **Object Detection and Tracking**, 두 과정을 통해 얻은 시계열 특징 \(궤적 데이터, 속도 등\)을 \*\*순환 신경망\(RNN\)\*\*이나 **1-Dimension CNN**, 또는 **지도 학습 알고리즘**을 통해 학습하여 특정 행동 카테고리를 자동으로 판별합니다\.
+
+### Behaviour Classification Example : Interacting primates and mice in complex environments
+
+<figure>
+  <img src="/notion-assets/research-note-decoding-animal-actions-how-machines-learn-behaviour/3a114b84a0f280d5a392dd940004ac8d.png" alt="Source: author's Notion note" />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+Fig\. 5\. Overview of the SIPEC workflow and modules
+
+이 논문에서는 복잡한 환경 속 여러 마리의 실험동물을 동시에 추적하고, 개별 행동을 자동으로 분류하기 위한 통합 프레임워크를 제시하였습니다\.
+
+이 연구는 앞서 언급한 세 과정을 포함한 구조로 1\. Pose Estimation → 2\. Object Tracking → 3\. Feature Extraction → 4\. Behaviour Classification의 파이프라인을 따릅니다\.
+
+**Pose Estimation 단계**에서는 각 개체의 신체 주요 지점\(keypoints\)을 검출하여 시각적 특징을 수치화하고,
+
+**Object Tracking 단계**에서는 이를 시간 축 상에서 연결하여 개체별 궤적\(trajectory\)을 생성합니다\.
+
+이렇게 얻은 시계열 특징\(위치 변화, 속도, 상대 거리 등\)을 **RNN 및 1D-CNN 기반 분류 모델**에 입력하여,
+
+<figure>
+  <img src="/notion-assets/research-note-decoding-animal-actions-how-machines-learn-behaviour/3a114b84a0f280b3add1da729b850e89.png" alt="Source: author's Notion note" />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+Fig\. 6\. SIPEC can recognize social interactions of multiple primates and infer their 3D 454 positions using a single camera
+
+사회적 상호작용, 탐색 행동, 공격성 등 다양한 행동 패턴을 자동으로 분류하였습니다\.
+
+이와 같은 사례를 통해 우리는 딥러닝 기반의 행동 분석 방법론은 다중 개체\(multi-animal\) 환경에서 포즈와 궤적을 동시에 고려한 행동 인식이 가능함을 실험적으로 확인할 수 있었습니다\.
+
+즉, 단일 개체 중심의 분석을 넘어 사회적 행동\(social behaviour\) 을 정량화할 수 있는 기반을 마련했습니다\.
+
+# Ⅲ Limitations
+
+딥러닝은 관찰의 정밀도와 속도를 향상시켰고 행동 분석에 드는 비용을 획기적으로 줄였지만 여전히 한계점은 존재합니다\.
+
+딥러닝 모델은 행동의 패턴과 구조를 정확히 분류할 수 있지만, **‘왜 그런 행동이 발생했는가’**에 대한 근본적인 원인과 생물학적 해석은 여전히 연구자의 몫으로 남아 있습니다\. 그렇기에 여전히 관찰 및 기록 단계에 머물러 있을 뿐입니다\.
+
+따라서 최근 움직임은 동물의 의사 결정 과정을 이해하고, 행동의 변화를 감지하는 **예측 모델링\(predictive modelling\)**으로 나아가고 있으며, 모델의 판단 과정을 투명하게 보여주는 **설명가능한 AI\(Explainable AI, XAI\)** 기술의 적용이 모색되고 있습니다\.
+
+# References
+
+1. 강태영\. \(2011\)\. 동물 행동학 기반 동물 애니메이션 동작 표현 방법 연구\. 한국콘텐츠학회논문지, 11\(8\), 39–47\.
+
+1. Fazzari, E\., Romano, D\., Falchi, F\., & Stefanini, C\. \(2024\)\. Animal Behavior Analysis Methods Using Deep Learning: A Survey\. arXiv\. [https://arxiv\.org/abs/2405\.14002](https://arxiv.org/abs/2405.14002)
+
+1. 박성모\(2024\)\. 머신 러닝을 이용한 실험동물 분석\. BRIC View 2024-T07\. Available from [https://www\.ibric\.org/bric/trend/bio-report\.do?mode=view&articleNo=9899771](https://www.ibric.org/bric/trend/bio-report.do?mode=view&articleNo=9899771) \(May 10, 2024\)
+
+1. 최재천\. \(1996\)\. 동물행동학의 역사와 연구 주제들\. 한국통합생물학회\. [https://scienceon\.kisti\.re\.kr/srch/selectPORSrchArticle\.do?cn=JAKO199611919895078](https://scienceon.kisti.re.kr/srch/selectPORSrchArticle.do?cn=JAKO199611919895078)
+
+1. Wojke, N\., & Bewley, A\., & Paulus, D\. \(2017\)\. Simple online and realtime tracking with a deep association metric\. arXiv\. [https://arxiv\.org/abs/1703\.07402](https://arxiv.org/abs/1703.07402)
+
+1. Matsumoto, K\., & Okamoto, M\. \(2022\)\. Deep-learning based identification, tracking, pose estimation, and behavior classification of interacting primates and mice in complex environments\. bioRxiv\. [https://www\.biorxiv\.org/content/10\.1101/2020\.10\.26\.355115v4\.full\.pdf](https://www.biorxiv.org/content/10.1101/2020.10.26.355115v4.full.pdf)
+
+> **마무리하며**
+> 
+> 이번 글은 제가 AI에 대해 학습 방향성을 고민해보며 적은 글로, animal behaviour analysis 분야에 대해 생각해보며 적어보았기에 자세한 기술적 위주의 글이 아닌 주로 개념, 또는 활용 모델의 의의에 초점을 맞추어 작성해보았습니다\. 다음 글로는 실제로 언급했던 모델들을 활용해보며 후기를 남겨볼 것 같습니다\.
