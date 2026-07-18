@@ -1,6 +1,6 @@
 ---
-title: "AdaCoF: Adaptive Collaboration of Flows for Video Frame Interpolation"
-slug: "adacof-adaptive-collaboration-of-flows-for-video-frame-interpolation"
+title: "[Reading Note] AdaCoF: Adaptive Collaboration of Flows for Video Frame Interpolation"
+slug: "reading-note-adacof-adaptive-collaboration-of-flows-for-video-frame-interpolation"
 generated: true
 status: "idea"
 domain: 
@@ -11,12 +11,10 @@ summary: "논문은 입력 프레임에서 출력 픽셀 생성에 필요한 참
 type: "paper-review"
 date: "2026-07-13"
 readTime: 1
-notion: "https://app.notion.com/p/AdaCoF-Adaptive-Collaboration-of-Flows-for-Video-Frame-Interpolation-39c14b84a0f280518897c825d660fac8"
+notion: "https://app.notion.com/p/Reading-Note-AdaCoF-Adaptive-Collaboration-of-Flows-for-Video-Frame-Interpolation-39c14b84a0f280518897c825d660fac8"
 ---
 
 {/* This file is generated from Notion. Do not edit directly. */}
-
-이미지의 형식에 맞추면 다음과 같이 작성하시면 됩니다\.
 
 ## Paper Information
 
@@ -60,7 +58,7 @@ notion: "https://app.notion.com/p/AdaCoF-Adaptive-Collaboration-of-Flows-for-Vid
 > 1. 그 좌표의 픽셀들을 어떤 비율로 결합할 것인가?
 > 
 > <figure>
->   <img src="/notion-assets/adacof-adaptive-collaboration-of-flows-for-video-frame-interpolation/39c14b84a0f28030ae27cc1bd2854f99.png" alt="Source: author's Notion note" />
+>   <img src="/notion-assets/reading-note-adacof-adaptive-collaboration-of-flows-for-video-frame-interpolation/39c14b84a0f28030ae27cc1bd2854f99.png" alt="Source: author's Notion note" />
 >   <figcaption>Source: author's Notion note</figcaption>
 > </figure>
 > 
@@ -82,7 +80,7 @@ notion: "https://app.notion.com/p/AdaCoF-Adaptive-Collaboration-of-Flows-for-Vid
   > 각 방법론은 어떤 한계점이 있는가?
   > 
   > <figure>
-  >   <img src="/notion-assets/adacof-adaptive-collaboration-of-flows-for-video-frame-interpolation/39c14b84a0f28052aadff89cfdb0d0a4.png" alt="Source: author's Notion note" />
+  >   <img src="/notion-assets/reading-note-adacof-adaptive-collaboration-of-flows-for-video-frame-interpolation/39c14b84a0f28052aadff89cfdb0d0a4.png" alt="Source: author's Notion note" />
   >   <figcaption>Source: author's Notion note</figcaption>
   > </figure>
   > 
@@ -109,6 +107,23 @@ notion: "https://app.notion.com/p/AdaCoF-Adaptive-Collaboration-of-Flows-for-Vid
 
 AdaCoF란 무엇인가?
 
+> **Adaptive Collaboration of Flows \(AdaCoF\)**
+
+1. 대상이 되는 픽셀을 합성하기 위해 각각 참조 위치를 가리키는 복수의 플로우 \(오프셋 벡터, offset vector\)를 예측하고 표본을 구한다
+
+1. 대상 픽셀은 표본값들을 선형 결합하여 얻을 수 있다
+
+이 방식은 Def-Conv \(Deformable Convolution\)에서 영감을 받았으나 아래와 같은 이유로 다르다고 한다
+
+> Jifeng Dai, Haozhi Qi, Yuwen Xiong, Yi Li, Guodong Zhang, Han Hu, and Yichen Wei\. Deformable convolutional networks\. In The IEEE International Conference on Computer Vision \(ICCV\), Oct 2017\. 2, 3
+
+1. Def-Conv의 경우 모든 위치에 대해 공유된 가중치가 있고 한 프레임의 각각의 위치에서는 다수의 움직임이 존재하기 때문에 비디오에 적합하지 않음
+  - 가중치\(W\)를 영상의 모든 위치에서 사용 $W_\text{왼쪽 위}=W_\text{중앙} =W_\text{오른쪽 아래}$
+  
+  → AdaCoF에서는 **가중치들이 픽셀 위치마다 다른 값**을 하게 한다
+
+1. DefConv는 영상에 대해
+
 ## 4\. Key Idea
 
 ## 5\. Result
@@ -120,5 +135,3 @@ AdaCoF란 무엇인가?
 ## 8\. What I Can Apply
 
 ## 9\. Next Step
-
-daptively estimates the large-sized kernel for each pixel and synthesizes the intermediate frame by convolving the kernels with the input\.
