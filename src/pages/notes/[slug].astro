@@ -22,7 +22,7 @@ const isWeeklyBrief = note.data.type === 'weekly-brief';
 ---
 
 <BaseLayout title={`${note.data.title} - Junu's Lab`}>
-  <section class="block-head">
+  <section class="block-head detail-head">
     <Eyebrow text={isWeeklyBrief ? 'Weekly Lab Brief' : 'Lab Note'} />
     <h2>{note.data.title}</h2>
     <p>{note.data.summary}</p>

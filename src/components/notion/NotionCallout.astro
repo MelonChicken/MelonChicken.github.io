@@ -1,0 +1,11 @@
+---
+const { icon = '', color = 'default' } = Astro.props;
+const colorClass = `notion-color-${String(color).replace(/[^a-zA-Z0-9_-]/g, '')}`;
+---
+
+<aside class:list={['notion-callout', colorClass]}>
+  {icon && <div class="notion-callout-icon" aria-hidden="true">{icon}</div>}
+  <div class="notion-callout-body">
+    <slot />
+  </div>
+</aside>

@@ -1,0 +1,14 @@
+---
+const { summary = 'Toggle', headingLevel = 0 } = Astro.props;
+---
+
+<details class="notion-toggle">
+  <summary>
+    {headingLevel === 1 && <h1>{summary}</h1>}
+    {headingLevel === 2 && <h2>{summary}</h2>}
+    {headingLevel === 3 && <h3>{summary}</h3>}
+    {headingLevel === 4 && <h4>{summary}</h4>}
+    {!headingLevel && <span>{summary}</span>}
+  </summary>
+  <slot />
+</details>

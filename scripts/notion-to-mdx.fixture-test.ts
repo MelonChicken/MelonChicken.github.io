@@ -29,6 +29,17 @@ const mdx = await blocksToMdxFromBlocks([
     block('b1', 'numbered_list_item', 'Child B-1'),
   ]),
   block('sep', 'paragraph', 'break'),
+  {
+    id: 'rt1',
+    type: 'paragraph',
+    has_children: false,
+    paragraph: {
+      rich_text: [
+        ...rt('Bold link', { bold: true }, { text: { link: { url: 'https://example.com/a)b' } } }),
+        ...rt(' and colored', { underline: true, color: 'yellow_background' }),
+      ],
+    },
+  },
   block('c', 'numbered_list_item', 'Starts at three', [], { list_start_index: 3 }),
   block('todo1', 'to_do', 'Checked task', [], { checked: true }),
   block('todo2', 'to_do', 'Unchecked task', [], { checked: false }),
@@ -49,18 +60,18 @@ const mdx = await blocksToMdxFromBlocks([
   { id: 'unsupported', type: 'unsupported', has_children: false, unsupported: {} },
 ], 'fixture');
 
-assert.match(mdx, /1\. Parent A\n {4}Child paragraph\n {4}\n {4}1\. Child A-1\n {8}- Bullet A\n {8}- Bullet B/m);
-assert.match(mdx, /2\. Parent B\n {4}1\. Child B-1/m);
-assert.match(mdx, /break\n\n3\. Starts at three/);
-assert.match(mdx, /- \[x\] Checked task/);
-assert.match(mdx, /- \[ \] Unchecked task/);
-assert.match(mdx, /<details class="notion-toggle">/);
-assert.match(mdx, /<aside class="notion-callout notion-color-blue_background">/);
-assert.match(mdx, /\| \*\*H1\*\* \| H2 \|/);
-assert.match(mdx, /\\\$ value/);
-assert.match(mdx, /<div class="notion-columns">/);
-assert.match(mdx, /Synced Notion block reference skipped: source/);
-assert.match(mdx, /Unsupported Notion block skipped: unsupported/);
+assert.match(mdx, /1\. <span>Parent A<\/span>\n {4}<span>Child paragraph<\/span>\n {4}\n {4}1\. <span>Child A-1<\/span>\n {8}- <span>Bullet A<\/span>\n {8}- <span>Bullet B<\/span>/m);
+assert.match(mdx, /2\. <span>Parent B<\/span>\n {4}1\. <span>Child B-1<\/span>/m);
+assert.match(mdx, /<span>break<\/span>\n\n<a href="https:\/\/example\.com\/a\)b"><span><strong>Bold link<\/strong><\/span><\/a><span class="notion-color-yellow_background"><u> and colored<\/u><\/span>\n\n3\. <span>Starts at three<\/span>/);
+assert.match(mdx, /- \[x\] <span>Checked task<\/span>/);
+assert.match(mdx, /- \[ \] <span>Unchecked task<\/span>/);
+assert.match(mdx, /<NotionToggle summary="Toggle title" headingLevel=\{0\}>/);
+assert.match(mdx, /<NotionCallout icon="!" color="blue_background">/);
+assert.match(mdx, /\| <strong><span>H1<\/span><\/strong> \| <span>H2<\/span> \|/);
+assert.match(mdx, /<span>&#36; value<\/span>/);
+assert.match(mdx, /<NotionColumns>/);
+assert.match(mdx, /TODO\(notion\): unsupported block type: synced_block; synced_from=source/);
+assert.match(mdx, /TODO\(notion\): unsupported block type: unsupported/);
 
 assert.equal(
   richTextToMarkdown(rt('[$5]', { bold: true }, { text: { link: { url: 'https://example.com/a)b' } } })),

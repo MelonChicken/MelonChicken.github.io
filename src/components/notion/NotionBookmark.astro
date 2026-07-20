@@ -1,0 +1,8 @@
+---
+const { href = '', label = href } = Astro.props;
+---
+
+<a class="notion-bookmark" href={href}>
+  <span class="notion-bookmark-title">{label}</span>
+  <span class="notion-bookmark-url">{href}</span>
+</a>

@@ -1,10 +1,12 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { assertRequiredNotionIds, getDiagnostics, getDatabaseId, printLoadedEnv, queryPublishedPages, syncTargets, type SyncTarget, type SyncTargetKey } from './notion-client';
-import { pageToMdx, shouldSyncPage } from './notion-to-mdx';
+import { assertRequiredNotionIds, getDiagnostics, getDatabaseId, notion, printLoadedEnv, queryPublishedPages, syncTargets, type SyncTarget, type SyncTargetKey } from './notion-client';
+import { getPageSlug, pageToMdx, shouldSyncPage } from './notion-to-mdx';
 
 const debug = process.argv.includes('--debug');
 const requestedTargets = parseTargets(process.argv.slice(2));
+const requestedSlug = parseSlug(process.argv.slice(2));
+const requestedPageId = parsePageId(process.argv.slice(2));
 
 main().catch((error) => {
   console.error(error);
@@ -26,13 +28,18 @@ async function syncTarget(target: SyncTarget) {
     return;
   }
 
-  const pages = (await queryPublishedPages(target, { requirePublishFilter: target.key === 'notes', debug }))
-    .filter((page) => shouldSyncPage(page, target.key));
+  const pages = requestedPageId
+    ? [await notion.pages.retrieve({ page_id: requestedPageId })]
+    : (await queryPublishedPages(target, { requirePublishFilter: target.key === 'notes', debug }))
+      .filter((page) => shouldSyncPage(page, target.key));
   let written = 0;
   let skipped = 0;
   const syncedSlugs = new Set<string>();
 
   for (const page of pages) {
+    const pageSlug = getPageSlug(page);
+    if (requestedSlug && pageSlug !== requestedSlug) continue;
+
     const { slug, mdx } = await pageToMdx(page, target.key);
     syncedSlugs.add(slug);
     const outputPath = path.join(process.cwd(), target.outputDir, `${slug}.mdx`);
@@ -42,8 +49,10 @@ async function syncTarget(target: SyncTarget) {
     if (result === 'skipped') skipped += 1;
   }
 
-  const pruned = await pruneGeneratedFiles(target.outputDir, syncedSlugs);
+  const pruned = requestedSlug || requestedPageId ? 0 : await pruneGeneratedFiles(target.outputDir, syncedSlugs);
   console.log(`Synced ${written} ${target.label} pages to ${target.outputDir}${skipped ? ` (${skipped} unchanged)` : ''}.`);
+  if (requestedSlug && written === 0 && skipped === 0) console.warn(`No ${target.label} page matched slug: ${requestedSlug}`);
+  if (requestedPageId && written === 0 && skipped === 0) console.warn(`No ${target.label} page was written for page id: ${requestedPageId}`);
   if (pruned > 0) console.log(`Pruned ${pruned} stale generated ${target.label} file(s).`);
 }
 
@@ -79,6 +88,22 @@ function parseTargets(args: string[]) {
 
   const keys: SyncTargetKey[] = selected.length ? selected : ['projects', 'notes'];
   return keys.map((key) => syncTargets[key]);
+}
+
+function parseSlug(args: string[]) {
+  const inline = args.find((arg) => arg.startsWith('--slug='));
+  if (inline) return inline.slice('--slug='.length).trim();
+
+  const index = args.indexOf('--slug');
+  return index >= 0 ? String(args[index + 1] || '').trim() : '';
+}
+
+function parsePageId(args: string[]) {
+  const inline = args.find((arg) => arg.startsWith('--page-id='));
+  if (inline) return inline.slice('--page-id='.length).trim();
+
+  const index = args.indexOf('--page-id');
+  return index >= 0 ? String(args[index + 1] || '').trim() : '';
 }
 
 async function readOptional(filePath: string) {

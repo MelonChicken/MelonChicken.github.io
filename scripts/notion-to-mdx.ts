@@ -1,12 +1,9 @@
-import { listBlockChildren, notion, type AnyNotionObject, type SyncTargetKey } from './notion-client';
-import { downloadNotionAsset } from './notion-assets';
-import { escapeMarkdownInline, escapeMdxAttribute, richTextToMarkdown, richTextToPlain } from './notion-rich-text';
+import { notion, type AnyNotionObject, type SyncTargetKey } from './notion-client';
+import { fetchNotionBlockAst, normalizeNotionBlocks } from './notion-ast';
+import { notionMdxImports, renderNotionBlocks } from './notion-mdx-renderer';
+import { richTextToPlain } from './notion-rich-text';
 
 type Frontmatter = Record<string, unknown>;
-export type NotionBlockNode = {
-  block: AnyNotionObject;
-  children: NotionBlockNode[];
-};
 
 const statusValues = ['idea', 'work-in-progress', 'completed', 'archived'] as const;
 const projectGroups = ['research', 'ml', 'product', 'archived'] as const;
@@ -41,8 +38,7 @@ const fallbackProjectTracks: Record<string, string[]> = {
 
 export async function pageToMdx(page: AnyNotionObject, target: SyncTargetKey) {
   const title = getTitle(page.properties);
-  const explicitSlug = getPropertyText(page.properties, ['Slug', 'slug']);
-  const slug = explicitSlug ? slugify(explicitSlug, page.id) : slugify(title, page.id);
+  const slug = getPageSlug(page, title);
   const frontmatter = await buildFrontmatter(page, target, title, slug);
   const body = await blocksToMdx(page.id, slug);
 
@@ -50,6 +46,11 @@ export async function pageToMdx(page: AnyNotionObject, target: SyncTargetKey) {
     slug,
     mdx: renderMdx(frontmatter, body),
   };
+}
+
+export function getPageSlug(page: AnyNotionObject, title = getTitle(page.properties)) {
+  const explicitSlug = getPropertyText(page.properties || {}, ['Slug', 'slug']);
+  return explicitSlug ? slugify(explicitSlug, page.id) : slugify(title, page.id);
 }
 
 export function shouldSyncPage(page: AnyNotionObject, target: SyncTargetKey) {
@@ -79,285 +80,13 @@ export function shouldSyncPage(page: AnyNotionObject, target: SyncTargetKey) {
 }
 
 export async function blocksToMdx(blockId: string, slug: string): Promise<string> {
-  const nodes = await listBlockTree(blockId);
-  return nodesToMdx(nodes, slug);
-}
-
-export async function listBlockTree(blockId: string, seen = new Set<string>()): Promise<NotionBlockNode[]> {
-  if (seen.has(blockId)) return [];
-
-  const nextSeen = new Set(seen);
-  nextSeen.add(blockId);
-  const blocks = await listBlockChildren(blockId);
-
-  return Promise.all(blocks.map(async (block) => ({
-    block,
-    children: block.has_children ? await listBlockTree(block.id, nextSeen) : [],
-  })));
+  const blocks = await fetchNotionBlockAst(blockId, slug);
+  return renderNotionBlocks(blocks);
 }
 
 export async function blocksToMdxFromBlocks(blocks: AnyNotionObject[], slug: string): Promise<string> {
-  return nodesToMdx(blocks.map(blockToNode), slug);
-}
-
-function blockToNode(block: AnyNotionObject): NotionBlockNode {
-  return {
-    block,
-    children: Array.isArray(block.children) ? block.children.map(blockToNode) : [],
-  };
-}
-
-async function nodesToMdx(nodes: NotionBlockNode[], slug: string, listDepth = 0): Promise<string> {
-  const lines: string[] = [];
-
-  for (let index = 0; index < nodes.length; index += 1) {
-    const node = nodes[index];
-    const block = node.block;
-    if (isListBlock(block)) {
-      const listType = block.type;
-      const listNodes = [node];
-      while (index + 1 < nodes.length && nodes[index + 1].block.type === listType) {
-        listNodes.push(nodes[index + 1]);
-        index += 1;
-      }
-
-      lines.push(await listBlockGroupToMdx(listType, listNodes, slug, listDepth));
-      continue;
-    }
-
-    const mdx = await blockToMdx(node, slug);
-    if (mdx) lines.push(mdx);
-  }
-
-  return lines.join('\n\n').trim();
-}
-
-async function blockToMdx(node: NotionBlockNode, slug: string): Promise<string> {
-  const { block } = node;
-  const value = block[block.type] || {};
-
-  switch (block.type) {
-    case 'paragraph':
-      return withChildren(richTextToMarkdown(value.rich_text), node, slug);
-    case 'heading_1':
-      return `# ${escapeMarkdownInline(richTextToPlain(value.rich_text))}`;
-    case 'heading_2':
-      return `## ${escapeMarkdownInline(richTextToPlain(value.rich_text))}`;
-    case 'heading_3':
-      return `### ${escapeMarkdownInline(richTextToPlain(value.rich_text))}`;
-    case 'heading_4':
-      return `#### ${escapeMarkdownInline(richTextToPlain(value.rich_text))}`;
-    case 'heading_1_toggle':
-      return detailsBlock(value.rich_text, node, slug, 'h1');
-    case 'heading_2_toggle':
-      return detailsBlock(value.rich_text, node, slug, 'h2');
-    case 'heading_3_toggle':
-      return detailsBlock(value.rich_text, node, slug, 'h3');
-    case 'bulleted_list_item':
-      return listBlockGroupToMdx('bulleted_list_item', [node], slug);
-    case 'numbered_list_item':
-      return listBlockGroupToMdx('numbered_list_item', [node], slug);
-    case 'to_do':
-      return listItem(`- [${value.checked ? 'x' : ' '}]`, value.rich_text, node, slug);
-    case 'toggle':
-      return detailsBlock(value.rich_text, node, slug);
-    case 'quote':
-      return quoteBlock(value.rich_text, node, slug);
-    case 'callout':
-      return calloutBlock(value.rich_text, node, slug);
-    case 'code':
-      return codeBlock(value);
-    case 'equation':
-      return equationBlock(value);
-    case 'divider':
-      return '---';
-    case 'image':
-      return assetBlockToMdx(block, value, slug, 'image');
-    case 'video':
-    case 'audio':
-    case 'file':
-    case 'pdf':
-      return assetBlockToMdx(block, value, slug, 'file');
-    case 'bookmark':
-    case 'link_preview':
-      return linkBlock(value);
-    case 'table':
-      return tableBlock(node, value, slug);
-    case 'table_row':
-      return tableRow(value);
-    case 'column_list':
-      return columnListBlock(node, slug);
-    case 'column':
-      return columnBlock(node, slug);
-    case 'synced_block':
-      return syncedBlock(node, slug);
-    case 'child_page':
-      return notionChildReference('Child page', value.title, block);
-    case 'child_database':
-      return notionChildReference('Child database', value.title, block);
-    case 'table_of_contents':
-      return `{/* Notion table_of_contents skipped: site TOC is generated from rendered headings. */}`;
-    case 'breadcrumb':
-      return `{/* Notion breadcrumb skipped: site navigation provides context. */}`;
-    case 'unsupported':
-      return `{/* Unsupported Notion block skipped: ${block.id} */}`;
-    default:
-      return value.rich_text
-        ? withChildren(richTextToMarkdown(value.rich_text), node, slug)
-        : `{/* Unsupported Notion block type: ${block.type} (${block.id}) */}`;
-  }
-}
-
-async function withChildren(markdown: string, node: NotionBlockNode, slug: string) {
-  const child = node.children.length ? await nodesToMdx(node.children, slug) : '';
-  return [markdown, child].filter(Boolean).join('\n\n');
-}
-
-async function listItem(marker: string, richText: AnyNotionObject[] = [], node: NotionBlockNode, slug: string) {
-  const child = node.children.length ? await nodesToMdx(node.children, slug) : '';
-  const text = richTextToMarkdown(richText);
-  return `${marker} ${text}${child ? `\n${indent(child, '    ')}` : ''}`;
-}
-
-function isListBlock(block: AnyNotionObject) {
-  return block.type === 'numbered_list_item' || block.type === 'bulleted_list_item';
-}
-
-async function listBlockGroupToMdx(
-  listType: 'numbered_list_item' | 'bulleted_list_item',
-  nodes: NotionBlockNode[],
-  slug: string,
-  listDepth = 0,
-) {
-  const items = await Promise.all(nodes.map((node, index) => listBlockItemToMdx(listType, node, slug, listDepth, index)));
-  return items.join('\n');
-}
-
-async function listBlockItemToMdx(
-  listType: 'numbered_list_item' | 'bulleted_list_item',
-  node: NotionBlockNode,
-  slug: string,
-  listDepth: number,
-  index: number,
-) {
-  const { block } = node;
-  const value = block[block.type] || {};
-  const marker = listType === 'bulleted_list_item' ? '-' : `${Number(value.list_start_index ?? (index + 1))}.`;
-  const baseIndent = '    '.repeat(listDepth);
-  const text = richTextToMarkdown(value.rich_text || []);
-  const child = node.children.length ? await nodesToMdx(node.children, slug) : '';
-  return `${baseIndent}${marker} ${text}${child ? `\n${indent(child, '    ')}` : ''}`;
-}
-
-async function detailsBlock(richText: AnyNotionObject[] = [], node: NotionBlockNode, slug: string, headingTag = '') {
-  const summary = escapeMdxAttribute(richTextToPlain(richText) || 'Toggle');
-  const child = node.children.length ? await nodesToMdx(node.children, slug) : '';
-  const summaryContent = headingTag ? `<${headingTag}>${summary}</${headingTag}>` : summary;
-  return `<details class="notion-toggle">\n  <summary>${summaryContent}</summary>\n\n${child}\n</details>`;
-}
-
-async function quoteBlock(richText: AnyNotionObject[] = [], node: NotionBlockNode, slug: string) {
-  const child = node.children.length ? await nodesToMdx(node.children, slug) : '';
-  const content = [richTextToMarkdown(richText), child].filter(Boolean).join('\n\n');
-  return prefixLines(content, '> ');
-}
-
-async function calloutBlock(richText: AnyNotionObject[] = [], node: NotionBlockNode, slug: string) {
-  const value = node.block.callout || {};
-  const icon = notionIconToText(value.icon);
-  const color = String(value.color || 'default').replace(/[^a-zA-Z0-9_-]/g, '');
-  const child = node.children.length ? await nodesToMdx(node.children, slug) : '';
-  const content = [richTextToMarkdown(richText), child].filter(Boolean).join('\n\n');
-  return `<aside class="notion-callout notion-color-${color}">\n  <div class="notion-callout-icon" aria-hidden="true">${escapeMdxAttribute(icon)}</div>\n  <div class="notion-callout-body">\n${indent(content, '    ')}\n  </div>\n</aside>`;
-}
-
-function codeBlock(value: AnyNotionObject) {
-  const language = String(value.language || '').replace(/[^a-zA-Z0-9_+-]/g, '');
-  const caption = richTextToMarkdown(value.caption || []);
-  const code = `\`\`\`${language}\n${richTextToPlain(value.rich_text)}\n\`\`\``;
-  return caption ? `${code}\n\n_${caption}_` : code;
-}
-
-function equationBlock(value: AnyNotionObject) {
-  const expression = String(value.expression || '').trim();
-  return expression ? `$$\n${expression}\n$$` : '';
-}
-
-async function assetBlockToMdx(block: AnyNotionObject, value: AnyNotionObject, slug: string, kind: 'image' | 'file') {
-  const sourceUrl = value.type === 'external' ? value.external?.url : value.file?.url;
-  if (!sourceUrl) return `{/* TODO: Notion ${kind} block has no downloadable URL: ${block.id} */}`;
-
-  const caption = richTextToPlain(value.caption || []);
-  const fallbackCaption = caption || "Source: author's Notion note";
-  const asset = await downloadNotionAsset(sourceUrl, slug, block.id);
-  const sourceComment = asset.downloaded ? '' : `\n{/* TODO: Asset download failed (${asset.error}); source left as original URL. */}`;
-
-  if (kind === 'file') {
-    return `<figure>${sourceComment}\n  <a href="${escapeMdxAttribute(asset.src)}">${escapeMdxAttribute(caption || asset.filename)}</a>\n  <figcaption>${escapeMdxAttribute(fallbackCaption)}</figcaption>\n</figure>`;
-  }
-
-  return `<figure>${sourceComment}\n  <img src="${escapeMdxAttribute(asset.src)}" alt="${escapeMdxAttribute(fallbackCaption)}" />\n  <figcaption>${escapeMdxAttribute(fallbackCaption)}</figcaption>\n</figure>`;
-}
-
-function linkBlock(value: AnyNotionObject) {
-  const url = value.url || value.link_preview?.url;
-  return url ? `[${escapeMarkdownInline(url)}](${url})` : '';
-}
-
-async function tableBlock(node: NotionBlockNode, value: AnyNotionObject, _slug: string) {
-  const rows = node.children.map((child) => child.block);
-  const renderedRows = rows.filter((row) => row.type === 'table_row').map((row) => tableRow(row.table_row, value));
-  if (renderedRows.length === 0) return '';
-
-  const firstRowCellCount = renderedRows[0].split('|').length - 2;
-  const separator = `| ${Array.from({ length: Math.max(firstRowCellCount, 1) }, () => '---').join(' | ')} |`;
-
-  if (value.has_column_header) {
-    return [renderedRows[0], separator, ...renderedRows.slice(1)].join('\n');
-  }
-
-  return [separator, ...renderedRows].join('\n');
-}
-
-function tableRow(value: AnyNotionObject, table: AnyNotionObject = {}) {
-  const cells = (value.cells || []).map((cell: AnyNotionObject[], index: number) => {
-    const content = richTextToMarkdown(cell).replace(/\|/g, '\\|');
-    return table.has_row_header && index === 0 ? `**${content}**` : content;
-  });
-  return `| ${cells.join(' | ')} |`;
-}
-
-async function columnListBlock(node: NotionBlockNode, slug: string) {
-  const columns = await Promise.all(node.children.map((child) => columnBlock(child, slug)));
-  return `<div class="notion-columns">\n${columns.join('\n')}\n</div>`;
-}
-
-async function columnBlock(node: NotionBlockNode, slug: string) {
-  const value = node.block.column || {};
-  const width = Number(value.width_ratio);
-  const style = Number.isFinite(width) && width > 0 ? ` style="--notion-column-ratio:${width}"` : '';
-  const content = node.children.length ? await nodesToMdx(node.children, slug) : '';
-  return `  <div class="notion-column"${style}>\n${indent(content, '    ')}\n  </div>`;
-}
-
-async function syncedBlock(node: NotionBlockNode, slug: string) {
-  const value = node.block.synced_block || {};
-  const child = node.children.length ? await nodesToMdx(node.children, slug) : '';
-  if (child) return child;
-  const sourceId = value.synced_from?.block_id;
-  return `{/* Synced Notion block reference skipped${sourceId ? `: ${sourceId}` : ''}. */}`;
-}
-
-function notionChildReference(kind: string, title: string, block: AnyNotionObject) {
-  const label = escapeMarkdownInline(title || kind);
-  return block.url ? `### [${label}](${block.url})` : `### ${label}`;
-}
-
-function notionIconToText(icon: AnyNotionObject = {}) {
-  if (icon.type === 'emoji') return icon.emoji || '';
-  if (icon.type === 'external') return icon.external?.url ? 'link' : '';
-  if (icon.type === 'file') return 'file';
-  return '';
+  const ast = await normalizeNotionBlocks(blocks, slug);
+  return renderNotionBlocks(ast);
 }
 
 async function buildFrontmatter(page: AnyNotionObject, target: SyncTargetKey, title: string, slug: string): Promise<Frontmatter> {
@@ -432,7 +161,7 @@ function renderMdx(frontmatter: Frontmatter, body: string) {
     .join('\n');
 
   const content = body || '{/* TODO: Add Notion page content. */}';
-  return `---\n${yaml}\n---\n\n{/* This file is generated from Notion. Do not edit directly. */}\n\n${content.trim()}\n`;
+  return `---\n${yaml}\n---\n\n${notionMdxImports()}\n\n{/* This file is generated from Notion. Do not edit directly. */}\n\n${content.trim()}\n`;
 }
 
 function getProperty(properties: AnyNotionObject = {}, names: string[]) {
@@ -621,12 +350,4 @@ function yamlValue(value: unknown): string {
 function yamlScalar(value: unknown) {
   if (typeof value === 'boolean' || typeof value === 'number') return String(value);
   return JSON.stringify(String(value).replace(/\s+/g, ' ').trim());
-}
-
-function indent(value: string, prefix: string) {
-  return value.split('\n').map((line) => `${prefix}${line}`).join('\n');
-}
-
-function prefixLines(value: string, prefix: string) {
-  return value.split('\n').map((line) => `${prefix}${line}`).join('\n');
 }
