@@ -22,89 +22,94 @@ featured: false
 problem: "F1 용어가 너무 어려운데 그때마다 누군가에게 묻기 부담스러워 — AI에게 물어보자"
 ---
 
+import NotionBookmark from '../../components/notion/NotionBookmark.astro';
+import NotionCallout from '../../components/notion/NotionCallout.astro';
+import NotionColumns from '../../components/notion/NotionColumns.astro';
+import NotionToggle from '../../components/notion/NotionToggle.astro';
+
 {/* This file is generated from Notion. Do not edit directly. */}
 
 ### Untitled
 
-<figure>
-  <img src="/notion-assets/f1-qna-bot/2ec14b84a0f28097b03fe9d5c6406b76.png" alt="Source: author's Notion note" />
+<figure class="notion-figure">
+  <img src={"/notion-assets/f1-qna-bot/2ec14b84a0f28097b03fe9d5c6406b76.png"} alt={"Source: author's Notion note"} />
   <figcaption>Source: author's Notion note</figcaption>
 </figure>
 
-# F1 Regulations Q&A Chatbot – 검색·응답 품질 개선 프로젝트
+# <span>F1 Regulations Q&amp;A Chatbot – 검색·응답 품질 개선 프로젝트</span>
 
-> F1 Sporting / Technical 규정 PDF를 기반으로 정확한 규정 답변과 상식 보완을 동시에 제공하는 Q&A 챗봇
+> <span>F1 Sporting / Technical 규정 PDF를 기반으로 정확한 규정 답변과 상식 보완을 동시에 제공하는 Q&amp;A 챗봇</span>
 
-> 해커톤/공모전 정보: 내용 없음
+> <span>해커톤/공모전 정보: 내용 없음</span>
 
 ---
 
-## 🎯 Executive Summary
+## <span>🎯 Executive Summary</span>
 
-- **문제**:
-    F1 Sporting / Technical 규정 PDF를 기반으로 한 Q&A 챗봇에서
+- <span><strong>문제</strong></span><span>:</span>
+    <span>F1 Sporting / Technical 규정 PDF를 기반으로 한 Q&amp;A 챗봇에서</span>
     
-    - 문서 구조 차이로 인한 인덱싱 실패
-    - 텍스트·표 혼합 검색으로 인한 검색 품질 저하
-    - 문서에 없는 질문에 대한 부자연스러운 응답
-        문제가 발생함
-- **해결**:
-    문서 타입별 처리 분리 \+ Text/Table 독립 벡터스토어 \+ Query Routing \+ 문서 기반 답변 후 상식 fallback 구조 설계
-- **결과**:
-    - Sporting 규정 PDF 정상 인덱싱 및 검색 성공
-    - 표 기반 질문에 대해 DataFrame 형태 응답 가능
-    - 문서 부재 질문에 대해 상식 기반 자연스러운 답변 제공
-- **다음 단계**:
-    - 2주: Technical 규정 전용 파서 구축
-    - 2개월: Retriever 라우팅 고도화 및 score threshold 튜닝
-    - 2분기: 규정 버전 관리 및 다국어 지원
+    - <span>문서 구조 차이로 인한 인덱싱 실패</span>
+    - <span>텍스트·표 혼합 검색으로 인한 검색 품질 저하</span>
+    - <span>문서에 없는 질문에 대한 부자연스러운 응답</span>
+        <span>문제가 발생함</span>
+- <span><strong>해결</strong></span><span>:</span>
+    <span>문서 타입별 처리 분리 + Text/Table 독립 벡터스토어 + Query Routing + 문서 기반 답변 후 상식 fallback 구조 설계</span>
+- <span><strong>결과</strong></span><span>:</span>
+    - <span>Sporting 규정 PDF 정상 인덱싱 및 검색 성공</span>
+    - <span>표 기반 질문에 대해 DataFrame 형태 응답 가능</span>
+    - <span>문서 부재 질문에 대해 상식 기반 자연스러운 답변 제공</span>
+- <span><strong>다음 단계</strong></span><span>:</span>
+    - <span>2주: Technical 규정 전용 파서 구축</span>
+    - <span>2개월: Retriever 라우팅 고도화 및 score threshold 튜닝</span>
+    - <span>2분기: 규정 버전 관리 및 다국어 지원</span>
 
 ---
 
-## 1\. 배경·목표
+## <span>1. 배경·목표</span>
 
-- **사용자/페르소나**:
-    - F1 규정을 질의응답 형태로 빠르게 확인하고 싶은 사용자
-    - 규정 조항·표·세부 조건을 정확히 알고 싶은 분석 목적 사용자
-- **성공 기준\(KPI\)**:
-    - 문서 기반 질문에 대한 정확한 근거 문단 반환
-    - 표 관련 질문에서 table retriever 정확 선택
-    - 문서 미존재 질문에 대해 “없음”이 아닌 보완 응답 제공
-- **범위\(Out of scope\)**:
-    - F1 규정 외 일반 스포츠 규정
-    - 실시간 경기 데이터 연동
-
----
-
-## 2\. 역할·스택·기간
-
-- **역할/기여**:
-    - FE: 내용 없음
-    - BE: 내용 없음
-    - 기획: 내용 없음
-- **스택**:
-    - Python
-    - LangChain / Chroma
-    - OpenAI LLM
-    - Streamlit
-    - Pandas
-- **기간**: 내용 없음
+- <span><strong>사용자/페르소나</strong></span><span>:</span>
+    - <span>F1 규정을 질의응답 형태로 빠르게 확인하고 싶은 사용자</span>
+    - <span>규정 조항·표·세부 조건을 정확히 알고 싶은 분석 목적 사용자</span>
+- <span><strong>성공 기준(KPI)</strong></span><span>:</span>
+    - <span>문서 기반 질문에 대한 정확한 근거 문단 반환</span>
+    - <span>표 관련 질문에서 table retriever 정확 선택</span>
+    - <span>문서 미존재 질문에 대해 “없음”이 아닌 보완 응답 제공</span>
+- <span><strong>범위(Out of scope)</strong></span><span>:</span>
+    - <span>F1 규정 외 일반 스포츠 규정</span>
+    - <span>실시간 경기 데이터 연동</span>
 
 ---
 
-## 3\. 데모 & 링크
+## <span>2. 역할·스택·기간</span>
 
-- **Demo**: 내용 없음
-- **Repo**: 내용 없음
-- **문서\(API/ERD/디자인\)**: 내용 없음
-- **시연영상**: 내용 없음
+- <span><strong>역할/기여</strong></span><span>:</span>
+    - <span>FE: 내용 없음</span>
+    - <span>BE: 내용 없음</span>
+    - <span>기획: 내용 없음</span>
+- <span><strong>스택</strong></span><span>:</span>
+    - <span>Python</span>
+    - <span>LangChain / Chroma</span>
+    - <span>OpenAI LLM</span>
+    - <span>Streamlit</span>
+    - <span>Pandas</span>
+- <span><strong>기간</strong></span><span>: 내용 없음</span>
 
 ---
 
-## 4\. 아키텍처 요약
+## <span>3. 데모 &amp; 링크</span>
 
-- **다이어그램**: 내용 없음
-- **데이터 흐름/외부 의존성**:
+- <span><strong>Demo</strong></span><span>: 내용 없음</span>
+- <span><strong>Repo</strong></span><span>: 내용 없음</span>
+- <span><strong>문서(API/ERD/디자인)</strong></span><span>: 내용 없음</span>
+- <span><strong>시연영상</strong></span><span>: 내용 없음</span>
+
+---
+
+## <span>4. 아키텍처 요약</span>
+
+- <span><strong>다이어그램</strong></span><span>: 내용 없음</span>
+- <span><strong>데이터 흐름/외부 의존성</strong></span><span>:</span>
 
 ```plaintext
 PDF
@@ -119,73 +124,73 @@ PDF
                          └─ 상식 fallback
 ```
 
-- **배포/CI·CD/롤백**: 내용 없음
+- <span><strong>배포/CI·CD/롤백</strong></span><span>: 내용 없음</span>
 
 ---
 
-## 5\. 핵심 기능 \(스크린샷/GIF 포함\)
+## <span>5. 핵심 기능 (스크린샷/GIF 포함)</span>
 
-1. **문서 자동 로드 및 벡터스토어 재생성** — data 폴더 전체 스캔 후 한 번의 버튼 클릭으로 인덱싱
-    / 엣지 케이스: clean chunk가 0일 경우 인덱싱 중단 처리
-2. **Text / Table 분리 인덱싱** — 텍스트와 표를 서로 다른 retriever로 관리하여 검색 정확도 향상
-    / 엣지 케이스: 표 질의 시 JSON → DataFrame 변환
-3. **Query Routing 기반 Retriever 선택** — 키워드 기반으로 text / table retriever 자동 선택
-    / 엣지 케이스: 모호한 질문은 기본 text retriever 사용
-4. **문서 기반 \+ 상식 fallback 응답** — 규정에 없을 경우 LLM 상식 답변으로 자연스럽게 보완
-
----
-
-## 6\. 기술 결정\(ADR 요약\)
-
-- **결론**:
-    Sporting 규정 우선 처리 \+ Technical 규정은 전용 파서로 분리
-- **버린 대안**:
-    모든 규정 PDF를 단일 split 로직으로 통합 처리
-- **근거**:
-    - 성능: 빈 chunk로 인한 Chroma 오류 제거
-    - 복잡도: 문서 타입별 책임 분리
-    - 정확성: 구조가 다른 문서에 동일 규칙 적용 방지
-- **리스크 및 완화**:
-    - 리스크: Technical 규정 검색 공백
-    - 완화: 전용 처리기 구축을 다음 단계로 분리
+1. <span><strong>문서 자동 로드 및 벡터스토어 재생성</strong></span><span> — data 폴더 전체 스캔 후 한 번의 버튼 클릭으로 인덱싱</span>
+    <span>/ 엣지 케이스: clean chunk가 0일 경우 인덱싱 중단 처리</span>
+2. <span><strong>Text / Table 분리 인덱싱</strong></span><span> — 텍스트와 표를 서로 다른 retriever로 관리하여 검색 정확도 향상</span>
+    <span>/ 엣지 케이스: 표 질의 시 JSON → DataFrame 변환</span>
+3. <span><strong>Query Routing 기반 Retriever 선택</strong></span><span> — 키워드 기반으로 text / table retriever 자동 선택</span>
+    <span>/ 엣지 케이스: 모호한 질문은 기본 text retriever 사용</span>
+4. <span><strong>문서 기반 + 상식 fallback 응답</strong></span><span> — 규정에 없을 경우 LLM 상식 답변으로 자연스럽게 보완</span>
 
 ---
 
-## 7\. 문제와 해결\(버그·장애 포함\)
+## <span>6. 기술 결정(ADR 요약)</span>
 
-- **이슈**: Technical 규정 PDF split 결과 0
-    → 원인: ARTICLE / SECTION 패턴 부재
+- <span><strong>결론</strong></span><span>:</span>
+    <span>Sporting 규정 우선 처리 + Technical 규정은 전용 파서로 분리</span>
+- <span><strong>버린 대안</strong></span><span>:</span>
+    <span>모든 규정 PDF를 단일 split 로직으로 통합 처리</span>
+- <span><strong>근거</strong></span><span>:</span>
+    - <span>성능: 빈 chunk로 인한 Chroma 오류 제거</span>
+    - <span>복잡도: 문서 타입별 책임 분리</span>
+    - <span>정확성: 구조가 다른 문서에 동일 규칙 적용 방지</span>
+- <span><strong>리스크 및 완화</strong></span><span>:</span>
+    - <span>리스크: Technical 규정 검색 공백</span>
+    - <span>완화: 전용 처리기 구축을 다음 단계로 분리</span>
+
+---
+
+## <span>7. 문제와 해결(버그·장애 포함)</span>
+
+- <span><strong>이슈</strong></span><span>: Technical 규정 PDF split 결과 0</span>
+    <span>→ 원인: ARTICLE / SECTION 패턴 부재</span>
     
-    → 조치: Sporting 규정만 우선 인덱싱
+    <span>→ 조치: Sporting 규정만 우선 인덱싱</span>
     
-    → 재발 방지: 문서 타입 감지 후 분기 처리
-- **이슈**: Chroma `_persist_directory` 오류
-    → 원인: 사용하지 않는 내부 속성 참조
+    <span>→ 재발 방지: 문서 타입 감지 후 분기 처리</span>
+- <span><strong>이슈</strong></span><span>: Chroma </span><span><code>_persist_directory</code></span><span> 오류</span>
+    <span>→ 원인: 사용하지 않는 내부 속성 참조</span>
     
-    → 조치: 코드 제거
-- **이슈**: fallback 응답 중 답변 중복 출력
-    → 원인: tuple 반환 구조
+    <span>→ 조치: 코드 제거</span>
+- <span><strong>이슈</strong></span><span>: fallback 응답 중 답변 중복 출력</span>
+    <span>→ 원인: tuple 반환 구조</span>
     
-    → 조치: 반환 값 구조 수정
+    <span>→ 조치: 반환 값 구조 수정</span>
 
 ---
 
-## 8\. 측정 결과\(전/후 비교\)
+## <span>8. 측정 결과(전/후 비교)</span>
 
-- **p95 지연**: 내용 없음 → 내용 없음
-- **전환율**: 내용 없음 → 내용 없음
-- **활성 사용자**: 내용 없음 → 내용 없음
-- 그래프: 내용 없음
+- <span><strong>p95 지연</strong></span><span>: 내용 없음 → 내용 없음</span>
+- <span><strong>전환율</strong></span><span>: 내용 없음 → 내용 없음</span>
+- <span><strong>활성 사용자</strong></span><span>: 내용 없음 → 내용 없음</span>
+- <span>그래프: 내용 없음</span>
 
 ---
 
-## 9\. 회고 & 개선
+## <span>9. 회고 &amp; 개선</span>
 
-- **잘된 점**
-    1. Text / Table 분리로 검색 품질 구조적 개선
-    2. Retriever routing 도입으로 질문 유형별 응답 정확도 상승
-    3. 문서 기반 \+ 상식 fallback으로 사용자 경험 개선
-- **아쉬운 점**
+- <span><strong>잘된 점</strong></span>
+    1. <span>Text / Table 분리로 검색 품질 구조적 개선</span>
+    2. <span>Retriever routing 도입으로 질문 유형별 응답 정확도 상승</span>
+    3. <span>문서 기반 + 상식 fallback으로 사용자 경험 개선</span>
+- <span><strong>아쉬운 점</strong></span>
     1.
-- **기술부채 목록과 상환 계획**
+- <span><strong>기술부채 목록과 상환 계획</strong></span>
     -

@@ -22,136 +22,141 @@ notion: "https://app.notion.com/p/Wildlife-Metadata-Fusion-31f14b84a0f2808bb88ef
 featured: false
 ---
 
+import NotionBookmark from '../../components/notion/NotionBookmark.astro';
+import NotionCallout from '../../components/notion/NotionCallout.astro';
+import NotionColumns from '../../components/notion/NotionColumns.astro';
+import NotionToggle from '../../components/notion/NotionToggle.astro';
+
 {/* This file is generated from Notion. Do not edit directly. */}
 
 ### Untitled
 
 ---
 
-# Wildlife Metadata Fusion – 카메라트랩 이미지와 메타데이터를 결합해 종 분류와 오류 패턴을 분석하는 프로젝트
+# <span>Wildlife Metadata Fusion – 카메라트랩 이미지와 메타데이터를 결합해 종 분류와 오류 패턴을 분석하는 프로젝트</span>
 
-> 이미지 단독 분류를 넘어서, 야생동물 데이터를 더 잘 해석하는 분류 시스템
+> <span>이미지 단독 분류를 넘어서, 야생동물 데이터를 더 잘 해석하는 분류 시스템</span>
 
-> 해커톤/공모전 정보: 데이터마이닝 수업 프로젝트 \(2026년 1학기 예정, 추후 기록 예정\)
+> <span>해커톤/공모전 정보: 데이터마이닝 수업 프로젝트 (2026년 1학기 예정, 추후 기록 예정)</span>
 
 ---
 
-> 🎯 Executive Summary
+> <span>🎯 Executive Summary</span>
 
-- 문제: 카메라트랩 야생동물 데이터는 **빈 프레임, 클래스 불균형, 촬영 환경 차이, 메타데이터 누락/편향** 때문에 단순 이미지 분류만으로는 안정적인 성능과 해석력을 확보하기 어렵다\.
-- 해결: **이미지 특징 \+ 메타데이터\(time/location/camera context 등\)** 를 함께 활용하여 종 분류 성능을 비교하고, 어떤 조건에서 오류가 줄거나 늘어나는지 분석한다\.
-- 결과: 이미지 단독 baseline 대비 성능 변화, 종별 성능 차이, 메타데이터 결합에 따른 오류 패턴 변화 **\(추후 기록 예정\)**
-- 다음 단계:
-    - 2주: 데이터셋 선정 및 baseline 구축
-    - 2개월: 이미지 단독 / 메타데이터 단독 / 결합 모델 비교 및 오류 분석
-    - 2분기: 시퀀스/행동 분석 문제로 확장 가능성 검토
+- <span>문제: 카메라트랩 야생동물 데이터는 </span><span><strong>빈 프레임, 클래스 불균형, 촬영 환경 차이, 메타데이터 누락/편향</strong></span><span> 때문에 단순 이미지 분류만으로는 안정적인 성능과 해석력을 확보하기 어렵다.</span>
+- <span>해결: </span><span><strong>이미지 특징 + 메타데이터(time/location/camera context 등)</strong></span><span> 를 함께 활용하여 종 분류 성능을 비교하고, 어떤 조건에서 오류가 줄거나 늘어나는지 분석한다.</span>
+- <span>결과: 이미지 단독 baseline 대비 성능 변화, 종별 성능 차이, 메타데이터 결합에 따른 오류 패턴 변화 </span><span><strong>(추후 기록 예정)</strong></span>
+- <span>다음 단계:</span>
+    - <span>2주: 데이터셋 선정 및 baseline 구축</span>
+    - <span>2개월: 이미지 단독 / 메타데이터 단독 / 결합 모델 비교 및 오류 분석</span>
+    - <span>2분기: 시퀀스/행동 분석 문제로 확장 가능성 검토</span>
 
-## 1\. 배경·목표
+## <span>1. 배경·목표</span>
 
-- 사용자/페르소나:
-    - 1차 사용자: 데이터마이닝 수업에서 **문제 정의부터 해석까지 완결성 있는 프로젝트**를 수행해야 하는 학생
-    - 2차 사용자: 야생동물 이미지 데이터를 단순 분류가 아니라 **맥락 정보까지 포함해 분석하고 싶은 연구/실무 지향 사용자**
-- 성공 기준\(KPI\):
-    - 이미지 단독 baseline 모델 구축 완료
-    - 메타데이터 단독 모델 구축 완료
-    - 이미지\+메타데이터 결합 모델 구축 완료
-    - 최소 1개 이상의 평가 지표에서 결합 모델의 유의미한 차이 확인
-    - 종별/환경별/조건별 오류 패턴 분석 리포트 작성
-    - GitHub에 실험 과정, 결과, 한계, 향후 확장 방향까지 정리
-- 범위\(Out of scope\):
-    - 대규모 end-to-end 딥러닝 재학습
-    - 실시간 서비스 배포
-    - 행동 인식/행동 예측 자체를 이번 프로젝트의 핵심 목표로 삼는 것
-    - 오픈소스 대규모 기여
-    - 새로운 detection 모델 설계
+- <span>사용자/페르소나:</span>
+    - <span>1차 사용자: 데이터마이닝 수업에서 </span><span><strong>문제 정의부터 해석까지 완결성 있는 프로젝트</strong></span><span>를 수행해야 하는 학생</span>
+    - <span>2차 사용자: 야생동물 이미지 데이터를 단순 분류가 아니라 </span><span><strong>맥락 정보까지 포함해 분석하고 싶은 연구/실무 지향 사용자</strong></span>
+- <span>성공 기준(KPI):</span>
+    - <span>이미지 단독 baseline 모델 구축 완료</span>
+    - <span>메타데이터 단독 모델 구축 완료</span>
+    - <span>이미지+메타데이터 결합 모델 구축 완료</span>
+    - <span>최소 1개 이상의 평가 지표에서 결합 모델의 유의미한 차이 확인</span>
+    - <span>종별/환경별/조건별 오류 패턴 분석 리포트 작성</span>
+    - <span>GitHub에 실험 과정, 결과, 한계, 향후 확장 방향까지 정리</span>
+- <span>범위(Out of scope):</span>
+    - <span>대규모 end-to-end 딥러닝 재학습</span>
+    - <span>실시간 서비스 배포</span>
+    - <span>행동 인식/행동 예측 자체를 이번 프로젝트의 핵심 목표로 삼는 것</span>
+    - <span>오픈소스 대규모 기여</span>
+    - <span>새로운 detection 모델 설계</span>
 
-## 2\. 역할·스택·기간
+## <span>2. 역할·스택·기간</span>
 
-- 역할/기여:
-    - 기획 35%
-    - 데이터 분석/전처리 30%
-    - 모델링 및 실험 25%
-    - 문서화/GitHub 정리 10%
-- 스택:
-    - Python
-    - Jupyter Notebook / VSCode
-    - pandas, numpy
-    - scikit-learn
-    - matplotlib / seaborn 대체 가능 시 matplotlib 중심
-    - 이미지 feature extractor 또는 사전학습 임베딩 활용 도구 **\(추후 확정 예정\)**
-    - Git / GitHub
-- 기간: 2026-03-10 ~ 2026-06-10
-    _\(수업 일정에 맞춰 조정 가능\)_
+- <span>역할/기여:</span>
+    - <span>기획 35%</span>
+    - <span>데이터 분석/전처리 30%</span>
+    - <span>모델링 및 실험 25%</span>
+    - <span>문서화/GitHub 정리 10%</span>
+- <span>스택:</span>
+    - <span>Python</span>
+    - <span>Jupyter Notebook / VSCode</span>
+    - <span>pandas, numpy</span>
+    - <span>scikit-learn</span>
+    - <span>matplotlib / seaborn 대체 가능 시 matplotlib 중심</span>
+    - <span>이미지 feature extractor 또는 사전학습 임베딩 활용 도구 </span><span><strong>(추후 확정 예정)</strong></span>
+    - <span>Git / GitHub</span>
+- <span>기간: 2026-03-10 ~ 2026-06-10</span>
+    <span><em>(수업 일정에 맞춰 조정 가능)</em></span>
 
-## 3\. 데모 & 링크
+## <span>3. 데모 &amp; 링크</span>
 
-- Demo: 분석 노트북 및 결과 시각화 **\(추후 기록 예정\)**
-- Repo: **\(추후 기록 예정\)**
-- 문서: 실험 로그, 데이터셋 설명, 결과 리포트 **\(추후 기록 예정\)**
-- 시연영상: **\(추후 기록 예정\)**
+- <span>Demo: 분석 노트북 및 결과 시각화 </span><span><strong>(추후 기록 예정)</strong></span>
+- <span>Repo: </span><span><strong>(추후 기록 예정)</strong></span>
+- <span>문서: 실험 로그, 데이터셋 설명, 결과 리포트 </span><span><strong>(추후 기록 예정)</strong></span>
+- <span>시연영상: </span><span><strong>(추후 기록 예정)</strong></span>
 
-## 4\. 아키텍처 요약
+## <span>4. 아키텍처 요약</span>
 
-- 다이어그램\(1장 첨부\): **\(추후 제작 예정\)**
-- 데이터 흐름/외부 의존성:
-    1. 카메라트랩 데이터셋 수집
-    2. 이미지/메타데이터 정제 및 공통 key 기준 병합
-    3. 실험용 subset 구성
-    4. 이미지 특징 추출
-    5. 메타데이터 feature engineering
-    6. 세 가지 실험 수행
-        - 이미지 단독
-        - 메타데이터 단독
-        - 이미지\+메타데이터 결합
-    7. 성능 비교 및 오류 패턴 분석
-- 배포/CI·CD/롤백:
-    - 본 프로젝트는 서비스 배포보다 **재현 가능한 실험 환경 구축**에 초점
-    - requirements 정리, 실험 로그 관리, 디렉토리 구조 표준화 중심
-    - CI/CD는 범위 밖이며 필요 시 최소 lint/test만 고려 **\(추후 기록 예정\)**
+- <span>다이어그램(1장 첨부): </span><span><strong>(추후 제작 예정)</strong></span>
+- <span>데이터 흐름/외부 의존성:</span>
+    1. <span>카메라트랩 데이터셋 수집</span>
+    2. <span>이미지/메타데이터 정제 및 공통 key 기준 병합</span>
+    3. <span>실험용 subset 구성</span>
+    4. <span>이미지 특징 추출</span>
+    5. <span>메타데이터 feature engineering</span>
+    6. <span>세 가지 실험 수행</span>
+        - <span>이미지 단독</span>
+        - <span>메타데이터 단독</span>
+        - <span>이미지+메타데이터 결합</span>
+    7. <span>성능 비교 및 오류 패턴 분석</span>
+- <span>배포/CI·CD/롤백:</span>
+    - <span>본 프로젝트는 서비스 배포보다 </span><span><strong>재현 가능한 실험 환경 구축</strong></span><span>에 초점</span>
+    - <span>requirements 정리, 실험 로그 관리, 디렉토리 구조 표준화 중심</span>
+    - <span>CI/CD는 범위 밖이며 필요 시 최소 lint/test만 고려 </span><span><strong>(추후 기록 예정)</strong></span>
 
-## 5\. 핵심 기능\(스크린샷/GIF 포함\)
+## <span>5. 핵심 기능(스크린샷/GIF 포함)</span>
 
-1. **데이터 통합 파이프라인** — 이미지와 메타데이터를 연결해 실험 가능한 분석 단위로 정리 / 누락값, 불균형 클래스, 중복 레코드 처리
-2. **모델 비교 실험 기능** — 이미지 단독, 메타데이터 단독, 결합 모델을 동일 기준으로 비교 / 데이터 누수 방지와 split 전략 명시
-3. **오류 패턴 분석 기능** — 종별 confusion, 환경별 실패 사례, 메타데이터가 도움이 된/되지 않은 조건 분석
-4. **결과 시각화 기능** — 성능 지표, confusion matrix, feature importance 또는 조건별 오류 시각화
+1. <span><strong>데이터 통합 파이프라인</strong></span><span> — 이미지와 메타데이터를 연결해 실험 가능한 분석 단위로 정리 / 누락값, 불균형 클래스, 중복 레코드 처리</span>
+2. <span><strong>모델 비교 실험 기능</strong></span><span> — 이미지 단독, 메타데이터 단독, 결합 모델을 동일 기준으로 비교 / 데이터 누수 방지와 split 전략 명시</span>
+3. <span><strong>오류 패턴 분석 기능</strong></span><span> — 종별 confusion, 환경별 실패 사례, 메타데이터가 도움이 된/되지 않은 조건 분석</span>
+4. <span><strong>결과 시각화 기능</strong></span><span> — 성능 지표, confusion matrix, feature importance 또는 조건별 오류 시각화</span>
 
-## 6\. 기술 결정\(ADR 요약\)
+## <span>6. 기술 결정(ADR 요약)</span>
 
-- 결론: **이미지 분류 단독 프로젝트가 아니라 이미지 \+ 메타데이터 결합형 데이터마이닝 프로젝트로 설계**
-    - 버린 대안:
-        - 단순 야생동물 이미지 분류
-        - MegaDetector 실패 분석 단독 프로젝트
-        - 행동 분석/시퀀스 마이닝 중심 프로젝트
-    - 근거:
-        - 단순 분류는 주제가 평범해질 가능성이 큼
-        - 실패 분석 단독은 실험 설계가 흔들릴 위험이 있음
-        - 행동 분석은 장기적으로는 좋지만 3개월 수업 프로젝트로는 스코프 관리가 어려움
-        - 결합형 구조는 **완성 가능성, 분석 가치, 향후 확장성**의 균형이 가장 좋음
-- 리스크 및 완화:
-    - 리스크: 메타데이터 품질이 낮거나 누락이 많을 수 있음
-        → 완화: 데이터셋 후보를 2~3개 비교 후 선정, 최소 사용 feature부터 시작
-    - 리스크: 위치 정보가 강한 shortcut이 되어 일반화 성능을 왜곡할 수 있음
-        → 완화: split 전략을 엄격히 설계하고 leakage 가능성 명시
-    - 리스크: 실험이 많아져 방향을 잃을 수 있음
-        → 완화: baseline → 비교 실험 → 오류 분석의 3단계만 핵심 범위로 고정
+- <span>결론: </span><span><strong>이미지 분류 단독 프로젝트가 아니라 이미지 + 메타데이터 결합형 데이터마이닝 프로젝트로 설계</strong></span>
+    - <span>버린 대안:</span>
+        - <span>단순 야생동물 이미지 분류</span>
+        - <span>MegaDetector 실패 분석 단독 프로젝트</span>
+        - <span>행동 분석/시퀀스 마이닝 중심 프로젝트</span>
+    - <span>근거:</span>
+        - <span>단순 분류는 주제가 평범해질 가능성이 큼</span>
+        - <span>실패 분석 단독은 실험 설계가 흔들릴 위험이 있음</span>
+        - <span>행동 분석은 장기적으로는 좋지만 3개월 수업 프로젝트로는 스코프 관리가 어려움</span>
+        - <span>결합형 구조는 </span><span><strong>완성 가능성, 분석 가치, 향후 확장성</strong></span><span>의 균형이 가장 좋음</span>
+- <span>리스크 및 완화:</span>
+    - <span>리스크: 메타데이터 품질이 낮거나 누락이 많을 수 있음</span>
+        <span>→ 완화: 데이터셋 후보를 2~3개 비교 후 선정, 최소 사용 feature부터 시작</span>
+    - <span>리스크: 위치 정보가 강한 shortcut이 되어 일반화 성능을 왜곡할 수 있음</span>
+        <span>→ 완화: split 전략을 엄격히 설계하고 leakage 가능성 명시</span>
+    - <span>리스크: 실험이 많아져 방향을 잃을 수 있음</span>
+        <span>→ 완화: baseline → 비교 실험 → 오류 분석의 3단계만 핵심 범위로 고정</span>
 
-## 7\. 문제와 해결\(버그·장애 포함\)
+## <span>7. 문제와 해결(버그·장애 포함)</span>
 
-- **\(추후 기록 예정\)**
+- <span><strong>(추후 기록 예정)</strong></span>
 
-## 8\. 측정 결과\(전/후 비교\)
+## <span>8. 측정 결과(전/후 비교)</span>
 
-- Accuracy / F1 / Balanced Accuracy / Log Loss: **\(추후 기록 예정\)**
-- 종별 성능 차이: **\(추후 기록 예정\)**
-- 메타데이터 결합 전/후 오류 변화: **\(추후 기록 예정\)**
-- 특정 조건\(시간/위치/카메라\)별 성능 차이: **\(추후 기록 예정\)**
-- 그래프 1~2장: **\(추후 기록 예정\)**
+- <span>Accuracy / F1 / Balanced Accuracy / Log Loss: </span><span><strong>(추후 기록 예정)</strong></span>
+- <span>종별 성능 차이: </span><span><strong>(추후 기록 예정)</strong></span>
+- <span>메타데이터 결합 전/후 오류 변화: </span><span><strong>(추후 기록 예정)</strong></span>
+- <span>특정 조건(시간/위치/카메라)별 성능 차이: </span><span><strong>(추후 기록 예정)</strong></span>
+- <span>그래프 1~2장: </span><span><strong>(추후 기록 예정)</strong></span>
 
-## 9\. 회고 & 개선
+## <span>9. 회고 &amp; 개선</span>
 
-- 잘된 점 3가지\(근거 포함\):
+- <span>잘된 점 3가지(근거 포함):</span>
     1.
-- 아쉬운 점 3가지\(원인/조치\):
+- <span>아쉬운 점 3가지(원인/조치):</span>
     1.
-- 기술부채 목록과 상환 계획\(우선순위/예상 공수\):
+- <span>기술부채 목록과 상환 계획(우선순위/예상 공수):</span>

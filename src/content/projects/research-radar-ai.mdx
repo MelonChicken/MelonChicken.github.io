@@ -26,132 +26,139 @@ featured: false
 problem: "컨설팅 리서치를 기회로 바꾸는 자동 탐색 시스템"
 ---
 
+import NotionBookmark from '../../components/notion/NotionBookmark.astro';
+import NotionCallout from '../../components/notion/NotionCallout.astro';
+import NotionColumns from '../../components/notion/NotionColumns.astro';
+import NotionToggle from '../../components/notion/NotionToggle.astro';
+
 {/* This file is generated from Notion. Do not edit directly. */}
 
 ### Untitled
 
-# Research Radar – AI 기반 시장 인텔리전스 대시보드
+# <span>Research Radar – AI 기반 시장 인텔리전스 대시보드</span>
 
-<details class="notion-toggle">
-  <summary>초기 버전 화면</summary>
+<NotionToggle summary={"초기 버전 화면"} headingLevel={0}>
 
-<figure>
-  <img src="/notion-assets/research-radar-ai/2ed14b84a0f28093aca7ddbe873cfee8.png" alt="Source: author's Notion note" />
-  <figcaption>Source: author's Notion note</figcaption>
-</figure>
-</details>
-
-<figure>
-  <img src="/notion-assets/research-radar-ai/30214b84a0f280528c70dec738353709.png" alt="Source: author's Notion note" />
+<figure class="notion-figure">
+  <img src={"/notion-assets/research-radar-ai/2ed14b84a0f28093aca7ddbe873cfee8.png"} alt={"Source: author's Notion note"} />
   <figcaption>Source: author's Notion note</figcaption>
 </figure>
 
-> AI가 글로벌 리서치 리포트에서 스타트업에 실제로 필요한 사업 기회를 추출하는 시장 레이더
+<p class="notion-empty" aria-hidden="true"></p>
 
-> 해커톤/공모전 정보: 없음
+</NotionToggle>
 
----
+<figure class="notion-figure">
+  <img src={"/notion-assets/research-radar-ai/30214b84a0f280528c70dec738353709.png"} alt={"Source: author's Notion note"} />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
 
-## 🎯 Executive Summary
+> <span>AI가 글로벌 리서치 리포트에서 스타트업에 실제로 필요한 사업 기회를 추출하는 시장 레이더</span>
 
-- **문제**: 스타트업과 개발자가 대형 리서치 리포트에서 실질적인 사업 기회와 기술적 공백을 식별하기 어렵다는 문제
-- **해결**: LLM 기반 필터링으로 리서치 리포트의 ‘기업 홍보성 문구’를 제거하고, 사업 기회 신호만 추출·점수화하는 대시보드
-
----
-
-## 1\. 배경·목표
-
-- **사용자/페르소나**:
-    - 스타트업 창업가
-    - 초기 제품/기술을 탐색하는 개발자
-- **성공 기준\(KPI\)**: 없음
-- **범위\(Out of scope\)**: 없음
+> <span>해커톤/공모전 정보: 없음</span>
 
 ---
 
-## 2\. 역할·스택·기간
+## <span>🎯 Executive Summary</span>
 
-- **역할/기여**:
-    - 개인 프로젝트
-- **스택**:
-    - Frontend: Streamlit \(Python\)
-    - AI Core: OpenAI GPT-3\.5 Turbo \(JSON Mode\)
-    - Data Engineering: Feedparser, BeautifulSoup4, PyPDF
-    - Data Validation: Pydantic
-    - Storage: JSON \(Lightweight MVP\)
-- **기간**: 내용 없음
+- <span><strong>문제</strong></span><span>: 스타트업과 개발자가 대형 리서치 리포트에서 실질적인 사업 기회와 기술적 공백을 식별하기 어렵다는 문제</span>
+- <span><strong>해결</strong></span><span>: LLM 기반 필터링으로 리서치 리포트의 ‘기업 홍보성 문구’를 제거하고, 사업 기회 신호만 추출·점수화하는 대시보드</span>
 
 ---
 
-## 3\. 데모 & 링크
+## <span>1. 배경·목표</span>
 
-- **Demo**: 내용 없음
-- **Repo**: 내용 없음
-- **문서\(API/ERD/디자인\)**: 내용 없음
-- **시연영상**: 내용 없음
-
----
-
-## 4\. 아키텍처 요약
-
-- **다이어그램**: 내용 없음
-- **데이터 흐름/외부 의존성**:
-    - RSS Feed → HTML/PDF 파싱 → LLM 기반 신호 추출 → JSON 저장 → Streamlit 대시보드 시각화
-- **배포/CI·CD/롤백**: 내용 없음
+- <span><strong>사용자/페르소나</strong></span><span>:</span>
+    - <span>스타트업 창업가</span>
+    - <span>초기 제품/기술을 탐색하는 개발자</span>
+- <span><strong>성공 기준(KPI)</strong></span><span>: 없음</span>
+- <span><strong>범위(Out of scope)</strong></span><span>: 없음</span>
 
 ---
 
-## 5\. 핵심 기능 \(스크린샷/GIF 포함\)
+## <span>2. 역할·스택·기간</span>
 
-1. **Startup-Focused AI Filter** — 스타트업 관점에서 의미 없는 거시적 문장을 제거하고, 실제 사업·기술적 문제만 추출
-    / 엣지 케이스 처리: Admin View에서 필터링된 결과 검증 가능
-2. **Dual-Language Support \(EN/KR\)** — 글로벌 리포트를 한국어로 즉시 이해 가능
-    / 엣지 케이스 처리: 기존 데이터도 재번역 가능
-3. **Interactive Dashboard** — 산업·기술 태그·중요도 점수 기반 필터링 제공
-    / 엣지 케이스 처리: 카드 상세 모달에서 근거·출처 확인
-
----
-
-## 6\. 기술 결정\(ADR 요약\)
-
-- **결론**: Streamlit \+ JSON 기반 MVP 선택
-- **버린 대안**: 전통적인 웹 프레임워크 기반 대시보드
-- **근거**:
-    - 성능: MVP 단계에서 충분
-    - 비용: 서버·DB 비용 최소화
-    - 복잡도: 빠른 실험과 반복에 유리
-- **리스크 및 완화**:
-    - 리스크: JSON 스토리지 확장성 한계
-    - 완화: 향후 DB 도입 전환 고려
+- <span><strong>역할/기여</strong></span><span>:</span>
+    - <span>개인 프로젝트</span>
+- <span><strong>스택</strong></span><span>:</span>
+    - <span>Frontend: Streamlit (Python)</span>
+    - <span>AI Core: OpenAI GPT-3.5 Turbo (JSON Mode)</span>
+    - <span>Data Engineering: Feedparser, BeautifulSoup4, PyPDF</span>
+    - <span>Data Validation: Pydantic</span>
+    - <span>Storage: JSON (Lightweight MVP)</span>
+- <span><strong>기간</strong></span><span>: 내용 없음</span>
 
 ---
 
-## 7\. 문제와 해결\(버그·장애 포함\)
+## <span>3. 데모 &amp; 링크</span>
 
-- **이슈**: 내용 없음
-- **이슈**: 내용 없음
-
----
-
-## 8\. 측정 결과\(전/후 비교\)
-
-- **p95 지연**: 내용 없음 → 내용 없음
-- **전환율**: 내용 없음 → 내용 없음
-- **활성 사용자**: 내용 없음 → 내용 없음
-- 그래프: 내용 없음
+- <span><strong>Demo</strong></span><span>: 내용 없음</span>
+- <span><strong>Repo</strong></span><span>: 내용 없음</span>
+- <span><strong>문서(API/ERD/디자인)</strong></span><span>: 내용 없음</span>
+- <span><strong>시연영상</strong></span><span>: 내용 없음</span>
 
 ---
 
-## 9\. 회고 & 개선
+## <span>4. 아키텍처 요약</span>
 
-- **잘된 점**
-    1. LLM을 활용한 ‘스타트업 관점 필터링’이라는 문제 정의의 명확성 \(근거: README 핵심 기능\)
-    2. 한국어/영어 이중 언어 지원으로 접근성 확보
-    3. MVP 지향 아키텍처로 빠른 실행 가능
-- **아쉬운 점**
+- <span><strong>다이어그램</strong></span><span>: 내용 없음</span>
+- <span><strong>데이터 흐름/외부 의존성</strong></span><span>:</span>
+    - <span>RSS Feed → HTML/PDF 파싱 → LLM 기반 신호 추출 → JSON 저장 → Streamlit 대시보드 시각화</span>
+- <span><strong>배포/CI·CD/롤백</strong></span><span>: 내용 없음</span>
+
+---
+
+## <span>5. 핵심 기능 (스크린샷/GIF 포함)</span>
+
+1. <span><strong>Startup-Focused AI Filter</strong></span><span> — 스타트업 관점에서 의미 없는 거시적 문장을 제거하고, 실제 사업·기술적 문제만 추출</span>
+    <span>/ 엣지 케이스 처리: Admin View에서 필터링된 결과 검증 가능</span>
+2. <span><strong>Dual-Language Support (EN/KR)</strong></span><span> — 글로벌 리포트를 한국어로 즉시 이해 가능</span>
+    <span>/ 엣지 케이스 처리: 기존 데이터도 재번역 가능</span>
+3. <span><strong>Interactive Dashboard</strong></span><span> — 산업·기술 태그·중요도 점수 기반 필터링 제공</span>
+    <span>/ 엣지 케이스 처리: 카드 상세 모달에서 근거·출처 확인</span>
+
+---
+
+## <span>6. 기술 결정(ADR 요약)</span>
+
+- <span><strong>결론</strong></span><span>: Streamlit + JSON 기반 MVP 선택</span>
+- <span><strong>버린 대안</strong></span><span>: 전통적인 웹 프레임워크 기반 대시보드</span>
+- <span><strong>근거</strong></span><span>:</span>
+    - <span>성능: MVP 단계에서 충분</span>
+    - <span>비용: 서버·DB 비용 최소화</span>
+    - <span>복잡도: 빠른 실험과 반복에 유리</span>
+- <span><strong>리스크 및 완화</strong></span><span>:</span>
+    - <span>리스크: JSON 스토리지 확장성 한계</span>
+    - <span>완화: 향후 DB 도입 전환 고려</span>
+
+---
+
+## <span>7. 문제와 해결(버그·장애 포함)</span>
+
+- <span><strong>이슈</strong></span><span>: 내용 없음</span>
+- <span><strong>이슈</strong></span><span>: 내용 없음</span>
+
+---
+
+## <span>8. 측정 결과(전/후 비교)</span>
+
+- <span><strong>p95 지연</strong></span><span>: 내용 없음 → 내용 없음</span>
+- <span><strong>전환율</strong></span><span>: 내용 없음 → 내용 없음</span>
+- <span><strong>활성 사용자</strong></span><span>: 내용 없음 → 내용 없음</span>
+- <span>그래프: 내용 없음</span>
+
+---
+
+## <span>9. 회고 &amp; 개선</span>
+
+- <span><strong>잘된 점</strong></span>
+    1. <span>LLM을 활용한 ‘스타트업 관점 필터링’이라는 문제 정의의 명확성 (근거: README 핵심 기능)</span>
+    2. <span>한국어/영어 이중 언어 지원으로 접근성 확보</span>
+    3. <span>MVP 지향 아키텍처로 빠른 실행 가능</span>
+- <span><strong>아쉬운 점</strong></span>
     1. 
     2. 
     3.
-- **기술부채 목록과 상환 계획**
-    - JSON 스토리지 → DB 전환 \(우선순위: 중 / 예상 공수: 내용 없음\)
-    - LLM 모델 고도화 \(우선순위: 중 / 예상 공수: 내용 없음\)
+- <span><strong>기술부채 목록과 상환 계획</strong></span>
+    - <span>JSON 스토리지 → DB 전환 (우선순위: 중 / 예상 공수: 내용 없음)</span>
+    - <span>LLM 모델 고도화 (우선순위: 중 / 예상 공수: 내용 없음)</span>

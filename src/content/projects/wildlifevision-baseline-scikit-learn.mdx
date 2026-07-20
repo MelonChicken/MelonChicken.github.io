@@ -21,117 +21,126 @@ featured: true
 problem: "촬영 환경 변화에도 흔들리지 않는 카메라트랩 이미지 분류 베이스라인을 scikit-learn으로 구축한다"
 ---
 
+import NotionBookmark from '../../components/notion/NotionBookmark.astro';
+import NotionCallout from '../../components/notion/NotionCallout.astro';
+import NotionColumns from '../../components/notion/NotionColumns.astro';
+import NotionToggle from '../../components/notion/NotionToggle.astro';
+
 {/* This file is generated from Notion. Do not edit directly. */}
+
+<p class="notion-empty" aria-hidden="true"></p>
 
 ### Untitled
 
-# Site-Generalized Wildlife Classifier
+# <span>Site-Generalized Wildlife Classifier </span>
 
-카메라트랩 이미지를 scikit-learn 기반 전통 특징으로 분류하고, site 단위 일반화 성능을 검증·제출까지 완주하는 학습형 CV 프로젝트
+<span>카메라트랩 이미지를 scikit-learn 기반 전통 특징으로 분류하고, site 단위 일반화 성능을 검증·제출까지 완주하는 학습형 CV 프로젝트</span>
 
-> **Traditional CV → Probabilistic Classifier → GroupKFold \(site\) → Submission**
+> <span><strong>Traditional CV → Probabilistic Classifier → GroupKFold (site) → Submission</strong></span>
 
-> 공모전: [https://www\.drivendata\.org/competitions/87/competition-image-classification-wildlife-conservation/](https://www.drivendata.org/competitions/87/competition-image-classification-wildlife-conservation/)
+> <span>공모전: </span><a href={"https://www.drivendata.org/competitions/87/competition-image-classification-wildlife-conservation/"}><span>https://www.drivendata.org/competitions/87/competition-image-classification-wildlife-conservation/</span></a>
 > 
-> 현재 단계: **베이스라인 구축 및 1차 제출 목표**
+> <span>현재 단계: </span><span><strong>베이스라인 구축 및 1차 제출 목표</strong></span>
 
 ---
 
-> 🎯 Executive Summary
+> <span>🎯 Executive Summary</span>
 
-- 문제: 카메라트랩 이미지 분류는 **촬영 환경 변화**가 크고, 무작위 분할로 평가하면 실제 성능을 과대평가하기 쉽다\.
-- 해결: 이미지에서 **“Histogram of Oriented Gradients, HOG” 특징을 추출**하고 **scikit-learn 확률 분류기**로 학습하되, 검증은 **GroupKFold**로 고정하여 “site 일반화”를 반영한다\.
-- 결과: \(2026-02-14 기준\)
-    - GroupKFold\(site\) 평균 log loss: `1.8639499`
-    - 1회 제출 점수\(리더보드\): **`1.9354`**
-    - 실험 수\(베이스라인/개선\): 40
-- 다음 단계:
-    - 2주: HOG Feature 조정
-    - 2개월:
-    - 2분기:
+- <span>문제: 카메라트랩 이미지 분류는 </span><span><strong>촬영 환경 변화</strong></span><span>가 크고, 무작위 분할로 평가하면 실제 성능을 과대평가하기 쉽다.</span>
+- <span>해결: 이미지에서 </span><span><strong>“Histogram of Oriented Gradients, HOG” 특징을 추출</strong></span><span>하고 </span><span><strong>scikit-learn 확률 분류기</strong></span><span>로 학습하되, 검증은 </span><span><strong>GroupKFold</strong></span><span>로 고정하여 “site 일반화”를 반영한다.</span>
+- <span>결과: (2026-02-14 기준)</span>
+    - <span>GroupKFold(site) 평균 log loss: </span><span><code>1.8639499</code></span>
+    - <span>1회 제출 점수(리더보드): </span><span><strong><code>1.9354</code></strong></span>
+    - <span>실험 수(베이스라인/개선): 40</span>
+- <span>다음 단계:</span>
+    - <span>2주: HOG Feature 조정</span>
+    - <span>2개월: </span>
+    - <span>2분기: </span>
 
-## 1\. 배경·목표
+## <span>1. 배경·목표</span>
 
-- 사용자/페르소나:
-    - \(학습 관점\) Computer Vision/ML 입문~중급 학습자 \(본인\)
-    - \(문제 관점\) 보전 생태 연구/현장 모니터링에서 카메라트랩 이미지를 분류해야 하는 연구자/기관
-- 성공 기준\(KPI\):
-    - GroupKFold\(site\) 기준 평균 **log loss 개선**
-    - **제출 성공 1회 이상**
-    - 실험 기록 템플릿으로 **실험 10회 이상** 누적 \(재현/비교 가능\)
-- 범위\(Out of scope\):
-    - 딥러닝 기반 end-to-end 탐지/분류 모델 학습 \(예: YOLO/ResNet fine-tuning\)
-    - 외부 데이터 추가 수집 \(대회 규정상 제한\)
+- <span>사용자/페르소나:</span>
+    - <span>(학습 관점) Computer Vision/ML 입문~중급 학습자 (본인)</span>
+    - <span>(문제 관점) 보전 생태 연구/현장 모니터링에서 카메라트랩 이미지를 분류해야 하는 연구자/기관</span>
+- <span>성공 기준(KPI):</span>
+    - <span>GroupKFold(site) 기준 평균 </span><span><strong>log loss 개선</strong></span>
+    - <span><strong>제출 성공 1회 이상</strong></span>
+    - <span>실험 기록 템플릿으로 </span><span><strong>실험 10회 이상</strong></span><span> 누적 (재현/비교 가능)</span>
+- <span>범위(Out of scope):</span>
+    - <span>딥러닝 기반 end-to-end 탐지/분류 모델 학습 (예: YOLO/ResNet fine-tuning)</span>
+    - <span>외부 데이터 추가 수집 (대회 규정상 제한)</span>
 
-## 2\. 역할·스택·기간
+## <span>2. 역할·스택·기간</span>
 
-- 역할/기여: ML/데이터/기획 **100%** \(개인\)
-- 스택:
-    - Python
-    - scikit-learn \(Logistic Regression, SVM, CalibratedClassifierCV, GroupKFold, log loss\)
-    - scikit-image / OpenCV \(이미지 전처리, HOG\)
-    - pandas/numpy
-- 기간: 2026-02-11 ~ YYYY-MM-DD
+- <span>역할/기여: ML/데이터/기획 </span><span><strong>100%</strong></span><span> (개인)</span>
+- <span>스택:</span>
+    - <span>Python</span>
+    - <span>scikit-learn (Logistic Regression, SVM, CalibratedClassifierCV, GroupKFold, log loss)</span>
+    - <span>scikit-image / OpenCV (이미지 전처리, HOG)</span>
+    - <span>pandas/numpy</span>
+- <span>기간: 2026-02-11 ~ YYYY-MM-DD</span>
 
-## 3\. 데모 & 링크
+## <span>3. 데모 &amp; 링크</span>
 
-- Demo: \(선택/추후\) Streamlit – 이미지 업로드 → 예측 확률 \+ 근거\(유사 이미지\)
-- Repo: [https://github\.com/MelonChicken/WildlifeVision-Baseline](https://github.com/MelonChicken/WildlifeVision-Baseline)
-- 문서: [Untitled](https://app.notion.com/p/30414b84a0f2806da17fc1e0c65b8d81)
-- 시연영상: \(선택/추후\)
+- <span>Demo: (선택/추후) Streamlit – 이미지 업로드 → 예측 확률 + 근거(유사 이미지)</span>
+- <span>Repo: </span><a href={"https://github.com/MelonChicken/WildlifeVision-Baseline"}><span>https://github.com/MelonChicken/WildlifeVision-Baseline</span></a>
+- <span>문서: </span><a href={"https://app.notion.com/p/30414b84a0f2806da17fc1e0c65b8d81"}><span>Untitled</span></a><span> </span>
+- <span>시연영상: (선택/추후)</span>
 
-## 4\. 아키텍처 요약
+## <span>4. 아키텍처 요약</span>
 
-- 다이어그램\(1장 첨부\): \(추후\)
-- 데이터 흐름/외부 의존성:
-    - CSV 로드 \(train\_features/train\_labels/submission\_format\)
-    - 이미지 로딩 \(filepath\)
-    - 전처리 \(resize, grayscale\)
-    - 특징 추출 \(HOG\)
-    - 모델 학습/평가 \(GroupKFold by site, log loss\)
-    - 전체 train 재학습 → test 예측 → submission\.csv 생성
-- 배포/CI·CD/롤백:
-    - 계획없음
+- <span>다이어그램(1장 첨부): (추후)</span>
+- <span>데이터 흐름/외부 의존성:</span>
+    - <span>CSV 로드 (train_features/train_labels/submission_format)</span>
+    - <span>이미지 로딩 (filepath)</span>
+    - <span>전처리 (resize, grayscale)</span>
+    - <span>특징 추출 (HOG)</span>
+    - <span>모델 학습/평가 (GroupKFold by site, log loss)</span>
+    - <span>전체 train 재학습 → test 예측 → submission.csv 생성</span>
+- <span>배포/CI·CD/롤백:</span>
+    - <span>계획없음</span>
 
-## 5\. 핵심 기능 \(스크린샷/GIF 포함\)
+## <span>5. 핵심 기능 (스크린샷/GIF 포함)</span>
 
-> 완성 이후 추가 예정
+> <span>완성 이후 추가 예정</span>
 
-1. **site-aware 검증 파이프라인** — 실제 테스트 조건에 맞춘 일반화 평가 / \(엣지\) site 불균형 시 fold 조정
-2. **HOG 특징 기반 분류 베이스라인** — 딥러닝 없이도 end-to-end 제출 가능 / \(엣지\) 이미지 크기 불일치 → 고정 resize
+1. <span><strong>site-aware 검증 파이프라인</strong></span><span> — 실제 테스트 조건에 맞춘 일반화 평가 / (엣지) site 불균형 시 fold 조정</span>
+2. <span><strong>HOG 특징 기반 분류 베이스라인</strong></span><span> — 딥러닝 없이도 end-to-end 제출 가능 / (엣지) 이미지 크기 불일치 → 고정 resize</span>
 
-## 6\. 기술 결정 \(ADR 요약\)
+## <span>6. 기술 결정 (ADR 요약)</span>
 
-- 결론: **HOG \+ scikit-learn 확률 분류 \+ GroupKFold\(site\)**
-    - 버린 대안: 랜덤 split 기반 평가, 딥러닝 end-to-end 학습
-    - 근거: 학습 목표가 기초부터 구현 \+ 대회 핵심 제약\(site 일반화\) 반영 \+ 재현 가능한 실험 설계
-- 리스크 및 완화:
-    - 리스크: 전통 특징만으로 성능 한계
-        - 완화: \(추후\) pre-trained 임베딩을 feature로 사용하고 분류기는 sklearn로 유지
-    - 리스크: HOG 특징 추출 비용\(시간\)
-        - 완화: 특징 캐싱\(cache\) 도입, 이미지 크기 축소 실험
+- <span>결론: </span><span><strong>HOG + scikit-learn 확률 분류 + GroupKFold(site)</strong></span>
+    - <span> 버린 대안: 랜덤 split 기반 평가, 딥러닝 end-to-end 학습</span>
+    - <span>근거: 학습 목표가 기초부터 구현 + 대회 핵심 제약(site 일반화) 반영 + 재현 가능한 실험 설계</span>
+- <span>리스크 및 완화:</span>
+    - <span>리스크: 전통 특징만으로 성능 한계</span>
+        - <span>완화: (추후) pre-trained 임베딩을 feature로 사용하고 분류기는 sklearn로 유지</span>
+    - <span>리스크: HOG 특징 추출 비용(시간)</span>
+        - <span>완화: 특징 캐싱(cache) 도입, 이미지 크기 축소 실험</span>
 
-## 7\. 문제와 해결 \(버그·장애 포함\)
+## <span>7. 문제와 해결 (버그·장애 포함)</span>
 
-- 이슈: \(추후 기입\)
-- 이슈: \(추후 기입\)
+- <span>이슈: (추후 기입) </span>
+- <span>이슈: (추후 기입)</span>
 
-## 8\. 측정 결과 \(전/후 비교\)
+## <span>8. 측정 결과 (전/후 비교)</span>
 
-<figure>
-  <img src="/notion-assets/wildlifevision-baseline-scikit-learn/31614b84a0f2802a8ce2cbe87b6b81d8.svg" alt="Source: author's Notion note" />
+<figure class="notion-figure">
+  <img src={"/notion-assets/wildlifevision-baseline-scikit-learn/31614b84a0f2802a8ce2cbe87b6b81d8.svg"} alt={"Source: author's Notion note"} />
   <figcaption>Source: author's Notion note</figcaption>
 </figure>
 
-## 9\. 회고 & 개선
+## <span>9. 회고 &amp; 개선</span>
 
-> 완성 이후 기록 예정
+> <span>완성 이후 기록 예정</span>
 
-- 잘된 점 3가지\(근거 포함\): \(추후\)
-- 아쉬운 점 3가지\(원인/조치\): \(추후\)
-- 기술 부채 목록과 상환 계획 \(예상\):
-    1. 특징 캐시/실험 재현성\(High, 0\.5d\)
-    2. 실험 기록 자동화\(중간, 1~2d\)
-    3. LangChain 기반 실험 요약 리포트 생성\(중간, 2~3d\)
+- <span>잘된 점 3가지(근거 포함): (추후)</span>
+- <span>아쉬운 점 3가지(원인/조치): (추후)</span>
+- <span>기술 부채 목록과 상환 계획 (예상):</span>
+    1. <span>특징 캐시/실험 재현성(High, 0.5d)</span>
+    2. <span>실험 기록 자동화(중간, 1~2d)</span>
+    3. <span>LangChain 기반 실험 요약 리포트 생성(중간, 2~3d)</span>
 
 ---
+
+<p class="notion-empty" aria-hidden="true"></p>

@@ -19,86 +19,93 @@ featured: false
 problem: "현재 정부 서버 중 복구된 서버를 시각적으로 볼 수 있을까 → request response를 활용해보자!"
 ---
 
+import NotionBookmark from '../../components/notion/NotionBookmark.astro';
+import NotionCallout from '../../components/notion/NotionCallout.astro';
+import NotionColumns from '../../components/notion/NotionColumns.astro';
+import NotionToggle from '../../components/notion/NotionToggle.astro';
+
 {/* This file is generated from Notion. Do not edit directly. */}
 
-<figure>
-  <img src="/notion-assets/govpulse/27f14b84a0f280e5913ce9c7f5e803fc.png" alt="Source: author's Notion note" />
+<figure class="notion-figure">
+  <img src={"/notion-assets/govpulse/27f14b84a0f280e5913ce9c7f5e803fc.png"} alt={"Source: author's Notion note"} />
   <figcaption>Source: author's Notion note</figcaption>
 </figure>
 
-# GovPulse – 정부 웹사이트\(\.go\.kr\) 상태를 저부하로 모니터링하는 FastAPI 기반 도구
+# <span>GovPulse – 정부 웹사이트(.go.kr) 상태를 </span><span><strong>저부하</strong></span><span>로 모니터링하는 FastAPI 기반 도구</span>
 
-> 정부 웹사이트\(\.go\.kr\) 상태를 저부하로 모니터링하는 FastAPI 기반 도구\.
+> <span>정부 웹사이트(.go.kr) 상태를 저부하로 모니터링하는 FastAPI 기반 도구. </span>
 
-> 해커톤/공모전 정보 \(일시, 성취도\) : 없음
+> <span>해커톤/공모전 정보 (일시, 성취도) : 없음</span>
 
 ---
 
-> 🎯 Executive Summary
+> <span>🎯 Executive Summary</span>
 
-- 문제: 2025-09-26 국가정보자원관리원 화재 여파로 정부 사이트 마비 상황에서, **복구 여부를 저부하로 실시간 파악**할 수단 부재\.
-- 해결: **FastAPI 기반**으로 `robots.txt` 준수, **HEAD 우선→GET 폴백**, 키워드·품질 기반 **3단계\(Healthy/Degraded/Unhealthy\) 판정**을 결합\.
+- <span>문제: 2025-09-26 국가정보자원관리원 화재 여파로 정부 사이트 마비 상황에서, </span><span><strong>복구 여부를 저부하로 실시간 파악</strong></span><span>할 수단 부재. </span>
+- <span>해결: </span><span><strong>FastAPI 기반</strong></span><span>으로 </span><span><code>robots.txt</code></span><span> 준수, </span><span><strong>HEAD 우선→GET 폴백</strong></span><span>, 키워드·품질 기반 </span><span><strong>3단계(Healthy/Degraded/Unhealthy) 판정</strong></span><span>을 결합. </span>
 
-## 1\. 배경·목표
+## <span>1. 배경·목표</span>
 
-- 사용자/페르소나:
-- 성공 기준\(KPI\):
-- 범위\(Out of scope\):
-    - 비공개/인증 경로 접근 금지 \(`/admin`, `/login` 등\)
-    - 개인정보 수집 금지 \(폼·쿠키 등\)
-    - 대량 요청·레이트 제한 우회 금지
-    - 콘텐츠 저장\(크롤링/스크래핑\) 금지 \([GitHub](https://github.com/MelonChicken/GovPulse)\)
+- <span>사용자/페르소나:</span>
+- <span>성공 기준(KPI):</span>
+- <span>범위(Out of scope):</span>
+    - <span>비공개/인증 경로 접근 금지 (</span><span><code>/admin</code></span><span>, </span><span><code>/login</code></span><span> 등)</span>
+    - <span>개인정보 수집 금지 (폼·쿠키 등)</span>
+    - <span>대량 요청·레이트 제한 우회 금지</span>
+    - <span>콘텐츠 저장(크롤링/스크래핑) 금지 (</span><a href={"https://github.com/MelonChicken/GovPulse"}><span>GitHub</span></a><span>)</span>
 
-## 2\. 역할·스택·기간
+## <span>2. 역할·스택·기간</span>
 
-- 역할/기여: Backend 100%
-- 스택: Python, FastAPI, Uvicorn, Requests, PyYAML
-- 기간: 2025-09-28 ~
+- <span>역할/기여: Backend 100%</span>
+- <span>스택: Python, FastAPI, Uvicorn, Requests, PyYAML</span>
+- <span>기간: 2025-09-28 ~ </span>
 
-## 3\. 데모 & 링크
+## <span>3. 데모 &amp; 링크</span>
 
-- Demo: [https://govpulse\.onrender\.com/](https://govpulse.onrender.com/)
-- Repo: [https://github\.com/MelonChicken/GovPulse](https://github.com/MelonChicken/GovPulse)
+- <span>Demo: </span><a href={"https://govpulse.onrender.com/"}><span>https://govpulse.onrender.com/</span></a>
+- <span>Repo: </span><a href={"https://github.com/MelonChicken/GovPulse"}><span>https://github.com/MelonChicken/GovPulse</span></a>
 
-## 4\. 아키텍처 요약
+## <span>4. 아키텍처 요약</span>
 
-- `res/endpoints.yaml` 설정 기반으로 대상 사이트 로드 → **robots\.txt 검사** → **HEAD 요청** 후 필요 시 **경량 GET**으로 폴백하여 상태 평가\.
-- **키워드·품질 규칙**이 존재하면 고급 분석\(3단계 판정\) 사용, 없으면 단순 200/비-200 판정으로 폴백\.
-- **캐싱/레이트 리밋**: robots\.txt 24시간 캐시, 호스트 동시 1·글로벌 동시 3, 호스트 60초·엔드포인트 10분 간격\.
+- <span><code>res/endpoints.yaml</code></span><span> 설정 기반으로 대상 사이트 로드 → </span><span><strong>robots.txt 검사</strong></span><span> → </span><span><strong>HEAD 요청</strong></span><span> 후 필요 시 </span><span><strong>경량 GET</strong></span><span>으로 폴백하여 상태 평가. </span>
+- <span><strong>키워드·품질 규칙</strong></span><span>이 존재하면 고급 분석(3단계 판정) 사용, 없으면 단순 200/비-200 판정으로 폴백. </span>
+- <span><strong>캐싱/레이트 리밋</strong></span><span>: robots.txt 24시간 캐시, 호스트 동시 1·글로벌 동시 3, 호스트 60초·엔드포인트 10분 간격. </span>
 
-## 5\. 핵심 기능\(스크린샷/GIF 포함\)
+<p class="notion-empty" aria-hidden="true"></p>
 
-1. **실시간 저부하 모니터링** — `robots.txt` 전면 준수, HEAD 우선·405 시 GET 폴백, 3단계 상태 표시\(Healthy/Degraded/Unhealthy\)\. 엣지 케이스: 405 Method Not Allowed 대응\.
-2. **오프라인 일괄 헬스체크 스크립트** — URL 목록/키워드 기반 대량 검사, CSV 자동 저장, 10단계 분석 파이프라인\.
-3. **키워드·도메인 규칙 기반 정밀 판정** — 부정/중립 키워드, 메타 태그 인정, 도메인별 최소 텍스트 길이 등으로 **False Positive 감소**\.
+## <span>5. 핵심 기능(스크린샷/GIF 포함)</span>
 
-## 6\. 기술 결정\(ADR 요약\)
+1. <span><strong>실시간 저부하 모니터링</strong></span><span> — </span><span><code>robots.txt</code></span><span> 전면 준수, HEAD 우선·405 시 GET 폴백, 3단계 상태 표시(Healthy/Degraded/Unhealthy). 엣지 케이스: 405 Method Not Allowed 대응.</span>
+2. <span><strong>오프라인 일괄 헬스체크 스크립트</strong></span><span> — URL 목록/키워드 기반 대량 검사, CSV 자동 저장, 10단계 분석 파이프라인. </span>
+3. <span><strong>키워드·도메인 규칙 기반 정밀 판정</strong></span><span> — 부정/중립 키워드, 메타 태그 인정, 도메인별 최소 텍스트 길이 등으로 </span><span><strong>False Positive 감소</strong></span><span>. </span>
 
-- 결론: **3단계 상태 분류\(Healthy/Degraded/Unhealthy\) 도입**
-    버린 대안: 이진\(200=정상, 그 외=장애\) 단순 판정
+## <span>6. 기술 결정(ADR 요약)</span>
+
+- <span>결론: </span><span><strong>3단계 상태 분류(Healthy/Degraded/Unhealthy) 도입</strong></span>
+    <span>버린 대안: 이진(200=정상, 그 외=장애) 단순 판정</span>
     
-    근거: 정부 사이트의 간결한 페이지 특성으로 인한 **오검출 감소**, 정보성 공지\(점검 예정 등\) 구분 필요\.
-- 리스크 및 완화:
-    - 과도한 트래픽 유발 위험 → **레이트 리밋/캐싱** 적용\.
-    - 짧은 본문으로 인한 오검출 → **메타 태그 인정·도메인별 최소 길이 오버라이드** 도입\.
+    <span>근거: 정부 사이트의 간결한 페이지 특성으로 인한 </span><span><strong>오검출 감소</strong></span><span>, 정보성 공지(점검 예정 등) 구분 필요. </span>
+- <span>리스크 및 완화:</span>
+    - <span>과도한 트래픽 유발 위험 → </span><span><strong>레이트 리밋/캐싱</strong></span><span> 적용.</span>
+    - <span>짧은 본문으로 인한 오검출 → </span><span><strong>메타 태그 인정·도메인별 최소 길이 오버라이드</strong></span><span> 도입.</span>
 
-## 7\. 문제와 해결\(버그·장애 포함\)
+## <span>7. 문제와 해결(버그·장애 포함)</span>
 
-- 이슈: **SHORT\_CONTENT 기반 Unhealthy 오판정**
-    원인 → 일부 정상 사이트의 본문이 짧아 임계치에 걸림
+- <span>이슈: </span><span><strong>SHORT_CONTENT 기반 Unhealthy 오판정</strong></span>
+    <span>원인 → 일부 정상 사이트의 본문이 짧아 임계치에 걸림</span>
     
-    조치 → 도메인별 최소 텍스트 길이·메타 태그 인정·중립 키워드 도입\(오검출 완화\)
+    <span>조치 → 도메인별 최소 텍스트 길이·메타 태그 인정·중립 키워드 도입(오검출 완화)</span>
     
-    재발 방지 → 규칙 지속 보강 및 키워드 유지관리\.
-- 이슈:
+    <span>재발 방지 → 규칙 지속 보강 및 키워드 유지관리. </span>
+- <span>이슈:</span>
 
-## \. 회고 & 개선
+## <span>. 회고 &amp; 개선</span>
 
-- 잘된 점 3가지\(근거 포함\)
-    1. **저부하 설계**\(HEAD 우선, 부분 GET, 타임아웃\)로 대상 서버 부담 최소화\. \([GitHub](https://github.com/MelonChicken/GovPulse)\)
-    2. **3단계 상태 체계**로 정보성 공지와 실제 장애를 구분하여 실무 적합도 향상\. \([GitHub](https://github.com/MelonChicken/GovPulse)\)
-    3. **법적·윤리적 준수 원칙**을 명시하고 시스템 수준에서 강제\. \([GitHub](https://github.com/MelonChicken/GovPulse)\)
-- 아쉬운 점 3가지\(원인/조치\)
-    1. **짧은 콘텐츠 페이지의 오판정 사례 존재**\(원인: 콘텐츠 부족\) / 조치: 임계값·메타 태그 인정 도입, 이슈 추적 중\. \([GitHub](https://github.com/MelonChicken/GovPulse/issues/1)\)
+- <span>잘된 점 3가지(근거 포함)</span>
+    1. <span><strong>저부하 설계</strong></span><span>(HEAD 우선, 부분 GET, 타임아웃)로 대상 서버 부담 최소화. (</span><a href={"https://github.com/MelonChicken/GovPulse"}><span>GitHub</span></a><span>)</span>
+    2. <span><strong>3단계 상태 체계</strong></span><span>로 정보성 공지와 실제 장애를 구분하여 실무 적합도 향상. (</span><a href={"https://github.com/MelonChicken/GovPulse"}><span>GitHub</span></a><span>)</span>
+    3. <span><strong>법적·윤리적 준수 원칙</strong></span><span>을 명시하고 시스템 수준에서 강제. (</span><a href={"https://github.com/MelonChicken/GovPulse"}><span>GitHub</span></a><span>)</span>
+- <span>아쉬운 점 3가지(원인/조치)</span>
+    1. <span><strong>짧은 콘텐츠 페이지의 오판정 사례 존재</strong></span><span>(원인: 콘텐츠 부족) / 조치: 임계값·메타 태그 인정 도입, 이슈 추적 중. (</span><a href={"https://github.com/MelonChicken/GovPulse/issues/1"}><span>GitHub</span></a><span>)</span>
 
 ---

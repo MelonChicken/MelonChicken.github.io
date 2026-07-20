@@ -21,77 +21,82 @@ featured: false
 problem: "인생네컷을 찍을때 매번 포즈가 고민이다 → 포즈를 수집&추천해주자"
 ---
 
+import NotionBookmark from '../../components/notion/NotionBookmark.astro';
+import NotionCallout from '../../components/notion/NotionCallout.astro';
+import NotionColumns from '../../components/notion/NotionColumns.astro';
+import NotionToggle from '../../components/notion/NotionToggle.astro';
+
 {/* This file is generated from Notion. Do not edit directly. */}
 
-<figure>
-  <img src="/notion-assets/opomo/26414b84a0f28030b1fddbaef94e0ea0.png" alt="Source: author's Notion note" />
+<figure class="notion-figure">
+  <img src={"/notion-assets/opomo/26414b84a0f28030b1fddbaef94e0ea0.png"} alt={"Source: author's Notion note"} />
   <figcaption>Source: author's Notion note</figcaption>
 </figure>
 
-# OPOMO – 오늘 포즈 모하지?
+# <span><strong>OPOMO</strong></span><span> – 오늘 포즈 모하지?</span>
 
-> 한줄 슬로건
+> <span>한줄 슬로건</span>
 
-> 해커톤/공모전 정보 \(일시, 성취도\)
+> <span>해커톤/공모전 정보 (일시, 성취도)</span>
 > 
-> [2022 IT서비스 아이디어 기획/개발 공모전 개발분야 은상 수상](https://itm.seoultech.ac.kr/bachelor_of_information/notice?do=view&profboardidx=0&bnum=1947&bidx=528233&cate=7&allboard=false&nowpage=1) \(2022\.10\.31\.\)
+> <a href={"https://itm.seoultech.ac.kr/bachelor_of_information/notice?do=view&profboardidx=0&bnum=1947&bidx=528233&cate=7&allboard=false&nowpage=1"}><span>2022 IT서비스 아이디어 기획/개발 공모전 개발분야 은상 수상</span></a><span> (2022.10.31.)</span>
 > 
-> [https://itm\.seoultech\.ac\.kr/bachelor\_of\_information/notice?do=view&profboardidx=0&bnum=1947&bidx=526247&cate=7&allboard=false&nowpage=6](https://itm.seoultech.ac.kr/bachelor_of_information/notice?do=view&profboardidx=0&bnum=1947&bidx=526247&cate=7&allboard=false&nowpage=6)
+> <a href={"https://itm.seoultech.ac.kr/bachelor_of_information/notice?do=view&profboardidx=0&bnum=1947&bidx=526247&cate=7&allboard=false&nowpage=6"}><span>https://itm.seoultech.ac.kr/bachelor_of_information/notice?do=view&amp;profboardidx=0&amp;bnum=1947&amp;bidx=526247&amp;cate=7&amp;allboard=false&amp;nowpage=6</span></a>
 > 
-> <details class="notion-toggle">
->   <summary>결과 스크린샷</summary>
+> <NotionToggle summary={"결과 스크린샷"} headingLevel={0}>
 > 
-> <figure>
->   <img src="/notion-assets/opomo/2e814b84a0f28096a07ce2d22a4d2222.png" alt="Source: author's Notion note" />
+> <figure class="notion-figure">
+>   <img src={"/notion-assets/opomo/2e814b84a0f28096a07ce2d22a4d2222.png"} alt={"Source: author's Notion note"} />
 >   <figcaption>Source: author's Notion note</figcaption>
 > </figure>
-> </details>
+> 
+> </NotionToggle>
 
 ---
 
-## 1\. 개요
+## <span><strong>1. 개요</strong></span>
 
-- 프로젝트명: **OPOMO** \(오늘 포즈 모하지?\)
-- 목적/가치: 4컷 사진 촬영을 위한 포즈 추천 웹 서비스
-- 배경/동기: 2022년 IT서비스 기획/프로그래밍 경진대회 출품작
-- 해커톤/공모전 정보: 2022년 IT서비스 기획/프로그래밍 경진대회\]
+- <span>프로젝트명: </span><span><strong>OPOMO</strong></span><span> (오늘 포즈 모하지?)</span>
+- <span>목적/가치: 4컷 사진 촬영을 위한 포즈 추천 웹 서비스</span>
+- <span>배경/동기: 2022년 IT서비스 기획/프로그래밍 경진대회 출품작</span>
+- <span>해커톤/공모전 정보: 2022년 IT서비스 기획/프로그래밍 경진대회]</span>
 
-## 2\. 역할·스택·기간
+## <span><strong>2. 역할·스택·기간</strong></span>
 
-- 역할/기여: FE 60%, BE 40%
-- 스택: HTML5, CSS3\(Sass\), JavaScript\(ES6\+\), Firebase\(Database, Storage\), jQuery
-- 기간: 2022-10-20 ~ 2022-11-19
+- <span>역할/기여: FE 60%, BE 40%</span>
+- <span>스택: HTML5, CSS3(Sass), JavaScript(ES6+), Firebase(Database, Storage), jQuery</span>
+- <span>기간: 2022-10-20 ~ 2022-11-19</span>
 
-## 3\. 데모 & 링크
+## <span><strong>3. 데모 &amp; 링크</strong></span>
 
-- Demo: N/A
-- Repo: [https://github\.com/MelonChicken/OPOMO\_project](https://github.com/MelonChicken/OPOMO_project)
-- 문서: N/A
-- 시연영상: N/A
+- <span>Demo: N/A</span>
+- <span>Repo: </span><a href={"https://github.com/MelonChicken/OPOMO_project"}><span>https://github.com/MelonChicken/OPOMO_project</span></a>
+- <span>문서: N/A</span>
+- <span>시연영상: N/A</span>
 
-## 4\. 아키텍처 요약
+## <span><strong>4. 아키텍처 요약</strong></span>
 
-- 데이터 흐름/외부 의존성:
-    - Firebase Realtime Database를 통한 포즈 데이터 저장/조회
-    - CDN을 통한 외부 라이브러리 로딩 \(jQuery, FontAwesome\)
-    - html2canvas를 통한 클라이언트 사이드 이미지 캡처
-- 배포/CI·CD/롤백: 정적 웹사이트 호스팅 \(배포 설정 파일 없음\)
+- <span>데이터 흐름/외부 의존성:</span>
+    - <span>Firebase Realtime Database를 통한 포즈 데이터 저장/조회</span>
+    - <span>CDN을 통한 외부 라이브러리 로딩 (jQuery, FontAwesome)</span>
+    - <span>html2canvas를 통한 클라이언트 사이드 이미지 캡처</span>
+- <span>배포/CI·CD/롤백: 정적 웹사이트 호스팅 (배포 설정 파일 없음)</span>
 
-## 5\. 핵심 기능\(스크린샷/GIF 포함\)
+## <span><strong>5. 핵심 기능(스크린샷/GIF 포함)</strong></span>
 
-1. **포즈 추천 시스템** — 사용자가 원하는 인원수와 컨셉에 맞는 4컷 포즈를 추천 / 태그 기반 필터링 지원
-2. **커스텀 포즈 배치** — 드래그 앤 드롭 인터페이스로 4컷 레이아웃 자유 구성 / 터치 디바이스 지원
-3. **위시리스트 기능** — 마음에 드는 포즈들을 저장하고 관리
-4. **모바일 최적화** — 터치 기반 인터랙션과 반응형 디자인
-5. **포즈 내보내기** — html2canvas를 활용한 이미지 생성 및 다운로드
+1. <span><strong>포즈 추천 시스템</strong></span><span> — 사용자가 원하는 인원수와 컨셉에 맞는 4컷 포즈를 추천 / 태그 기반 필터링 지원 </span>
+2. <span><strong>커스텀 포즈 배치</strong></span><span> — 드래그 앤 드롭 인터페이스로 4컷 레이아웃 자유 구성 / 터치 디바이스 지원</span>
+3. <span><strong>위시리스트 기능</strong></span><span> — 마음에 드는 포즈들을 저장하고 관리</span>
+4. <span><strong>모바일 최적화</strong></span><span> — 터치 기반 인터랙션과 반응형 디자인</span>
+5. <span><strong>포즈 내보내기</strong></span><span> — html2canvas를 활용한 이미지 생성 및 다운로드</span>
 
-## 6\. 기술적 특징
+## <span><strong>6. 기술적 특징</strong></span>
 
-- 포즈 데이터베이스: 카테고리별 포즈 이미지 \(2명/3명/4명 이상\)
-- Sass를 활용한 모듈화된 스타일링
-- jQuery UI Sortable을 통한 드래그 앤 드롭 구현
+- <span>포즈 데이터베이스: 카테고리별 포즈 이미지 (2명/3명/4명 이상)</span>
+- <span>Sass를 활용한 모듈화된 스타일링</span>
+- <span>jQuery UI Sortable을 통한 드래그 앤 드롭 구현</span>
 
-## 7\. 성과 및 영향
+## <span><strong>7. 성과 및 영향</strong></span>
 
-- 성공 기준\(KPI\): 사용자 편의성과 직관적인 포즈 선택 경험 제공
-- 범위\(Out of scope\): 실시간 사진 촬영, SNS 공유 기능
+- <span>성공 기준(KPI): 사용자 편의성과 직관적인 포즈 선택 경험 제공</span>
+- <span>범위(Out of scope): 실시간 사진 촬영, SNS 공유 기능</span>
