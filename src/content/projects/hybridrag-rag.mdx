@@ -25,9 +25,9 @@ problem: "벡터 기반 검색과 그래프 기반 검색을 결합한 하이브
 
 {/* This file is generated from Notion. Do not edit directly. */}
 
-{/* Unsupported Notion block type: child_database (32414b84-a0f2-80a5-a97f-f664f9eccb6d) */}
+### Untitled
 
-{/* Unsupported Notion block type: table_of_contents (36c14b84-a0f2-80dc-bfa0-f228e325e807) */}
+{/* Notion table_of_contents skipped: site TOC is generated from rendered headings. */}
 
 > 트랙 : Ⅱ\. **Research Reproduction Track**
 
@@ -51,7 +51,6 @@ problem: "벡터 기반 검색과 그래프 기반 검색을 결합한 하이브
 RAG는 대개 두가지 방식으로 나눌 수 있다 Vector DB를 활용한 Vector RAG와 Graph DB를 활용한 Graph RAG\.
 
 - **Vector RAG** : 임베딩 공간에서 질문과 문서 청크 간의 유사도를 계산하여 관련 정보를 검색하는 방식
-
 - **Graph RAG** : 지식 그래프와 같은 구조화된 데이터베이스를 활용하여 개체 간의 관계와 논리적 추론을 가능하게 하는 방식
 
 | --- | --- | --- |
@@ -72,26 +71,19 @@ RAG는 대개 두가지 방식으로 나눌 수 있다 Vector DB를 활용한 Ve
 ## Reproduction 계획
 
 - 구현 범위 \(Implementation Scope\)
-  HybridRAG 시스템을 구축하기 위해 개발해야 할 기능적 단계들입니다\.
-  
-  - **지식 추출 및 그래프 구축 \(Graph Construction\)**:
-    - PDF 문서를 청크\(Chunk\) 단위로 분할하는 로직을 구현합니다\.
+    HybridRAG 시스템을 구축하기 위해 개발해야 할 기능적 단계들입니다\.
     
-    - LLM을 이용해 각 청크에서 개체\(Entity\)와 관계\(Relation\)를 추출하여 트리플\($N_{s}, R, N_{t}$\)을 생성하는 모듈을 개발합니다\.
-    
-    - 각 노드에 해당 텍스트의 벡터 임베딩을 속성\(Property\)으로 저장하는 기능을 구현합니다\.
-  
-  - **벡터 유사도 기반 탐색 \(Retrieval\)**:
-    - 사용자의 질문을 벡터로 변환하는 기능을 구현합니다\.
-    
-    - 질문 벡터와 그래프 노드 벡터 간의 유사도를 계산하여 탐색을 시작할 '상위 K개 노드'를 선정하는 알고리즘을 코딩합니다\.
-    
-    - 선정된 노드로부터 인접한 정보를 가져오기 위한 그래프 탐색\(DFS 등\) 로직을 구현합니다\.
-  
-  - **답변 생성 파이프라인 \(Generation\)**:
-    - 검색된 그래프 컨텍스트를 LLM이 이해할 수 있는 텍스트 형태로 변환\(Decoding\)하는 모듈을 만듭니다\.
-    
-    - 최종적으로 질문과 컨텍스트를 결합하여 답변을 생성하는 프롬프트 체인을 구축합니다\.
+    - **지식 추출 및 그래프 구축 \(Graph Construction\)**:
+        - PDF 문서를 청크\(Chunk\) 단위로 분할하는 로직을 구현합니다\.
+        - LLM을 이용해 각 청크에서 개체\(Entity\)와 관계\(Relation\)를 추출하여 트리플\($N_{s}, R, N_{t}$\)을 생성하는 모듈을 개발합니다\.
+        - 각 노드에 해당 텍스트의 벡터 임베딩을 속성\(Property\)으로 저장하는 기능을 구현합니다\.
+    - **벡터 유사도 기반 탐색 \(Retrieval\)**:
+        - 사용자의 질문을 벡터로 변환하는 기능을 구현합니다\.
+        - 질문 벡터와 그래프 노드 벡터 간의 유사도를 계산하여 탐색을 시작할 '상위 K개 노드'를 선정하는 알고리즘을 코딩합니다\.
+        - 선정된 노드로부터 인접한 정보를 가져오기 위한 그래프 탐색\(DFS 등\) 로직을 구현합니다\.
+    - **답변 생성 파이프라인 \(Generation\)**:
+        - 검색된 그래프 컨텍스트를 LLM이 이해할 수 있는 텍스트 형태로 변환\(Decoding\)하는 모듈을 만듭니다\.
+        - 최종적으로 질문과 컨텍스트를 결합하여 답변을 생성하는 프롬프트 체인을 구축합니다\.
 
 <figure>
   <img src="/notion-assets/hybridrag-rag/36c14b84a0f280a98ccde314bbe2ffad.png" alt="Source: author's Notion note" />
@@ -99,73 +91,58 @@ RAG는 대개 두가지 방식으로 나눌 수 있다 Vector DB를 활용한 Ve
 </figure>
 
 - 실험 구성 \(Experimental Setup\)
-  개발된 시스템의 객관적인 성능을 측정하기 위한 실험 환경 정의입니다\.
-  
-  - **기술적 설정 \(Technical Settings\)**:
-    - **사용 언어 및 프레임워크**: Python, LangChain
+    개발된 시스템의 객관적인 성능을 측정하기 위한 실험 환경 정의입니다\.
     
-    - **사용 모델**: GPT-3\.5-Turbo \(LLM\), text-embedding-ada-002 \(Embedding\)\.
-    
-    - **하이퍼파라미터**: 청크 크기\(미정\), 탐색 깊이\(DFS Depth=default\), 온도\(Temperature=0\) 등\.
+    - **기술적 설정 \(Technical Settings\)**:
+        - **사용 언어 및 프레임워크**: Python, LangChain
+        - **사용 모델**: GPT-3\.5-Turbo \(LLM\), text-embedding-ada-002 \(Embedding\)\.
+        - **하이퍼파라미터**: 청크 크기\(미정\), 탐색 깊이\(DFS Depth=default\), 온도\(Temperature=0\) 등\.
 
 ## 활용 데이터셋
 
 1. **`재현용 데이터셋`**** **ARAGOG \(Advanced RAG Output Grading\) 벤치마크 데이터셋
-  - 출처 : : RAG 모델의 성능을 비교할 수 있는 데이터셋
-  
-  - 특성 : arXiv AI 분야 논문 16개에서 추출된 107개의 질의응답 쌍
-
-1. **`확장 실험용 데이터셋`**** **서울과학기술대학교 규정
-  - 출처 :  [https://www\.seoultech\.ac\.kr/intro/uvstat/rules/](https://www.seoultech.ac.kr/intro/uvstat/rules/)
-  
-  - 특성 : 규정 문서의 계층 구조를 띄고 있음 / 조항 간의 연결성이 존재함
+    - 출처 : : RAG 모델의 성능을 비교할 수 있는 데이터셋
+    - 특성 : arXiv AI 분야 논문 16개에서 추출된 107개의 질의응답 쌍
+2. **`확장 실험용 데이터셋`**** **서울과학기술대학교 규정
+    - 출처 :  [https://www\.seoultech\.ac\.kr/intro/uvstat/rules/](https://www.seoultech.ac.kr/intro/uvstat/rules/)
+    - 특성 : 규정 문서의 계층 구조를 띄고 있음 / 조항 간의 연결성이 존재함
 
 ## 확장 방향
 
 - 연구 확장 또는 서비스 확장 계획
-  - **서비스 확장:** 학칙/규정 기반 QA 챗봇 적용
+    - **서비스 확장:** 학칙/규정 기반 QA 챗봇 적용
 
 ## 평가 방법
 
 - 성능 평가 기준
-  | 지표 | 무엇을 평가하는가 | 핵심 질문 |
-  | --- | --- | --- |
-  | Context Precision | 검색 결과의 정확성 | 가져온 문맥이 정말 관련 있는가? |
-  | Context Recall | 검색 결과의 포괄성 | 필요한 문맥을 충분히 가져왔는가? |
-  | Faithfulness | 답변의 근거 충실성 | 답변이 검색 문맥에 기반하고 있는가? |
-  | Answer Relevancy | 질문-답변 관련성 | 답변이 질문 의도에 맞는가? |
-  | Answer Correctness | 답변의 정답성 | 답변 내용이 실제로 맞는가? |
-  | Answer Similarity | 정답과의 의미적 유사성 | 생성 답변이 참조 정답과 비슷한가? |
-  
-  - **문맥 정밀도 \(Context Precision\) **→ 상위 검색 결과 중 **관련 있는 문맥이 얼마나 정확하게 포함되었는지** 평가
-    $\frac{\sum_{k=1}^{K} Precision@k \times v_k}{\text{Total num of relevant items in the top K results}}$
-  
-  - **문맥 재현율 \(Context Recall\) **→ 전체 정답 문맥 중 **얼마나 많이 검색해냈는지** 평가
-    $\frac{|\text{Number of relevant contexts retrieved}|}{|\text{Total number of reference contexts}|}$
-  
-  - **신뢰도 \(Faithfulness\) **→ 생성된 답변의 주장 중 **근거 문맥으로 뒷받침되는 비율** 평가
-    $\frac{|\text{Number of supported claims in the generated answer}|}{|\text{Total number of claims in the generated answer}|}$
-  
-  - **답변 관련도 \(Answer Relevancy\) **→ 생성된 답변이 **질문과 의미적으로 얼마나 관련 있는지** 평가
-    $\frac{1}{N}\sum_{i=1}^{N}\cos(E_{g_i}, E_o)$
-  
-  - **답변 정확도 \(Answer Correctness\) **→ 생성된 답변이 **정답과 얼마나 정확하게 일치하는지** 평가
-    $\frac{|TP|}{|TP| + 0.5 \times (|FP| + |FN|)}$
-  
-  - **답변 유사도 \(Answer Similarity\) **→ 생성된 답변과 참조 정답이 **의미적으로 얼마나 유사한지** 평가
-    $a_i \cdot g_i$
-
+    | 지표 | 무엇을 평가하는가 | 핵심 질문 |
+    | --- | --- | --- |
+    | Context Precision | 검색 결과의 정확성 | 가져온 문맥이 정말 관련 있는가? |
+    | Context Recall | 검색 결과의 포괄성 | 필요한 문맥을 충분히 가져왔는가? |
+    | Faithfulness | 답변의 근거 충실성 | 답변이 검색 문맥에 기반하고 있는가? |
+    | Answer Relevancy | 질문-답변 관련성 | 답변이 질문 의도에 맞는가? |
+    | Answer Correctness | 답변의 정답성 | 답변 내용이 실제로 맞는가? |
+    | Answer Similarity | 정답과의 의미적 유사성 | 생성 답변이 참조 정답과 비슷한가? |
+    
+    - **문맥 정밀도 \(Context Precision\) **→ 상위 검색 결과 중 **관련 있는 문맥이 얼마나 정확하게 포함되었는지** 평가
+        $\frac{\sum_{k=1}^{K} Precision@k \times v_k}{\text{Total num of relevant items in the top K results}}$
+    - **문맥 재현율 \(Context Recall\) **→ 전체 정답 문맥 중 **얼마나 많이 검색해냈는지** 평가
+        $\frac{|\text{Number of relevant contexts retrieved}|}{|\text{Total number of reference contexts}|}$
+    - **신뢰도 \(Faithfulness\) **→ 생성된 답변의 주장 중 **근거 문맥으로 뒷받침되는 비율** 평가
+        $\frac{|\text{Number of supported claims in the generated answer}|}{|\text{Total number of claims in the generated answer}|}$
+    - **답변 관련도 \(Answer Relevancy\) **→ 생성된 답변이 **질문과 의미적으로 얼마나 관련 있는지** 평가
+        $\frac{1}{N}\sum_{i=1}^{N}\cos(E_{g_i}, E_o)$
+    - **답변 정확도 \(Answer Correctness\) **→ 생성된 답변이 **정답과 얼마나 정확하게 일치하는지** 평가
+        $\frac{|TP|}{|TP| + 0.5 \times (|FP| + |FN|)}$
+    - **답변 유사도 \(Answer Similarity\) **→ 생성된 답변과 참조 정답이 **의미적으로 얼마나 유사한지** 평가
+        $a_i \cdot g_i$
 - **비교군 \(Baselines\)**:
-  - 기존 **Vector RAG**: 단순 벡터 유사도 검색 방식\.
-  
-  - 기존 **Graph RAG**: Cypher 쿼리 등을 이용한 그래프 검색 방식\.
-  
-  - **Vector \+ Graph RAG \(Concatenate/Summarize\)**: 두 검색 결과를 단순히 합치거나 요약하는 방식\.
+    - 기존 **Vector RAG**: 단순 벡터 유사도 검색 방식\.
+    - 기존 **Graph RAG**: Cypher 쿼리 등을 이용한 그래프 검색 방식\.
+    - **Vector \+ Graph RAG \(Concatenate/Summarize\)**: 두 검색 결과를 단순히 합치거나 요약하는 방식\.
 
 ## references
 
 1. [https://www\.dbpia\.co\.kr/journal/articleDetail?nodeId=NODE11995493](https://www.dbpia.co.kr/journal/articleDetail?nodeId=NODE11995493)
-
-1. **HybridRAG: Integrating Knowledge Graphs and Vector Retrieval Augmented Generation for Efficient Information Extraction **[https://arxiv\.org/pdf/2408\.04948](https://arxiv.org/pdf/2408.04948)
-
-1. ARAGOG Dataset [https://github\.com/predlico/ARAGOG](https://github.com/predlico/ARAGOG)
+2. **HybridRAG: Integrating Knowledge Graphs and Vector Retrieval Augmented Generation for Efficient Information Extraction **[https://arxiv\.org/pdf/2408\.04948](https://arxiv.org/pdf/2408.04948)
+3. ARAGOG Dataset [https://github\.com/predlico/ARAGOG](https://github.com/predlico/ARAGOG)

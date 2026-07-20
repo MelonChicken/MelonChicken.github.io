@@ -27,7 +27,10 @@ notion: "https://app.notion.com/p/AI-BMOD-1-39c14b84a0f280cc95c9c40f2ad262d9"
 
 > 시작은 유튜브 영상 하나였습니다\.
 
-{/* Unsupported Notion block type: video (39c14b84-a0f2-803b-a8f2-d3e1a0f33c53) */}
+<figure>
+  <a href="/notion-assets/ai-bmod-1/39c14b84a0f2803ba8f2d3e1a0f33c53.bin">39c14b84a0f2803ba8f2d3e1a0f33c53.bin</a>
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
 
 [BMO local agent를 라즈베리파이로 구현하는 영상](https://www.youtube.com/watch?v=l5ggH-YhuAw)을 보고, _"이거 재밌겠다"_ 싶어서 그 뒤에는 매일 당근마켓에서 중고 라즈베리파이를 찾아보다 결국 구매까지 해버렸습니다\.
 
@@ -98,9 +101,7 @@ _"오리가 지금 뭘 하는지 알아채고, 행동이 바뀌면 반응하고,
 CLIP 임베딩 \+ Logistic Regression 조합은 다음 이유로 선택했습니다:
 
 - Pi에 이식하기 충분히 가볍다
-
 - 노트북에서 개발하고 Pi로 옮기기 쉽다
-
 - 행동 분류에 필요한 visual feature를 CLIP이 이미 잘 뽑아준다
 
 물론 리스크도 있습니다\. CLIP feature가 행동 자체보다 **장면 특성** \(배경, 조명 등\)에 반응할 수 있다는 점\. 그래서 초기 라벨링은 클래스당 20구간씩, 대표 구간만 먼저 구성해서 threshold validation을 꼼꼼히 할 계획입니다\.
@@ -112,21 +113,13 @@ CLIP 임베딩 \+ Logistic Regression 조합은 다음 이유로 선택했습니
 현재는 핵심 파이프라인 구현을 진행 중입니다\.
 
 - ✅ 전체 아키텍처 설계 완료
-
 - ✅ ffmpeg 기반 프레임 추출 \(5초 구간, 10프레임\)
-
 - ✅ CLIP 임베딩 추출 및 구간 평균
-
 - ✅ Logistic Regression 분류기 \(dummy fallback 포함\)
-
 - ▢ 행동 전환 기반 이벤트 감지 로직
-
 - ▢ `SessionLogger` 클래스 설계 \(CSV \+ JSON 듀얼 출력\)
-
 - ▢ tkinter GUI 연동
-
 - ▢ 실제 오리 데이터셋 라벨링 \(클래스당 20구간 목표\)
-
 - ▢ Pi 이식 및 오프라인 실행 검증
 
 몇 가지 설계 결정을 공유하면:
@@ -142,9 +135,7 @@ CLIP 임베딩 \+ Logistic Regression 조합은 다음 이유로 선택했습니
 단기적으로는 이렇게 진행합니다:
 
 - **2주 내:** 데이터셋 구성 완료 \+ notebook 기반 baseline 검증
-
 - **이후:** Pi 이식 → 오프라인 시연 가능한 형태로 완성
-
 - **더 나아가:** 날짜별 행동 패턴 분석 파이프라인, 다른 동물로 확장
 
 리포트 포맷도 이미 정해놨습니다\. 세션이 끝나면 **행동 타임라인 \+ 대표 이벤트 5개 \+ 2~3문장 요약**이 나옵니다\. 연구자나 학생이 오리를 오래 관찰한 뒤 "오늘 뭐가 있었지?"를 바로 파악할 수 있습니다\.

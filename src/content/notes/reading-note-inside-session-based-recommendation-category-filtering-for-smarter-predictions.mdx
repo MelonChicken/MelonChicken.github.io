@@ -82,8 +82,7 @@ notion: "https://app.notion.com/p/Reading-Note-Inside-Session-Based-Recommendati
 > 1. 증강 데이터셋의 낮은 품질
 
 1. 불필요한 모델 학습시간 증가
-
-1. 부수 정보\(auxiliary information\) 적용 방법론 부재
+2. 부수 정보\(auxiliary information\) 적용 방법론 부재
 
 > **Crop 기법**
 > : 기존 세션에서 일부분만 삭제하거나 생략하는 방식
@@ -145,18 +144,15 @@ notion: "https://app.notion.com/p/Reading-Note-Inside-Session-Based-Recommendati
 
 - 카테고리의 정의 자체가 도메인에 따라 달라질 수 있다는 점입니다\.
 예를 들어 ‘가전’과 ‘전자기기’가 동일한 수준의 카테고리로 취급되지 않는 경우, 모델이 일관된 유사도를 학습하기 어렵습니다\.
-
 - 카테고리 분류 체계에 지나치게 의존할 경우, 실제 사용자 행동 패턴과 어긋날 수 있습니다\. 사용자가 ‘노트북 가방’을 찾더라도 ‘패션’ 카테고리로 묶인다면 추천의 맥락이 왜곡될 수 있습니다\.
-
 - 제안된 필터링 규칙은 정적인 구조로 설계되어 있어, 새로운 아이템이나 트렌드 변화에 즉각적으로 대응하기 어렵다는 한계도 있습니다\.
-
 - **데이터셋의 분포 특성**에 따라 필터링 효과가 달라질 수 있습니다\.
 
  탁승연, 김경옥, 「세션 기반 추천에서의 예측 향상을 위한 카테고리 기반 데이터 필터링 기법」, 한국경영과학회 학술대회논문집, 2025\.6, 출처: [https://www\.dbpia\.co\.kr/journal/articleDetail?nodeId=NODE12294174](https://www.dbpia.co.kr/journal/articleDetail?nodeId=NODE12294174)
-  <figure>
-    <img src="/notion-assets/reading-note-inside-session-based-recommendation-category-filtering-for-smarter-predictions/39f14b84a0f28016b388e13952794ac7.png" alt="Source: author's Notion note" />
-    <figcaption>Source: author's Notion note</figcaption>
-  </figure>
+    <figure>
+      <img src="/notion-assets/reading-note-inside-session-based-recommendation-category-filtering-for-smarter-predictions/39f14b84a0f28016b388e13952794ac7.png" alt="Source: author's Notion note" />
+      <figcaption>Source: author's Notion note</figcaption>
+    </figure>
 
 > 실제 실험에서도 \*\*Head 아이템 \(인기 상품\)\*\*과 **Tail 아이템 \(비인기 상품\)** 간 성능 차이가 데이터셋마다 상이하게 나타난다\.
 > 

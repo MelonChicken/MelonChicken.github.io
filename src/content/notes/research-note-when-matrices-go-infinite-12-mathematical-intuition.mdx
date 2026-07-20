@@ -48,13 +48,9 @@ notion: "https://app.notion.com/p/Research-Note-When-Matrices-Go-Infinite-1-2-Ma
 무한 차원에서의 영 행렬, 삼각 행렬, 대각 행렬, 유니터리 행렬, 전치 행렬은 유한 행렬과 매우 유사하게 \(analogously\) 정의될 수 있습니다\.
 
 - **영행렬 \(Zero matrix\):** 모든 원소가 0인 행렬\. 무한 차원에서도 모든 원소가 0이면 영행렬로 정의됩니다\.
-
 - **삼각행렬 \(Triangular matrix\):** 상삼각 또는 하삼각 형태를 가지는 행렬\. 무한 차원에서도 특정 방향으로 원소가 0인 구조를 유지하면 삼각행렬로 간주됩니다\.
-
 - **대각행렬 \(Diagonal matrix\):** 대각선 외의 모든 원소가 0인 행렬\. 무한 차원에서도 대각선만 값을 가지면 대각행렬입니다\.
-
 - **유니터리 행렬 \(Unitary matrix\):** 자기 전치 행렬과 역행렬이 같은 행렬\. 무한 차원에서도 내적 보존 조건을 만족하면 유니터리 행렬로 정의됩니다\.
-
 - **전치 행렬 \(Transposed matrix\):** 행과 열을 바꾼 행렬\. 무한 차원에서도 동일한 방식으로 정의됩니다\.
 
 ### Ⅰ\.1\.2\. Multiplication in infinite matries
@@ -86,7 +82,6 @@ notion: "https://app.notion.com/p/Research-Note-When-Matrices-Go-Infinite-1-2-Ma
 선형 사상은 무한 연립 방정식 시스템을 해석하는 데 직접적으로 사용됩니다\.
 
 - 시스템: $Ax = b$ \(여기서 $A, x, b$는 무한 차원을 가질 수 있습니다\)\.
-
 - 이 시스템이 해 $x$를 가진다는 것은 \(Has a solution or solutions\), 타겟 벡터 $b$가 행렬 $A$의 변환 영역\($\text{Im}(f)$\) 안에 들어 있다는 의미와 같게 됩니다\. \($b \in \text{Im}(f)$\)\.
 
 > **Rouché-Capelli Theorem \(Kronecker-Capelli Theorem\)**
@@ -136,11 +131,9 @@ notion: "https://app.notion.com/p/Research-Note-When-Matrices-Go-Infinite-1-2-Ma
 > 
 > 1. 유클리드 공간 $\mathbb{R}^n$에서의 표준 노름\(=2-노름, Euclidean norm\):
 > $||x||_2 = \sqrt{x_1^2 + x_2^2 + \cdots + x_n^2}$
-> 
-> 1. 1-노름 \(Manhattan norm\):
+> 2. 1-노름 \(Manhattan norm\):
 > $||x||_1 = |x_1| + |x_2| + \cdots + |x_n|$
-> 
-> 1. 무한대 노름 \(Max norm\):
+> 3. 무한대 노름 \(Max norm\):
 > $||x||_\infty = \max_i |x_i|$
 
 **노름 공간**이란 벡터 공간 $X$에 대하여 아래의 세 조건을 만족하는 $||•||$ :$X→\Reals$이 존재하면 $||•||$를 $X$의 놈 \($norm$\)이라 하고  \($X$, $||•||$ \)를 노름 공간이라고 합니다\.
@@ -168,13 +161,13 @@ notion: "https://app.notion.com/p/Research-Note-When-Matrices-Go-Infinite-1-2-Ma
 
 축소의 단계는 두단계로 나누어 볼 수 있습니다\.
 
-**1단계 \(절단, Truncation\)**
+#### 1단계 \(절단, Truncation\)
 
 먼저, 무한 연산자 방정식 $Ax = y$를 유한한 $n$차원 부분 공간으로 투영\(projection\)합니다\. 이는 곧 무한 행렬 A의 왼쪽 위 $n×n$ 부분 행렬만을 고려하여 $A_n = P_nAP_n$이라는 유한 연산자를 만드는 것과 같습니다\.
 
 여기서 $P_n$은 $X_n$으로 표시되는 n차원 부분 공간으로의 프로젝터입니다\. 이렇게 변환된 유한 시스템은 $A_nx_n = P_ny$가 되며, 이는 우리가 컴퓨터로 풀 수 있는 유한 연립방정식이 됩니다\.
 
-**2단계 \(수렴, Convergence\)**
+#### 2단계 \(수렴, Convergence\)
 
 이렇게 만들어진 유한 연산자 $A_n$들의 수열은 $n$이 무한대로 갈 때, 원래의 무한 연산자 A로 **강하게 수렴\(strongly converges\)**합니다\. 즉, n→∞일 때 $A_nx$가 모든 x에 대해 $Ax$로 수렴하게 됩니다\.
 
@@ -198,17 +191,13 @@ notion: "https://app.notion.com/p/Research-Note-When-Matrices-Go-Infinite-1-2-Ma
 # References
 
 1. Matysiak, L\., Przewoźniak, W\., & Rulińska, N\. \(2021\)\. Matrices of infinite dimensions and their applications\. Italian Journal of Pure and Applied Mathematics, \(46\), 1–8\. arXiv:2104\.13404\. [https://arxiv\.org/abs/2104\.13404](https://arxiv.org/abs/2104.13404)
+2. Vasilyev, A\. V\., Vasilyev, V\. B\., & Kamanda Bongay, A\. B\. \(2024\)\. On infinite matrices\. arXiv preprint arXiv:2403\.06445\. [https://arxiv\.org/abs/2403\.06445](https://arxiv.org/abs/2403.06445)
+3. Adams, R\. A\., & Fournier, J\. J\. F\. \(2003\)\. Sobolev spaces \(2nd ed\.\)\. Academic Press\. [https://books\.google\.co\.kr/books?id=R5A65Koh-EoC&printsec=frontcover&redir\_esc=y\#v=onepage&q=normed&f=false](https://books.google.co.kr/books?id=R5A65Koh-EoC&printsec=frontcover&redir_esc=y#v=onepage&q=normed&f=false)
+4. William R\. Wade, An Introduction to Analysis \(4th Edition, 2010\)
 
-1. Vasilyev, A\. V\., Vasilyev, V\. B\., & Kamanda Bongay, A\. B\. \(2024\)\. On infinite matrices\. arXiv preprint arXiv:2403\.06445\. [https://arxiv\.org/abs/2403\.06445](https://arxiv.org/abs/2403.06445)
-
-1. Adams, R\. A\., & Fournier, J\. J\. F\. \(2003\)\. Sobolev spaces \(2nd ed\.\)\. Academic Press\. [https://books\.google\.co\.kr/books?id=R5A65Koh-EoC&printsec=frontcover&redir\_esc=y\#v=onepage&q=normed&f=false](https://books.google.co.kr/books?id=R5A65Koh-EoC&printsec=frontcover&redir_esc=y#v=onepage&q=normed&f=false)
-
-1. William R\. Wade, An Introduction to Analysis \(4th Edition, 2010\)
-
-같이 보면 좋은 블로그 글/유튜브
+#### 같이 보면 좋은 블로그 글/유튜브
 
 1. [생새우 초밥집](https://freshrimpsushi.github.io/ko/categories/%EB%B0%94%EB%82%98%ED%9D%90%EA%B3%B5%EA%B0%84/)
-
-1. [Zundamon's Theorem](https://youtu.be/b-GpwCGtuwA?si=96bx7bkN1arP_Tlp)
+2. [Zundamon's Theorem](https://youtu.be/b-GpwCGtuwA?si=96bx7bkN1arP_Tlp)
 
 > 긴 글 읽어주셔서 감사합니다\. 이 글에 대해 의견이 있다면 댓글로 남겨주세요\.

@@ -25,7 +25,7 @@ problem: "라즈베리파이 기반 동물 행동 관찰 반응형 에이전트"
 
 {/* This file is generated from Notion. Do not edit directly. */}
 
-{/* Unsupported Notion block type: child_database (35a14b84-a0f2-80a6-9c21-dcec1e8b8f2d) */}
+### Untitled
 
 # Be MOre Duck – 라즈베리파이 기반 오리 행동 관찰 반응형 에이전트
 
@@ -42,174 +42,116 @@ problem: "라즈베리파이 기반 동물 행동 관찰 반응형 에이전트"
 > 🎯 Executive Summary
 
 - 문제: 기존의 단순 행동 분류 시스템은 **행동을 인식하더라도 사용자와 상호작용하지 않고**, 세션 단위의 행동 변화를 직관적으로 전달하지 못한다\. 특히 동물 행동 관찰 맥락에서는 **관찰 결과를 즉시 반응하고 요약하는 embodied interface**가 부족하다\.
-
 - 해결: 오리 영상을 입력으로 받아 **5초 구간 단위 행동 분류\(resting / feeding / exploring\)** 를 수행하고, 행동 전환 시 캐릭터형 반응을 보이며, 세션 종료 후 타임라인·이벤트·요약 리포트를 생성하는 **lightweight behaviour observation system**을 설계한다\.
-
 - 결과:
-  - 행동 클래스 **3종** 정의
-  
-  - 구간 단위 **5초**
-  
-  - 프레임 샘플링 **10프레임/구간**
-  
-  - 클래스별 초기 라벨링 목표 **20구간**
-
+    - 행동 클래스 **3종** 정의
+    - 구간 단위 **5초**
+    - 프레임 샘플링 **10프레임/구간**
+    - 클래스별 초기 라벨링 목표 **20구간**
 - 다음 단계:
-  - **2주:** 데이터셋 추출 및 notebook baseline 구현
-  
-  - **2개월:** Pi 이식 및 오프라인 시연
-  
-  - **2분기:** 날짜별 행동 패턴 분석 파이프라인 및 animal behaviour 확장
+    - **2주:** 데이터셋 추출 및 notebook baseline 구현
+    - **2개월:** Pi 이식 및 오프라인 시연
+    - **2분기:** 날짜별 행동 패턴 분석 파이프라인 및 animal behaviour 확장
 
 ## 1\. 배경·목표
 
 - 사용자/페르소나:
-  - 동물 행동을 직관적으로 관찰·기록하고 싶은 연구자/학생
-  
-  - lightweight on-device behaviour observation 데모를 만들고 싶은 연구실 지원 준비자
-
+    - 동물 행동을 직관적으로 관찰·기록하고 싶은 연구자/학생
+    - lightweight on-device behaviour observation 데모를 만들고 싶은 연구실 지원 준비자
 - 성공 기준\(KPI\):
-  - 2~3분 길이의 오리 영상 1개에 대해 **구간별 행동 분류 → 이벤트 반응 → 종료 후 리포트**까지 전체 파이프라인이 동작
-  
-  - 세션 종료 시 **행동 타임라인 \+ 대표 이벤트 5개 \+ 2~3문장 요약** 생성
-  
-  - 날짜별 누적 기록이 **CSV \+ JSON** 형태로 저장
-
+    - 2~3분 길이의 오리 영상 1개에 대해 **구간별 행동 분류 → 이벤트 반응 → 종료 후 리포트**까지 전체 파이프라인이 동작
+    - 세션 종료 시 **행동 타임라인 \+ 대표 이벤트 5개 \+ 2~3문장 요약** 생성
+    - 날짜별 누적 기록이 **CSV \+ JSON** 형태로 저장
 - 범위\(Out of scope\):
-  - 실시간 카메라 기반 온라인 추론
-  
-  - 다종 동물 일반화
-  
-  - 복잡한 로봇 제어 및 ROS2 기반 분산 아키텍처
-  
-  - 고정밀 행동 인식 모델 연구 자체
+    - 실시간 카메라 기반 온라인 추론
+    - 다종 동물 일반화
+    - 복잡한 로봇 제어 및 ROS2 기반 분산 아키텍처
+    - 고정밀 행동 인식 모델 연구 자체
 
 ## 2\. 역할·스택·기간
 
 - 역할/기여:
-  - FE **20%**
-  
-  - BE/ML **50%**
-  
-  - 기획/설계 **30%**
-
+    - FE **20%**
+    - BE/ML **50%**
+    - 기획/설계 **30%**
 - 스택:
-  - Python
-  
-  - Jupyter Notebook
-  
-  - CLIP/임베딩 계열 feature extractor
-  
-  - Logistic Regression
-  
-  - CSV / JSON
-  
-  - Raspberry Pi 5 8GB
-  
-  - UI: 정적 이미지 기반 표정 표시, 이후 웹 UI 확장 예정
-
+    - Python
+    - Jupyter Notebook
+    - CLIP/임베딩 계열 feature extractor
+    - Logistic Regression
+    - CSV / JSON
+    - Raspberry Pi 5 8GB
+    - UI: 정적 이미지 기반 표정 표시, 이후 웹 UI 확장 예정
 - 기간: 2026\.05\.08\.** ~ TBD**
 
 ## 3\. 데모 & 링크
 
 - Demo: **TBD**
-
 - Repo: **TBD**
-
 - 문서: notebook 설계 문서 / 데이터 라벨링 기준 / 리포트 포맷 문서 \(**TBD**\)
-
 - 시연영상: **TBD**
 
 ## 4\. 아키텍처 요약
 
 - 다이어그램\(1장 첨부\)
-  - **입력 영상 → 5초 구간 분할 → 10프레임 샘플링 → CLIP 임베딩 평균 → Logistic Regression 분류 → 이벤트 감지 → 반응 생성 → 리포트 생성 → CSV/JSON 저장**
-
+    - **입력 영상 → 5초 구간 분할 → 10프레임 샘플링 → CLIP 임베딩 평균 → Logistic Regression 분류 → 이벤트 감지 → 반응 생성 → 리포트 생성 → CSV/JSON 저장**
 - 데이터 흐름/외부 의존성:
-  - 입력: 미리 다운로드한 오리 영상 파일
-  
-  - feature extraction: CLIP/임베딩 계열 모델
-  
-  - classifier: Logistic Regression
-  
-  - 요약: 규칙 기반 이벤트 로그 \+ 소형 로컬 요약 모델
-  
-  - 출력: 표정, 문구, uncertain 음성, 세션 종료 리포트
-
+    - 입력: 미리 다운로드한 오리 영상 파일
+    - feature extraction: CLIP/임베딩 계열 모델
+    - classifier: Logistic Regression
+    - 요약: 규칙 기반 이벤트 로그 \+ 소형 로컬 요약 모델
+    - 출력: 표정, 문구, uncertain 음성, 세션 종료 리포트
 - 배포/CI·CD/롤백:
-  - 1차는 notebook 기반 로컬 실행
-  
-  - 이후 Pi 스크립트화 및 오프라인 실행 예정
-  
-  - CI·CD: **TBD**
-  
-  - 롤백: **TBD**
+    - 1차는 notebook 기반 로컬 실행
+    - 이후 Pi 스크립트화 및 오프라인 실행 예정
+    - CI·CD: **TBD**
+    - 롤백: **TBD**
 
 ## 5\. 핵심 기능\(스크린샷/GIF 포함\)
 
 1. **구간 단위 행동 관찰**
-  - 사용자 가치: 긴 영상을 5초 단위로 나누어 행동을 구조적으로 인식 가능
-  
-  - 엣지 케이스 처리: confidence가 낮은 경우 uncertain 처리
-
-1. **행동 전환 기반 embodied reaction**
-  - 사용자 가치: 단순 분석 결과가 아니라, 비모가 행동 변화를 먼저 감지하고 반응
-  
-  - 엣지 케이스 처리: 동일 행동이 최소 3구간\(15초\) 유지된 뒤 전환될 때만 특별 반응
-
-1. **세션 종료 behaviour report**
-  - 사용자 가치: 관찰 내용을 시간 순 타임라인과 이벤트 중심으로 한 번에 해석 가능
-  
-  - 엣지 케이스 처리: representative event만 5개 추출, uncertain 비율도 함께 표시
+    - 사용자 가치: 긴 영상을 5초 단위로 나누어 행동을 구조적으로 인식 가능
+    - 엣지 케이스 처리: confidence가 낮은 경우 uncertain 처리
+2. **행동 전환 기반 embodied reaction**
+    - 사용자 가치: 단순 분석 결과가 아니라, 비모가 행동 변화를 먼저 감지하고 반응
+    - 엣지 케이스 처리: 동일 행동이 최소 3구간\(15초\) 유지된 뒤 전환될 때만 특별 반응
+3. **세션 종료 behaviour report**
+    - 사용자 가치: 관찰 내용을 시간 순 타임라인과 이벤트 중심으로 한 번에 해석 가능
+    - 엣지 케이스 처리: representative event만 5개 추출, uncertain 비율도 함께 표시
 
 ## 6\. 기술 결정\(ADR 요약\)
 
 - 결론: **CLIP 임베딩 평균 \+ Logistic Regression**
-  - 버린 대안: end-to-end video model, 무거운 sequence model, 실시간 대형 VLM
-  
-  - 근거:
-    - 성능보다 **Pi 이식 가능성**이 중요
-    
-    - lightweight pipeline이 목표
-    
-    - 노트북 선개발 후 Pi 단독 실행으로 옮기기 쉬움
-
+    - 버린 대안: end-to-end video model, 무거운 sequence model, 실시간 대형 VLM
+    - 근거:
+        - 성능보다 **Pi 이식 가능성**이 중요
+        - lightweight pipeline이 목표
+        - 노트북 선개발 후 Pi 단독 실행으로 옮기기 쉬움
 - 리스크 및 완화:
-  - 리스크: CLIP feature가 행동보다 장면 특성에 민감할 수 있음
-  
-  - 완화:
-    - 대표 구간만 먼저 라벨링
-    
-    - threshold validation 기반 uncertain 처리
-    
-    - 필요 시 feeding 전용 추가 영상 확보
+    - 리스크: CLIP feature가 행동보다 장면 특성에 민감할 수 있음
+    - 완화:
+        - 대표 구간만 먼저 라벨링
+        - threshold validation 기반 uncertain 처리
+        - 필요 시 feeding 전용 추가 영상 확보
 
 ## 7\. 문제와 해결\(버그·장애 포함\)
 
 ## 8\. 측정 결과\(전/후 비교\)
 
 - p95 지연: **TBD**
-
 - 전환율: 행동 전환 감지 이벤트 수 / 세션 길이 기준 **TBD**
-
 - 활성 사용자: **TBD**
-
 - 추가 측정 예정:
-  - 구간 분류 정확도 또는 validation 성능
-  
-  - uncertain 비율
-  
-  - 세션당 이벤트 수
-  
-  - Pi에서의 5초 구간 처리 시간
+    - 구간 분류 정확도 또는 validation 성능
+    - uncertain 비율
+    - 세션당 이벤트 수
+    - Pi에서의 5초 구간 처리 시간
 
 ## 9\. 회고 & 개선
 
 - 잘된 점 3가지\(근거 포함\)
-  1. TBD
-
+    1. TBD
 - 아쉬운 점 3가지\(원인/조치\)
-  1. TBD
-
+    1. TBD
 - 기술부채 목록과 상환 계획\(우선순위/예상 공수\)
-  1. TBD
+    1. TBD

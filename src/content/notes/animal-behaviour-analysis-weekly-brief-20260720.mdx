@@ -1,0 +1,416 @@
+---
+title: "Animal Behaviour Analysis Weekly Brief — 2026.07.20."
+slug: "animal-behaviour-analysis-weekly-brief-20260720"
+generated: true
+status: "completed"
+domain: 
+  - "Animal Behavior"
+type: "weekly-brief"
+date: "2026-07-20"
+notion: "https://app.notion.com/p/Animal-Behaviour-Analysis-Weekly-Brief-2026-07-20-3a314b84a0f280358301f9aa17bb7205"
+---
+
+{/* This file is generated from Notion. Do not edit directly. */}
+
+# Animal Behaviour Analysis Weekly Research Briefing
+
+**기준일:** 2026-07-20
+
+**우선 검색 기간:** 2026-07-06 ~ 2026-07-20
+
+> 이번 주 핵심은 pose model을 keypoint 좌표 생성기에만 쓰지 않고, behavior recognition용 visual encoder로 재사용하는 흐름입니다\. 가장 중요한 자료는 BehaviorScope-X이며, GenCeption은 video generation backbone의 animal-domain 전이 가능성을 보여주는 간접 자료입니다\.
+
+## 1\. 이번 주 한눈에 보기
+
+- **이번 주 반드시 볼 자료:** BehaviorScope-X
+- pose checkpoint의 visual feature, pose-self feature, inter-animal geometry를 temporal classifier에 결합합니다\.
+- annotation, split, full-video window 생성, feature cache, training, inference, ethogram, review MP4까지 하나의 workflow로 공개되었습니다\.
+- GenCeption은 video generation model이 depth, segmentation, camera pose, 3D keypoint prediction에 전이될 수 있음을 보여줍니다\.
+- MammAlps-S2는 행동 label, persistent track, bounding box, demographic attribute를 함께 제공하는 최근 camera-trap video dataset입니다\.
+
+### Labeling 자동화 관점의 핵심
+
+이번 주 직접적인 animal-specific pseudo-labeling 또는 active-learning 신작은 많지 않았습니다\. 대신 다음이 중요합니다\.
+
+1. pose annotation으로 학습한 representation을 behavior recognition에 재사용
+2. full-video prediction을 review MP4와 ethogram으로 검토
+3. low-confidence segment를 human review queue로 보내는 확장 가능성
+4. large-scale video pretraining으로 적은 task-specific label에 대응하는 방향
+
+### 지금 바로 해야 할 것
+
+`동물 영상 → pose/trajectory feature → 5초 window → 경량 분류기 → 저신뢰 구간 검토`
+
+---
+
+## 2\. 이번 주 핵심 트렌드
+
+### Pose model의 역할이 좌표 추정에서 행동 표현 추출로 확장
+
+- **무엇이 바뀌었는가:** pose checkpoint를 keypoint detector와 frozen visual encoder로 동시에 사용합니다\.
+- **왜 중요한가:** pose annotation 비용을 behavior classification에서도 활용할 수 있습니다\.
+- **연결:** social interaction, grooming, contact behavior처럼 좌표만으로 불충분한 행동에 유리할 수 있습니다\.
+- **관심도:** High
+- **신뢰도:** bioRxiv preprint와 초기 GitHub repo
+
+### Full-video annotation과 prediction review가 통합
+
+- **무엇이 바뀌었는가:** BehaviorScope-X가 annotation, train/val/test split, full-video cache, training, inference, ethogram, review video를 연결합니다\.
+- **왜 중요한가:** 실제 연구에서는 model training보다 annotation provenance와 오류 검토가 큰 병목입니다\.
+- **연결:** BMOD Labeler의 향후 architecture에 참고할 수 있습니다\.
+- **관심도:** High
+
+### Video generation backbone의 perception 전이
+
+- **무엇이 바뀌었는가:** GenCeption은 text-to-video diffusion backbone을 feed-forward perception model로 사용합니다\.
+- **왜 중요한가:** generation model이 motion과 geometry prior를 학습할 수 있다는 근거입니다\.
+- **연결:** animal pose와 motion representation에 전이 가능성이 있습니다\.
+- **관심도:** Medium
+- **주의:** animal behavior recognition을 직접 평가한 연구는 아닙니다\.
+
+### Wildlife dataset이 behavior, tracking, retrieval을 함께 제공
+
+- **무엇이 바뀌었는가:** MammAlps-S2가 dense bounding box, persistent track, action/activity label, text query를 함께 제공합니다\.
+- **왜 중요한가:** behavior segmentation, tracking, retrieval을 동일 데이터에서 연구할 수 있습니다\.
+- **연결:** long-video wildlife analysis와 trajectory modeling에 적합합니다\.
+- **관심도:** High
+
+---
+
+## 3\. 추천 논문
+
+## 3\.1 BehaviorScope-X: Reusing Pose-Trained Visual Representations for Full-Video Ethology
+
+- **링크:** [https://www\.biorxiv\.org/content/10\.64898/2026\.07\.02\.735695v1](https://www.biorxiv.org/content/10.64898/2026.07.02.735695v1)
+- **코드:** [https://github\.com/farhanaugustine/BehaviorScope-X](https://github.com/farhanaugustine/BehaviorScope-X)
+- **공개:** 2026-07-07
+- **상태:** bioRxiv preprint
+- **분야:** animal behavior recognition, multi-animal analysis, pose representation reuse
+
+### 핵심 문제
+
+pose estimation과 behavior recognition이 분리되면서 pose model 내부의 domain-specific visual representation이 downstream classifier에서 버려지는 문제입니다\.
+
+### 핵심 아이디어
+
+하나의 pose checkpoint를 두 역할로 사용합니다\.
+
+1. keypoint estimation
+2. visual feature extraction
+
+이후 pose 좌표 기반 움직임과 개체 간 geometry를 결합해 temporal classifier를 학습합니다\.
+
+### 모델 구조
+
+1. multi-animal video 입력
+2. pose model로 detection과 keypoint 추정
+3. pose backbone에서 visual descriptor 추출
+4. 좌표로 posture, velocity 등 pose-self feature 생성
+5. 개체 간 거리와 방향 등 relational feature 생성
+6. 시간 window 단위로 LSTM 등의 classifier에 입력
+7. behavior prediction, ethogram, bout summary, review MP4 출력
+
+### 기존 방법과의 차이
+
+pose 좌표만 사용하는 것이 아니라 pose model의 intermediate visual representation까지 재사용합니다\.
+
+### 주요 결과
+
+저자들은 assay-trained pose checkpoint가 full-video ethology를 위한 reusable visual encoder가 될 수 있다고 주장합니다\. 정확한 수치와 재현성은 원문 표와 추가 공개 자료 확인이 필요합니다\.
+
+### 한계
+
+- peer-reviewed 논문이 아님
+- repo가 초기 단계
+- tutorial dataset과 checkpoint가 포함되지 않음
+- GPU 권장
+- visual cache와 temporal pipeline이 복잡함
+- class imbalance와 data leakage를 별도 관리해야 함
+
+### 내 관심사와의 연결
+
+매우 높음: pose → behavior, long video, multi-animal interaction, annotation reuse, active review
+
+### 읽기 우선순위
+
+High
+
+### 읽을 때 집중할 부분
+
+- feature extraction layer
+- pose-only vs visual\+pose ablation
+- temporal window
+- relation feature
+- split 기준
+- smoothing
+
+### 구현 난이도
+
+어려움
+
+### 선행 학습
+
+PyTorch Dataset/DataLoader, feature extraction, LSTM, keypoint normalization, class imbalance
+
+### 포트폴리오 포인트
+
+Pose checkpoint의 visual representation과 trajectory feature를 행동 분류에 재사용하는 최근 pipeline을 분석하고, 경량 baseline으로 축소 구현했다\.
+
+---
+
+## 3\.2 Video Generation Models are General-Purpose Vision Learners
+
+- **링크:** [https://arxiv\.org/abs/2607\.09024](https://arxiv.org/abs/2607.09024)
+- **프로젝트:** [https://genception\.github\.io](https://genception.github.io/)
+- **공개:** 2026-07-10
+- **상태:** arXiv, ECCV 2026 표기
+- **분야:** video foundation model, generative pretraining
+- **Animal 관련성:** 간접적
+
+### 핵심 문제
+
+다양한 vision task에 전이되는 통합 pretraining 방식이 무엇인지 탐구합니다\.
+
+### 핵심 아이디어
+
+text-to-video generation model의 diffusion backbone이 motion, geometry, appearance를 학습한다고 보고, 이를 perception model로 변환합니다\.
+
+### 모델 구조
+
+1. image/video와 text instruction 입력
+2. pretrained video diffusion backbone 처리
+3. task conditioning
+4. feed-forward prediction
+5. depth, normal, segmentation, camera pose, 3D keypoint 출력
+
+### 주요 결과
+
+저자들은 여러 perception task에서 specialized model과 경쟁하는 성능을 보고하며, 비교 설정에서 VideoMAE와 V-JEPA보다 강한 representation을 관찰했다고 주장합니다\. synthetic human video로 학습한 모델이 동물과 로봇으로 일반화되는 사례도 제시합니다\.
+
+### 한계
+
+- animal behavior classification 직접 평가 없음
+- 대형 compute 필요
+- qualitative OOD 사례를 fine-grained behavior 성능으로 해석할 수 없음
+- species-specific 검증 필요
+
+### 내 관심사와의 연결
+
+중간: video generation representation이 animal motion understanding에 전이되는지 연구 질문을 만드는 데 유용
+
+### 읽기 우선순위
+
+Medium
+
+### 구현 난이도
+
+매우 어려움
+
+### 포트폴리오 포인트
+
+Video generation foundation model의 animal-domain 전이 가능성을 분석하고, 소형 video encoder 기반 대체 실험을 설계했다\.
+
+---
+
+## 4\. 추천 repo / dataset / tool
+
+## BehaviorScope-X
+
+- **링크:** [https://github\.com/farhanaugustine/BehaviorScope-X](https://github.com/farhanaugustine/BehaviorScope-X)
+- **기능:** annotation, pose feature cache, temporal classifier, inference, ethogram, review video
+- **최근 업데이트:** v1\.0\.0은 2026-06-30, preprint는 2026-07-07
+- **중요성:** pose-trained representation의 full-video behavior 분석 재사용
+- **난이도:** 어려움
+- **당장 할 것:** 전체 설치보다 `prepare_full_video_npz.py`, `precompute_visual_features_x.py`, `train_x.py` 입출력 분석
+- **주의:** dataset과 checkpoint가 포함되지 않음
+
+## MammAlps-S2 / Prompting-MammAlps
+
+- **Hugging Face:** [https://huggingface\.co/datasets/amathislab/Prompting-MammAlps](https://huggingface.co/datasets/amathislab/Prompting-MammAlps)
+- **GitHub:** [https://github\.com/amathislab/prompting-mammalps](https://github.com/amathislab/prompting-mammalps)
+- **공개:** 2026-06-30
+- **구성:** 2,865 clips, 18\.4시간, 7 species, 23 actions, 12 activities, persistent tracks, frame-level boxes, 135 text queries
+- **중요성:** behavior recognition, segmentation, multi-animal tracking, text-video retrieval을 함께 연구 가능
+- **난이도:** 보통~어려움
+- **당장 할 것:** 전체 75GB 다운로드보다 metadata와 일부 clip으로 class distribution과 action hierarchy 분석
+- **주의:** CC BY-NC 4\.0, 단일 지역, 계절 shift, class imbalance
+
+## MMPose Experiments for Animal Tracking
+
+- **링크:** [https://github\.com/KumarLabJax/mmpose-experiments](https://github.com/KumarLabJax/mmpose-experiments)
+- **기능:** MMPose top-down/bottom-up 모델과 DLC, SLEAP, SuperAnimal 비교
+- **중요성:** COCO 변환, PCK/RMSE, cross-dataset generalization 코드 제공
+- **난이도:** 어려움
+- **당장 할 것:** training보다 annotation conversion과 evaluation script 분석
+- **주의:** Singularity, SLURM, CUDA 전제
+
+---
+
+## 5\. 이번 주 미니프로젝트
+
+- **제목:** Pose/Trajectory 기반 행동 분류와 Active Review Queue
+- **목표:** Duck video 5초 segment의 행동을 분류하고 저신뢰 segment를 human review 대상으로 선별
+- **데이터:** BMOD Labeler duck segment 또는 짧은 공개 동물 영상
+- **도구:** pandas, NumPy, scikit-learn, 선택적으로 PyTorch/CLIP
+- **최소 범위:**
+    1. 좌표 sequence 준비
+    2. 좌표 정규화
+    3. speed, acceleration, distance, stationary ratio, turning angle 계산
+    4. Logistic Regression 학습
+    5. Macro-F1과 confusion matrix 평가
+    6. 낮은 maximum probability clip을 review CSV에 저장
+    7. accept/edit/reject 필드 추가
+- **확장 범위:** CLIP fusion, entropy sampling, active learning, correction 전후 비교
+- **산출물:** Notion, Velog, README, notebook, confusion matrix, trajectory plot, review CSV, demo video
+- **포트폴리오 한 줄:** 동물 행동 영상에서 trajectory 기반 temporal feature로 5초 행동 구간을 분류하고 uncertainty 기반으로 검토 우선 segment를 선별하는 human-in-the-loop prototype을 구현했다\.
+- **예상 시간:** 7~10시간
+- **실패 위험:** pose 품질, 표본 부족, class imbalance, data leakage
+- **대체 목표:** resting vs active 이진 분류와 오류 분석
+
+---
+
+## 6\. 이번 주 읽기 루틴
+
+### 1회독
+
+- BehaviorScope-X: abstract, pipeline, feature 종류, output, ablation
+- GenCeption: abstract, overview, VideoMAE/V-JEPA 비교, animal OOD example
+
+### 2회독
+
+- visual feature layer
+- pose normalization
+- relational geometry
+- temporal window
+- split과 smoothing
+- GenCeption의 frozen/fine-tuned 범위와 data efficiency
+
+### 3회독
+
+- CLIP으로 BehaviorScope-X visual feature를 단순화할 수 있는가
+- centroid와 bounding box로 pose를 대체할 수 있는가
+- low-confidence segment를 labeling queue로 보낼 수 있는가
+- 동일 영상 leakage를 어떻게 막을 것인가
+
+### 질문 3개
+
+1. pose 좌표만 쓸 때와 visual feature를 함께 쓸 때 어떤 행동에서 차이가 큰가?
+2. review 대상은 confidence, entropy, novelty, class balance 중 무엇으로 고르는가?
+3. video generation model의 animal OOD 일반화가 fine-grained behavior에도 유지될 근거가 있는가?
+
+---
+
+## 7\. 다음 주 Watchlist
+
+### 키워드
+
+1. pose-trained visual representation animal behavior
+2. active learning animal behavior annotation
+3. pseudo-labeling multi-animal pose tracking
+4. video foundation model animal motion
+5. weakly supervised temporal animal behavior localization
+
+### repo/tool
+
+1. BehaviorScope-X
+2. Prompting-MammAlps
+3. A-SOiD
+
+### open question
+
+1. BehaviorScope-X에 pretrained checkpoint와 tutorial dataset이 추가되는가?
+2. MammAlps-S2 기반 behavior segmentation baseline이 공개되는가?
+3. annotation time 절감량을 측정한 animal active-learning benchmark가 나오는가?
+
+---
+
+# 게시용 자료
+
+## 제목
+
+Pose 모델의 표현을 행동 분석에 재사용하기: BehaviorScope-X와 Video Foundation Model 흐름
+
+## 요약문
+
+이번 주 animal behavior analysis에서 가장 중요한 흐름은 pose model을 좌표 추정기로만 사용하지 않고 행동 분류를 위한 visual encoder로 재사용하는 것이다\. BehaviorScope-X는 pose backbone의 visual token, 개체 자체의 pose feature, 개체 간 relational geometry를 temporal classifier에 결합한다\. GenCeption은 video generation backbone이 depth, segmentation, 3D keypoint 같은 perception task에 전이될 수 있음을 보여준다\. 이번 주 실습에서는 duck video의 trajectory feature로 5초 행동 segment를 분류하고 low-confidence segment를 human review 대상으로 선별한다\.
+
+## 태그
+
+\#AnimalBehaviourAnalysis \#ComputationalEthology \#AnimalPoseEstimation \#BehaviorRecognition \#VideoUnderstanding \#TrajectoryModeling \#ActiveLearning \#PseudoLabeling \#HumanInTheLoop \#BehaviorScopeX \#MammAlps
+
+## README 초안
+
+# Pose and Trajectory-Based Active Review for Animal Behavior Classification
+
+## Overview
+
+This project implements a lightweight animal behavior classification pipeline using pose or trajectory features extracted from short video segments\.
+
+## Objective
+
+Classify animal behavior clips and prioritize uncertain predictions for human review\.
+
+## Pipeline
+
+1. Split videos into fixed-length segments\.
+2. Extract keypoints, centroids, or bounding-box trajectories\.
+3. Normalize coordinates\.
+4. Compute temporal motion features\.
+5. Train a lightweight classifier\.
+6. Estimate prediction confidence\.
+7. Send low-confidence segments to a review queue\.
+8. Record accept, edit, or reject decisions\.
+
+## Features
+
+- velocity
+- acceleration
+- movement distance
+- stationary ratio
+- turning angle
+- trajectory range
+- bounding-box variation
+
+## Models
+
+- Logistic Regression
+- Random Forest
+- Optional 1D CNN or LSTM
+- Optional CLIP feature fusion
+
+## Evaluation
+
+- Macro-F1
+- confusion matrix
+- class-wise recall
+- review rate
+- correction rate
+- performance before and after review
+
+## Portfolio Statement
+
+Built a human-in-the-loop animal behavior labeling prototype that classifies short video segments from pose and trajectory features and prioritizes uncertain predictions for expert review\.
+
+## 블로그 초안
+
+### Pose 모델은 좌표만 생성하는 도구가 아니다
+
+동물 행동 분석에서는 pose estimation으로 keypoint 좌표를 얻은 뒤 좌표 sequence를 별도의 행동 분류기에 입력하는 방식이 일반적이다\. 이 과정에서는 pose model이 내부적으로 학습한 appearance와 body-structure representation이 대부분 버려진다\.
+
+BehaviorScope-X는 하나의 pose checkpoint를 keypoint detector와 visual feature encoder로 동시에 사용한다\. pose backbone의 visual token, 개체의 자세와 움직임, 개체 사이의 거리와 방향을 temporal classifier에 결합한다\.
+
+이 방식은 pose annotation 비용을 behavior recognition에서도 활용할 수 있다는 장점이 있다\. 특히 multi-animal interaction은 같은 자세라도 상대 개체의 위치와 접촉 여부에 따라 의미가 달라질 수 있다\.
+
+GenCeption은 더 넓은 foundation-model 관점에서 video generation backbone을 depth, segmentation, camera pose, 3D keypoint prediction에 전환한다\. 사람 synthetic video로 학습한 모델이 동물 영상에 일부 일반화된 결과는 흥미롭지만, fine-grained animal behavior recognition 성능으로 직접 해석해서는 안 된다\.
+
+이번 주에는 BehaviorScope-X 전체를 재현하지 않는다\. 대신 duck video를 5초 구간으로 나누고 trajectory feature로 행동을 분류한다\. 이후 confidence가 낮은 구간만 사람이 검토하도록 active review queue를 만든다\. 이 작은 실험은 pose estimation, behavior recognition, labeling automation을 연결하는 출발점이 된다\.
+
+## Sources
+
+- [https://www\.biorxiv\.org/content/10\.64898/2026\.07\.02\.735695v1](https://www.biorxiv.org/content/10.64898/2026.07.02.735695v1)
+- [https://github\.com/farhanaugustine/BehaviorScope-X](https://github.com/farhanaugustine/BehaviorScope-X)
+- [https://arxiv\.org/abs/2607\.09024](https://arxiv.org/abs/2607.09024)
+- [https://genception\.github\.io](https://genception.github.io/)
+- [https://huggingface\.co/datasets/amathislab/Prompting-MammAlps](https://huggingface.co/datasets/amathislab/Prompting-MammAlps)
+- [https://github\.com/KumarLabJax/mmpose-experiments](https://github.com/KumarLabJax/mmpose-experiments)
+- [https://github\.com/YttriLab/A-SOID](https://github.com/YttriLab/A-SOID)
