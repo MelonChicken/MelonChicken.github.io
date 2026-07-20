@@ -8,7 +8,7 @@ dist/
 .codex-files/
 .codex-astro-scaffold/
 .tmp/
-
+public/notion-assets/**/*.bin
 # OS/editor noise
 .DS_Store
 Thumbs.db
