@@ -185,12 +185,12 @@ async function renderQuote(block: NotionBlockAst) {
 async function renderCallout(block: NotionBlockAst) {
   const child = block.children.length ? await renderBlocks(block.children) : '';
   const content = [renderRichText(block.richText), child].filter(Boolean).join('\n\n');
-  return `<NotionCallout icon="${escapeAttr(block.icon)}" color="${escapeAttr(block.color)}">\n\n${content}\n\n</NotionCallout>`;
+  return `<NotionCallout icon={${jsxString(block.icon)}} color={${jsxString(block.color)}}>\n\n${content}\n\n</NotionCallout>`;
 }
 
 async function renderToggle(block: NotionBlockAst, headingLevel = 0) {
   const child = block.children.length ? await renderBlocks(block.children) : '';
-  return `<NotionToggle summary="${escapeAttr(renderPlainText(block.richText) || 'Toggle')}" headingLevel={${headingLevel}}>\n\n${child}\n\n</NotionToggle>`;
+  return `<NotionToggle summary={${jsxString(renderPlainText(block.richText) || 'Toggle')}} headingLevel={${headingLevel}}>\n\n${child}\n\n</NotionToggle>`;
 }
 
 function renderCode(block: NotionBlockAst) {
@@ -212,9 +212,9 @@ function renderFigure(block: NotionBlockAst, tag: 'img') {
       : `{/* TODO: Notion image block has no downloadable URL: ${block.id} */}`;
   }
   const caption = renderRichText(block.caption);
-  const alt = escapeAttr(renderPlainText(block.caption) || "Source: author's Notion note");
+  const alt = renderPlainText(block.caption) || "Source: author's Notion note";
   const sourceComment = block.asset.downloaded ? '' : `\n{/* TODO: Asset download failed (${block.asset.error}); source left as original URL. */}`;
-  return `<figure class="notion-figure">${sourceComment}\n  <${tag} src="${escapeAttr(block.asset.src)}" alt="${alt}" />\n  <figcaption>${caption || escapeHtml("Source: author's Notion note")}</figcaption>\n</figure>`;
+  return `<figure class="notion-figure">${sourceComment}\n  <${tag} src={${jsxString(block.asset.src)}} alt={${jsxString(alt)}} />\n  <figcaption>${caption || escapeText("Source: author's Notion note")}</figcaption>\n</figure>`;
 }
 
 function renderFile(block: NotionBlockAst) {
@@ -225,7 +225,7 @@ function renderFile(block: NotionBlockAst) {
   }
   const caption = renderRichText(block.caption) || escapeHtml(block.asset.filename);
   const sourceComment = block.asset.downloaded ? '' : `\n{/* TODO: Asset download failed (${block.asset.error}); source left as original URL. */}`;
-  return `<figure class="notion-figure notion-file">${sourceComment}\n  <a href="${escapeAttr(block.asset.src)}">${caption}</a>\n  <figcaption>${caption}</figcaption>\n</figure>`;
+  return `<figure class="notion-figure notion-file">${sourceComment}\n  <a href={${jsxString(block.asset.src)}}>${caption}</a>\n  <figcaption>${caption}</figcaption>\n</figure>`;
 }
 
 function renderTable(block: NotionBlockAst) {
@@ -260,7 +260,7 @@ async function renderColumn(block: NotionBlockAst) {
 function renderBookmark(block: NotionBlockAst) {
   const href = block.url || renderPlainText(block.richText);
   if (!href) return `{/* Notion ${block.type} block has no URL: ${block.id} */}`;
-  return `<NotionBookmark href="${escapeAttr(href)}" label="${escapeAttr(href)}" />`;
+  return `<NotionBookmark href={${jsxString(href)}} label={${jsxString(href)}} />`;
 }
 
 function childReference(kind: string, block: NotionBlockAst) {
@@ -285,7 +285,7 @@ export function renderRichText(richText: NotionRichText[]) {
 function renderRichTextItem(item: NotionRichText) {
   if (item.type === 'equation') return mathInline(item.equation || item.plainText);
 
-  let text = escapeHtml(item.plainText).replace(/\$/g, '&#36;').replace(/\n/g, '<br />');
+  let text = escapeText(item.plainText).replace(/\$/g, '&#36;').replace(/\n/g, '<br />');
   if (!text) return '';
 
   if (item.annotations.code) text = `<code>${text.replace(/`/g, '&#96;')}</code>`;
@@ -296,7 +296,7 @@ function renderRichTextItem(item: NotionRichText) {
 
   const colorClass = notionColorClass(item.annotations.color);
   text = `<span${colorClass ? ` class="${colorClass}"` : ''}>${text}</span>`;
-  if (item.href) text = `<a href="${escapeAttr(item.href)}">${text}</a>`;
+  if (item.href) text = `<a href={${jsxString(item.href)}}>${text}</a>`;
 
   return text;
 }
@@ -326,8 +326,14 @@ function escapeHtml(value: string) {
     .replace(/>/g, '&gt;');
 }
 
-function escapeAttr(value: string) {
-  return escapeHtml(value).replace(/"/g, '&quot;');
+function escapeText(value: string) {
+  return escapeHtml(value)
+    .replace(/\{/g, '&#123;')
+    .replace(/\}/g, '&#125;');
+}
+
+function jsxString(value: string) {
+  return JSON.stringify(value);
 }
 
 function escapeUrl(value: string) {

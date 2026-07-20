@@ -17,69 +17,74 @@ relatedProject: "be-more-duck-vision-language-embodied-agent"
 notion: "https://app.notion.com/p/AI-BMOD-1-39c14b84a0f280cc95c9c40f2ad262d9"
 ---
 
+import NotionBookmark from '../../components/notion/NotionBookmark.astro';
+import NotionCallout from '../../components/notion/NotionCallout.astro';
+import NotionColumns from '../../components/notion/NotionColumns.astro';
+import NotionToggle from '../../components/notion/NotionToggle.astro';
+
 {/* This file is generated from Notion. Do not edit directly. */}
 
-> 개발 계기, 방향성, 그리고 지금 어디까지 왔는지
+> <span>개발 계기, 방향성, 그리고 지금 어디까지 왔는지</span>
 
 ---
 
-## BMO에서 오리까지
+## <span>BMO에서 오리까지</span>
 
-> 시작은 유튜브 영상 하나였습니다\.
+> <span>시작은 유튜브 영상 하나였습니다.</span>
 
-<figure>
-  <a href="/notion-assets/ai-bmod-1/39c14b84a0f2803ba8f2d3e1a0f33c53.bin">39c14b84a0f2803ba8f2d3e1a0f33c53.bin</a>
+<figure class="notion-figure notion-file">
+  <a href={"/notion-assets/ai-bmod-1/39c14b84a0f2803ba8f2d3e1a0f33c53.bin"}>39c14b84a0f2803ba8f2d3e1a0f33c53.bin</a>
+  <figcaption>39c14b84a0f2803ba8f2d3e1a0f33c53.bin</figcaption>
+</figure>
+
+<a href={"https://www.youtube.com/watch?v=l5ggH-YhuAw"}><span>BMO local agent를 라즈베리파이로 구현하는 영상</span></a><span>을 보고, </span><span><em>"이거 재밌겠다"</em></span><span> 싶어서 그 뒤에는 매일 당근마켓에서 중고 라즈베리파이를 찾아보다 결국 구매까지 해버렸습니다.</span>
+
+<figure class="notion-figure">
+  <img src={"/notion-assets/ai-bmod-1/39c14b84a0f280ec89d1f58e5a0032ff.png"} alt={"Source: author's Notion note"} />
   <figcaption>Source: author's Notion note</figcaption>
 </figure>
 
-[BMO local agent를 라즈베리파이로 구현하는 영상](https://www.youtube.com/watch?v=l5ggH-YhuAw)을 보고, _"이거 재밌겠다"_ 싶어서 그 뒤에는 매일 당근마켓에서 중고 라즈베리파이를 찾아보다 결국 구매까지 해버렸습니다\.
+<span>하지만 생각보다 비쌌다는..</span>
 
-<figure>
-  <img src="/notion-assets/ai-bmod-1/39c14b84a0f280ec89d1f58e5a0032ff.png" alt="Source: author's Notion note" />
+<span>이전에 </span><span><strong>핀과 제이크의 어드벤처 타임</strong></span><span>을 재밌게 보기도 했고 BMO처럼 말 걸면 반응하는 로컬 AI가 가슴을 설레게 했었습니다.</span>
+
+<span>그런데 막상 따라 만들다 보니 질문이 생겼습니다.</span>
+
+> <span><em>단순히 재현하는 것 이상으로, 어떤 가치를 더할 수 있을까?</em></span>
+
+<span>그 고민을 하던 차에 이전에 실험을 진행했던 </span><a href={"https://github.com/MelonChicken/WildlifeVision-Baseline"}><span>카메라 트랩 이미지 처리</span></a><span>가 생각났습니다.</span>
+
+<figure class="notion-figure">
+  <img src={"/notion-assets/ai-bmod-1/39c14b84a0f2808d9a33fbe1c1d4381b.png"} alt={"Source: author's Notion note"} />
   <figcaption>Source: author's Notion note</figcaption>
 </figure>
 
-하지만 생각보다 비쌌다는\.\.
+<span>이 프로젝트 자체는 Animal Classification에 지나지 않았지만 어떻게 하면 단순 분류에서 더 나아가 연구를 할 수 있을까하고 생각을 하게 되었고, 여기서 Vision-Language Model이 "이게 어떤 동물이다"를 넘어서 "어떤 동물이 어떤 상황에서 이런 행동을 한다"라고 설명을 더 풍부하게 해줄 수 있다는 점을 배웠기 때문입니다.</span>
 
-이전에 **핀과 제이크의 어드벤처 타임**을 재밌게 보기도 했고 BMO처럼 말 걸면 반응하는 로컬 AI가 가슴을 설레게 했었습니다\.
+<span>그때부터 </span><span><code>라즈베리파이 + 비전 + 행동 인식</code></span><span> 으로 실제 구현을 해보고 싶다라는 개발 방향이 잡혔습니다.</span>
 
-그런데 막상 따라 만들다 보니 질문이 생겼습니다\.
+<span>그 뒤 그럼 어떤 영상을 대상으로 진행을 할까 생각했고 이전에 영국에 갔을때 공원에서 흔히 볼 수 있었던 오리가 생각나 유튜브 오리 영상을 보며 영상이 풍부하게 있다는 점, 사람들에게 낯설지 않은 동물이라는 점을 근거로 오리 영상을 선정하게 되었습니다.</span>
 
-> _단순히 재현하는 것 이상으로, 어떤 가치를 더할 수 있을까?_
-
-그 고민을 하던 차에 이전에 실험을 진행했던 [카메라 트랩 이미지 처리](https://github.com/MelonChicken/WildlifeVision-Baseline)가 생각났습니다\.
-
-<figure>
-  <img src="/notion-assets/ai-bmod-1/39c14b84a0f2808d9a33fbe1c1d4381b.png" alt="Source: author's Notion note" />
+<figure class="notion-figure">
+  <img src={"/notion-assets/ai-bmod-1/39c14b84a0f2808f8547fdbe0bddf683.png"} alt={"Source: author's Notion note"} />
   <figcaption>Source: author's Notion note</figcaption>
 </figure>
 
-이 프로젝트 자체는 Animal Classification에 지나지 않았지만 어떻게 하면 단순 분류에서 더 나아가 연구를 할 수 있을까하고 생각을 하게 되었고, 여기서 Vision-Language Model이 "이게 어떤 동물이다"를 넘어서 "어떤 동물이 어떤 상황에서 이런 행동을 한다"라고 설명을 더 풍부하게 해줄 수 있다는 점을 배웠기 때문입니다\.
+<span><em>"오리가 지금 뭘 하는지 알아채고, 행동이 바뀌면 반응하고, 세션이 끝나면 요약까지 해주는 걸 만들면 어떨까?"</em></span>
 
-그때부터 `라즈베리파이 + 비전 + 행동 인식` 으로 실제 구현을 해보고 싶다라는 개발 방향이 잡혔습니다\.
+<span>기존 행동 분류 시스템은 대부분 "이게 A다, B다"를 판단하는 데서 끝납니다. 하지만 제가 만들고 싶었던 것은 단순 분류 결과를 출력하는 시스템이 아니라, </span><span><strong>관찰 결과에 반응하고 세션 단위로 요약해주는 작은 인터페이스</strong></span><span>였습니다.</span>
 
-그 뒤 그럼 어떤 영상을 대상으로 진행을 할까 생각했고 이전에 영국에 갔을때 공원에서 흔히 볼 수 있었던 오리가 생각나 유튜브 오리 영상을 보며 영상이 풍부하게 있다는 점, 사람들에게 낯설지 않은 동물이라는 점을 근거로 오리 영상을 선정하게 되었습니다\.
-
-<figure>
-  <img src="/notion-assets/ai-bmod-1/39c14b84a0f2808f8547fdbe0bddf683.png" alt="Source: author's Notion note" />
-  <figcaption>Source: author's Notion note</figcaption>
-</figure>
-
-_"오리가 지금 뭘 하는지 알아채고, 행동이 바뀌면 반응하고, 세션이 끝나면 요약까지 해주는 걸 만들면 어떨까?"_
-
-기존 행동 분류 시스템은 대부분 "이게 A다, B다"를 판단하는 데서 끝납니다\. 하지만 제가 만들고 싶었던 것은 단순 분류 결과를 출력하는 시스템이 아니라, **관찰 결과에 반응하고 세션 단위로 요약해주는 작은 인터페이스**였습니다\.
-
-물론 실제로 만드는 경험 자체가 저에게 도움이 될거라 생각하기도 했습니다\.
+<span>물론 실제로 만드는 경험 자체가 저에게 도움이 될거라 생각하기도 했습니다.</span>
 
 ---
 
-## 무엇을 만드는가
+## <span>무엇을 만드는가</span>
 
-> 깃허브 링크: [https://github\.com/MelonChicken/be-more-agent-duck](https://github.com/MelonChicken/be-more-agent-duck)
+> <span>깃허브 링크: </span><a href={"https://github.com/MelonChicken/be-more-agent-duck"}><span>https://github.com/MelonChicken/be-more-agent-duck</span></a>
 
-**BMOD**는 오리 영상을 입력받아 행동을 분류하고, 행동 변화에 반응하며, 세션이 끝나면 리포트를 생성하는 **lightweight behaviour observation system**입니다\.
+<span><strong>BMOD</strong></span><span>는 오리 영상을 입력받아 행동을 분류하고, 행동 변화에 반응하며, 세션이 끝나면 리포트를 생성하는 </span><span><strong>lightweight behaviour observation system</strong></span><span>입니다.</span>
 
-파이프라인을 한 줄로 정리하면 이렇습니다:
+<span>파이프라인을 한 줄로 정리하면 이렇습니다:</span>
 
 ```plaintext
 입력 영상
@@ -92,60 +97,60 @@ _"오리가 지금 뭘 하는지 알아채고, 행동이 바뀌면 반응하고,
   → 세션 리포트 (CSV + JSON)
 ```
 
-행동 클래스는 세 가지입니다: **resting**, **feeding**, **exploring**\. 그리고 분류 신뢰도가 낮을 때를 위한 **uncertain** 상태도 따로 두었습니다\.
+<span>행동 클래스는 세 가지입니다: </span><span><strong>resting</strong></span><span>, </span><span><strong>feeding</strong></span><span>, </span><span><strong>exploring</strong></span><span>. 그리고 분류 신뢰도가 낮을 때를 위한 </span><span><strong>uncertain</strong></span><span> 상태도 따로 두었습니다.</span>
 
-### 왜 이 스택인가
+### <span>왜 이 스택인가</span>
 
-처음엔 성능만 따지면 훨씬 좋은 end-to-end video model도 고려했습니다\. 그런데 이 프로젝트의 최종 목표는 **Raspberry Pi 5 위에서 오프라인으로 돌아가는 것**이었기에 무거운 모델은 선택지가 될 수 없었습니다\.
+<span>처음엔 성능만 따지면 훨씬 좋은 end-to-end video model도 고려했습니다. 그런데 이 프로젝트의 최종 목표는 </span><span><strong>Raspberry Pi 5 위에서 오프라인으로 돌아가는 것</strong></span><span>이었기에 무거운 모델은 선택지가 될 수 없었습니다.</span>
 
-CLIP 임베딩 \+ Logistic Regression 조합은 다음 이유로 선택했습니다:
+<span>CLIP 임베딩 + Logistic Regression 조합은 다음 이유로 선택했습니다:</span>
 
-- Pi에 이식하기 충분히 가볍다
-- 노트북에서 개발하고 Pi로 옮기기 쉽다
-- 행동 분류에 필요한 visual feature를 CLIP이 이미 잘 뽑아준다
+- <span>Pi에 이식하기 충분히 가볍다</span>
+- <span>노트북에서 개발하고 Pi로 옮기기 쉽다</span>
+- <span>행동 분류에 필요한 visual feature를 CLIP이 이미 잘 뽑아준다</span>
 
-물론 리스크도 있습니다\. CLIP feature가 행동 자체보다 **장면 특성** \(배경, 조명 등\)에 반응할 수 있다는 점\. 그래서 초기 라벨링은 클래스당 20구간씩, 대표 구간만 먼저 구성해서 threshold validation을 꼼꼼히 할 계획입니다\.
-
----
-
-## 지금 어디까지 왔나
-
-현재는 핵심 파이프라인 구현을 진행 중입니다\.
-
-- ✅ 전체 아키텍처 설계 완료
-- ✅ ffmpeg 기반 프레임 추출 \(5초 구간, 10프레임\)
-- ✅ CLIP 임베딩 추출 및 구간 평균
-- ✅ Logistic Regression 분류기 \(dummy fallback 포함\)
-- ▢ 행동 전환 기반 이벤트 감지 로직
-- ▢ `SessionLogger` 클래스 설계 \(CSV \+ JSON 듀얼 출력\)
-- ▢ tkinter GUI 연동
-- ▢ 실제 오리 데이터셋 라벨링 \(클래스당 20구간 목표\)
-- ▢ Pi 이식 및 오프라인 실행 검증
-
-몇 가지 설계 결정을 공유하면:
-
-**행동 전환 반응은 최소 3구간\(15초\) 유지 후에만 발생합니다\.** 5초 단위 분류가 짧게 흔들릴 수 있어서, 노이즈 반응을 막기 위한 smoothing 규칙입니다\. \(`MIN_STABLE_SEGMENTS = 3`으로 상수화\)
-
-**uncertain 처리도 신중하게 설계하는 중입니다\.** `CONFIDENCE_THRESHOLD = 0.55` 미만이면 uncertain으로 처리하는데, 연속 uncertain이 일정 횟수 이상 발생할 때만 별도 반응을 보여줍니다\. 시연 중 uncertain이 너무 자주 뜨면 몰입감이 깨지기 때문입니다\.
+<span>물론 리스크도 있습니다. CLIP feature가 행동 자체보다 </span><span><strong>장면 특성</strong></span><span> (배경, 조명 등)에 반응할 수 있다는 점. 그래서 초기 라벨링은 클래스당 20구간씩, 대표 구간만 먼저 구성해서 threshold validation을 꼼꼼히 할 계획입니다.</span>
 
 ---
 
-## 앞으로의 계획
+## <span>지금 어디까지 왔나</span>
 
-단기적으로는 이렇게 진행합니다:
+<span>현재는 핵심 파이프라인 구현을 진행 중입니다.</span>
 
-- **2주 내:** 데이터셋 구성 완료 \+ notebook 기반 baseline 검증
-- **이후:** Pi 이식 → 오프라인 시연 가능한 형태로 완성
-- **더 나아가:** 날짜별 행동 패턴 분석 파이프라인, 다른 동물로 확장
+- <span>✅ 전체 아키텍처 설계 완료</span>
+- <span>✅ ffmpeg 기반 프레임 추출 (5초 구간, 10프레임)</span>
+- <span>✅ CLIP 임베딩 추출 및 구간 평균</span>
+- <span>✅ Logistic Regression 분류기 (dummy fallback 포함)</span>
+- <span>▢ 행동 전환 기반 이벤트 감지 로직</span>
+- <span>▢ </span><span><code>SessionLogger</code></span><span> 클래스 설계 (CSV + JSON 듀얼 출력)</span>
+- <span>▢ tkinter GUI 연동</span>
+- <span>▢ 실제 오리 데이터셋 라벨링 (클래스당 20구간 목표)</span>
+- <span>▢ Pi 이식 및 오프라인 실행 검증</span>
 
-리포트 포맷도 이미 정해놨습니다\. 세션이 끝나면 **행동 타임라인 \+ 대표 이벤트 5개 \+ 2~3문장 요약**이 나옵니다\. 연구자나 학생이 오리를 오래 관찰한 뒤 "오늘 뭐가 있었지?"를 바로 파악할 수 있습니다\.
+<span>몇 가지 설계 결정을 공유하면:</span>
+
+<span><strong>행동 전환 반응은 최소 3구간(15초) 유지 후에만 발생합니다.</strong></span><span> 5초 단위 분류가 짧게 흔들릴 수 있어서, 노이즈 반응을 막기 위한 smoothing 규칙입니다. (</span><span><code>MIN_STABLE_SEGMENTS = 3</code></span><span>으로 상수화)</span>
+
+<span><strong>uncertain 처리도 신중하게 설계하는 중입니다.</strong></span><span> </span><span><code>CONFIDENCE_THRESHOLD = 0.55</code></span><span> 미만이면 uncertain으로 처리하는데, 연속 uncertain이 일정 횟수 이상 발생할 때만 별도 반응을 보여줍니다. 시연 중 uncertain이 너무 자주 뜨면 몰입감이 깨지기 때문입니다.</span>
 
 ---
 
-## 마치며
+## <span>앞으로의 계획</span>
 
-> 아직 데모와 실험 결과는 완성되지 않았지만, 프로젝트의 구조와 방향성은 어느 정도 잡혔고 코드는 조금씩 쌓이고 있습니다\.
+<span>단기적으로는 이렇게 진행합니다:</span>
+
+- <span><strong>2주 내:</strong></span><span> 데이터셋 구성 완료 + notebook 기반 baseline 검증</span>
+- <span><strong>이후:</strong></span><span> Pi 이식 → 오프라인 시연 가능한 형태로 완성</span>
+- <span><strong>더 나아가:</strong></span><span> 날짜별 행동 패턴 분석 파이프라인, 다른 동물로 확장</span>
+
+<span>리포트 포맷도 이미 정해놨습니다. 세션이 끝나면 </span><span><strong>행동 타임라인 + 대표 이벤트 5개 + 2~3문장 요약</strong></span><span>이 나옵니다. 연구자나 학생이 오리를 오래 관찰한 뒤 "오늘 뭐가 있었지?"를 바로 파악할 수 있습니다.</span>
+
+---
+
+## <span>마치며</span>
+
+> <span>아직 데모와 실험 결과는 완성되지 않았지만, 프로젝트의 구조와 방향성은 어느 정도 잡혔고 코드는 조금씩 쌓이고 있습니다.</span>
 > 
-> 다음 글에서는 데이터셋 라벨링 기준과 CLIP feature가 행동을 얼마나 잘 구분하는지 초기 실험 결과를 들고 와보겠습니다\.
+> <span>다음 글에서는 데이터셋 라벨링 기준과 CLIP feature가 행동을 얼마나 잘 구분하는지 초기 실험 결과를 들고 와보겠습니다.</span>
 > 
-> 오리를 관찰하는 AI를 만드는 일이 생각보다 재미있습니다\.
+> <span>오리를 관찰하는 AI를 만드는 일이 생각보다 재미있습니다.</span>

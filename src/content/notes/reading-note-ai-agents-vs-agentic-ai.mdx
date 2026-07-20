@@ -12,122 +12,119 @@ date: "2025-10-12"
 notion: "https://app.notion.com/p/Reading-Note-AI-Agents-vs-Agentic-AI-39f14b84a0f280fabe46df27ca7413f0"
 ---
 
+import NotionBookmark from '../../components/notion/NotionBookmark.astro';
+import NotionCallout from '../../components/notion/NotionCallout.astro';
+import NotionColumns from '../../components/notion/NotionColumns.astro';
+import NotionToggle from '../../components/notion/NotionToggle.astro';
+
 {/* This file is generated from Notion. Do not edit directly. */}
 
-# 들어가며
+# <span>들어가며</span>
 
-> 이번 글은 제 기준 흥미로운 내용을 담고 있는 논문에 대해 소개하는 것을 목적으로 작성된 글입니다\. AI Agent와 Agentic AI의 개념적 차이에 대해 다룹니다\.
+> <span>이번 글은 제 기준 흥미로운 내용을 담고 있는 논문에 대해 소개하는 것을 목적으로 작성된 글입니다. AI Agent와 Agentic AI의 개념적 차이에 대해 다룹니다.</span>
 
-## Paper Information
+## <span>Paper Information</span>
 
-> **Title:** AI Agents vs\. Agentic AI: A Conceptual Taxonomy, Applications, and Challenges
+> <span><strong>Title:</strong></span><span> AI Agents vs. Agentic AI: A Conceptual Taxonomy, Applications, and Challenges</span>
 > 
-> **Authors:** Yuchen Lin, Jie Fu, et al\.
+> <span><strong>Authors:</strong></span><span> Yuchen Lin, Jie Fu, et al.</span>
 > 
-> **Journal:** _Information Fusion_ \(2025\)
+> <span><strong>Journal:</strong></span><span> </span><span><em>Information Fusion</em></span><span> (2025)</span>
 > 
-> **arXiv ID:** [arXiv:2505\.10468](https://arxiv.org/abs/2505.10468)
+> <span><strong>arXiv ID:</strong></span><span> </span><a href={"https://arxiv.org/abs/2505.10468"}><span>arXiv:2505.10468</span></a>
 
-# Ⅰ\. Introduction
+# <span>Ⅰ. Introduction</span>
 
-> 당신은 지금부터 사용자가 제공한 강의 \{\{Title\}\} 스크립트를 바탕으로 ‘대학 강의노트’를 작성하는 전문가입니다\. 모든 학문 분야에 적용 가능한 형태로 아래 양식과 규칙을 따르세요\.
-> 🔶 출력 형식 \(공통 템플릿\)
-> \.\.\.
+> <span>당신은 지금부터 사용자가 제공한 강의 &#123;&#123;Title&#125;&#125; 스크립트를 바탕으로 ‘대학 강의노트’를 작성하는 전문가입니다. 모든 학문 분야에 적용 가능한 형태로 아래 양식과 규칙을 따르세요.<br />🔶 출력 형식 (공통 템플릿)<br />...</span>
 
-위 글은 실제로 제가 유튜브 강의 영상을 요약하고 기록하는데 활용하는 프롬프트의 일부입니다\. 기본적으로 **역할**을 주고 **출력 형식**을 준 뒤 **데이터를 입력**하는 간단한 구조로 되어있습니다\. 이러한 프롬프트 구조 역시 단일 AI Agent적 사고의 예시로 볼 수 있습니다\.
+<span>위 글은 실제로 제가 유튜브 강의 영상을 요약하고 기록하는데 활용하는 프롬프트의 일부입니다. 기본적으로 </span><span><strong>역할</strong></span><span>을 주고 </span><span><strong>출력 형식</strong></span><span>을 준 뒤 </span><span><strong>데이터를 입력</strong></span><span>하는 간단한 구조로 되어있습니다. 이러한 프롬프트 구조 역시 단일 AI Agent적 사고의 예시로 볼 수 있습니다.</span>
 
-위와 같은 상황에서 활용되는 **프롬프트**라는 단어는 어느새 우리의 일상에 들어와 Prompt Engineering이라는 분야가 생기기까지 했습니다\. 현재 우리는 ChatGPT가 나온 이후로 어떻게 이것을 활용할 것인지 주목하고 있으며, 구글 검색 통계를 통해 이러한 관심사를 ChatGPT의 출시 이후 'AI Agent'과 'Agentic AI'의 검색량 증가로 확인 할 수 있습니다\. $^{Fig.\ 1.}$
+<span>위와 같은 상황에서 활용되는 </span><span><strong>프롬프트</strong></span><span>라는 단어는 어느새 우리의 일상에 들어와 Prompt Engineering이라는 분야가 생기기까지 했습니다. 현재 우리는 ChatGPT가 나온 이후로 어떻게 이것을 활용할 것인지 주목하고 있으며, 구글 검색 통계를 통해 이러한 관심사를 ChatGPT의 출시 이후 'AI Agent'과 'Agentic AI'의 검색량 증가로 확인 할 수 있습니다. </span>$^{Fig.\ 1.}$
 
-<figure>
-  <img src="/notion-assets/reading-note-ai-agents-vs-agentic-ai/39f14b84a0f28087a518f27ce0c72b43.png" alt="Source: author's Notion note" />
+<figure class="notion-figure">
+  <img src={"/notion-assets/reading-note-ai-agents-vs-agentic-ai/39f14b84a0f28087a518f27ce0c72b43.png"} alt={"Source: author's Notion note"} />
   <figcaption>Source: author's Notion note</figcaption>
 </figure>
 
-> [최근 결과값도 확인 가능합니다\.](https://trends.google.com/trends/explore?date=today%205-y&q=AI%20Agent%2CAgentic%20AI&hl=ko)
+> <a href={"https://trends.google.com/trends/explore?date=today%205-y&q=AI%20Agent%2CAgentic%20AI&hl=ko"}><span>최근 결과값도 확인 가능합니다.</span></a>
 
-그렇다면 AI Agent가 정확하게 무엇인가? 그리고 Agentic AI와는 어떤 차이가 있는가? 이 질문들에 대해 이번 아티클의 내용을 소개하며 답해보려 합니다\.
+<span>그렇다면 AI Agent가 정확하게 무엇인가? 그리고 Agentic AI와는 어떤 차이가 있는가? 이 질문들에 대해 이번 아티클의 내용을 소개하며 답해보려 합니다.</span>
 
-# Ⅱ\. Concepts of AI Agent and Agentic AI
+# <span>Ⅱ. Concepts of AI Agent and Agentic AI</span>
 
-## Ⅱ\. 1\. Concept of AI Agent
+## <span>Ⅱ. 1. Concept of AI Agent</span>
 
-이 아티클에서는 AI Agent를 **범위가 정해저 있는 디지털 환경 내**에서 **목표 지향적인 작업 실행**을 위해서 설계된 **자율적인** 소프트웨어 독립체 \(또는 개체\)로 바라보고 있습니다\. 따라서 AI Agent는 구조화되거나 구조화되지 않은 입력값에 대한 인식 능력과 맥락 정보에 대한 추론 능력, 특정 목적을 달성하기 위한 행동 능력에 의해 정의된다고 합니다\.
+<span>이 아티클에서는 AI Agent를 </span><span><strong>범위가 정해저 있는 디지털 환경 내</strong></span><span>에서 </span><span><strong>목표 지향적인 작업 실행</strong></span><span>을 위해서 설계된 </span><span><strong>자율적인</strong></span><span> 소프트웨어 독립체 (또는 개체)로 바라보고 있습니다. 따라서 AI Agent는 구조화되거나 구조화되지 않은 입력값에 대한 인식 능력과 맥락 정보에 대한 추론 능력, 특정 목적을 달성하기 위한 행동 능력에 의해 정의된다고 합니다.</span>
 
-그렇기에 AI Agent의 특징으로는 **자율성 \(Autonomy\)**, **작업 특수성 \(Task-Specificity\)**, \*\*반응 및 적응성 \(Reactivity with Adaption\)\*\*이 존재합니다\. 그리고 이러한 특성들은 AI Agent의 아키텍처 분류 및 실증적인 배포 사례에서도 찾아볼 수 있습니다\. \(e\.g\. Antrophic 의 [**Computer Use 모델링**](https://www.anthropic.com/news/developing-computer-use)과 [**AI Agent 설계 서비스**](https://claude.com/solutions/agents)\)
+<span>그렇기에 AI Agent의 특징으로는 </span><span><strong>자율성 (Autonomy)</strong></span><span>, </span><span><strong>작업 특수성 (Task-Specificity)</strong></span><span>, **반응 및 적응성 (Reactivity with Adaption)**이 존재합니다. 그리고 이러한 특성들은 AI Agent의 아키텍처 분류 및 실증적인 배포 사례에서도 찾아볼 수 있습니다. (e.g. Antrophic 의 </span><a href={"https://www.anthropic.com/news/developing-computer-use"}><span><strong>Computer Use 모델링</strong></span></a><span>과 </span><a href={"https://claude.com/solutions/agents"}><span><strong>AI Agent 설계 서비스</strong></span></a><span>)</span>
 
-> **자율성 \(Autonomy\)**
-> : AI Agent는 일단 목표가 주어지면 사람의 개입 없이 혹은 최소한의 개입과 함께 스스로 작업을 수행합니다
+> <span><strong>자율성 (Autonomy)</strong></span><span><br />: AI Agent는 일단 목표가 주어지면 사람의 개입 없이 혹은 최소한의 개입과 함께 스스로 작업을 수행합니다</span>
 
-1. **작업 특수성 \(Task-Specificity\)**
-: AI Agent는 이메일 필터링이나 데이터베이스 조회와 같이 명확하게 정의된 좁은 영역의 작업을 효율적으로 처리하도록 최적화되어 있습니다\.
-2. **반응 및 적응성 \(Reactivity with Adaption\)**
-: AI Agent는 사용자 요청이나 외부 데이터 변화와 같은 실시간 자극에 대응하며 행동을 조정합니다\.
-    <figure>
-      <img src="/notion-assets/reading-note-ai-agents-vs-agentic-ai/39f14b84a0f280269922fa743e789850.png" alt="Source: author's Notion note" />
+1. <span><strong>작업 특수성 (Task-Specificity)</strong></span><span><br />: AI Agent는 이메일 필터링이나 데이터베이스 조회와 같이 명확하게 정의된 좁은 영역의 작업을 효율적으로 처리하도록 최적화되어 있습니다.</span>
+2. <span><strong>반응 및 적응성 (Reactivity with Adaption)</strong></span><span><br />: AI Agent는 사용자 요청이나 외부 데이터 변화와 같은 실시간 자극에 대응하며 행동을 조정합니다.</span>
+    <figure class="notion-figure">
+      <img src={"/notion-assets/reading-note-ai-agents-vs-agentic-ai/39f14b84a0f280269922fa743e789850.png"} alt={"Source: author's Notion note"} />
       <figcaption>Source: author's Notion note</figcaption>
     </figure>
 
-## Ⅱ\. 2\. Concept of Agentic AI
+## <span>Ⅱ. 2. Concept of Agentic AI</span>
 
-반면 Agentic AI는 특정 작업에 대한 숙련도나 완성도를 올리는게 목적이 아니라 어떠한 문제에 대한 해결에 초점을 맞춥니다\. 그렇기에 기존 AI Agent를 구현하는데 요구되는 특정 작업에 대한 모델 말고도 다수의 AI Agent를 조율하고 상호작용을 자동화 및 감독하는 모델이 요구됩니다\. 오케스트라 공연단에서 AI Agent가 개별 연주자라면 Agentic AI는 지휘자인 셈입니다\.
+<span>반면 Agentic AI는 특정 작업에 대한 숙련도나 완성도를 올리는게 목적이 아니라 어떠한 문제에 대한 해결에 초점을 맞춥니다. 그렇기에 기존 AI Agent를 구현하는데 요구되는 특정 작업에 대한 모델 말고도 다수의 AI Agent를 조율하고 상호작용을 자동화 및 감독하는 모델이 요구됩니다. 오케스트라 공연단에서 AI Agent가 개별 연주자라면 Agentic AI는 지휘자인 셈입니다.</span>
 
-<figure>
-  <img src="/notion-assets/reading-note-ai-agents-vs-agentic-ai/39f14b84a0f28033892cd60ea0cc81bf.png" alt="Source: author's Notion note" />
+<figure class="notion-figure">
+  <img src={"/notion-assets/reading-note-ai-agents-vs-agentic-ai/39f14b84a0f28033892cd60ea0cc81bf.png"} alt={"Source: author's Notion note"} />
   <figcaption>Source: author's Notion note</figcaption>
 </figure>
 
-> $Fig. \ 7.$에서도 볼 수 있듯이 Agentic AI의 핵심은 여러 전문 에이전트의 **협업**, 동적인 **작업 분해**, **공유된 메모리**, 그리고 **자율적인 조정 능력**에 있습니다\. 이것이 바로 개별 자동화를 뛰어넘는 \*\*'Orchestrated Ecosystem'\*\*의 개념입니다\.
+> $Fig. \ 7.$<span>에서도 볼 수 있듯이 Agentic AI의 핵심은 여러 전문 에이전트의 </span><span><strong>협업</strong></span><span>, 동적인 </span><span><strong>작업 분해</strong></span><span>, </span><span><strong>공유된 메모리</strong></span><span>, 그리고 </span><span><strong>자율적인 조정 능력</strong></span><span>에 있습니다. 이것이 바로 개별 자동화를 뛰어넘는 **'Orchestrated Ecosystem'**의 개념입니다.</span>
 
-> Anthropic의 Claude Code는 [**subagent**](https://docs.claude.com/ko/docs/claude-code/sub-agents) 기능을 제공하여, 역할 분할과 위임\(delegate\) 방식을 통해 일부 Agentic AI 특성을 경험할 수 있게 합니다\.
+> <span>Anthropic의 Claude Code는 </span><a href={"https://docs.claude.com/ko/docs/claude-code/sub-agents"}><span><strong>subagent</strong></span></a><span> 기능을 제공하여, 역할 분할과 위임(delegate) 방식을 통해 일부 Agentic AI 특성을 경험할 수 있게 합니다.</span>
 > 
-> 물론 엄밀하게 하자면 Claude Code subagent는 메인 Agent가 작업을 위임하는 방식으로 진행하기에 완전한 독립 AI Agent로서 자기 주도적으로 움직인다고 하기는 어렵습니다\. 따라서 완전한 Agentic AI가 아니라 이와 유사한 사용 경험을 제공한다 정도로 이해할 수 있습니다\.
+> <span>물론 엄밀하게 하자면 Claude Code subagent는 메인 Agent가 작업을 위임하는 방식으로 진행하기에 완전한 독립 AI Agent로서 자기 주도적으로 움직인다고 하기는 어렵습니다. 따라서 완전한 Agentic AI가 아니라 이와 유사한 사용 경험을 제공한다 정도로 이해할 수 있습니다.</span>
 
-<figure>
-  <img src="/notion-assets/reading-note-ai-agents-vs-agentic-ai/39f14b84a0f280559a12d10fd15a9879.png" alt="Source: author's Notion note" />
+<figure class="notion-figure">
+  <img src={"/notion-assets/reading-note-ai-agents-vs-agentic-ai/39f14b84a0f280559a12d10fd15a9879.png"} alt={"Source: author's Notion note"} />
   <figcaption>Source: author's Notion note</figcaption>
 </figure>
 
-# Ⅲ\. Limitations of Agentic AI
+# <span>Ⅲ. Limitations of Agentic AI</span>
 
-그렇다면 **Agentic AI는 AI Agent가 고질적으로 가지고 있던 Hallucination과 같은 문제를 완전히 해결했는가?** 라고 물어본다면 꼭 그렇다고는 할 수 없습니다\. 오히려 다수의 Agent를 관리 및 조율함으로서 훨씬 복합적이고 새로운 차원의 문제가 발생하기도 합니다\.
+<span>그렇다면 </span><span><strong>Agentic AI는 AI Agent가 고질적으로 가지고 있던 Hallucination과 같은 문제를 완전히 해결했는가?</strong></span><span> 라고 물어본다면 꼭 그렇다고는 할 수 없습니다. 오히려 다수의 Agent를 관리 및 조율함으로서 훨씬 복합적이고 새로운 차원의 문제가 발생하기도 합니다.</span>
 
-단일 AI Agent의 작은 결함이 Agentic AI 시스템 전체의 안정성을 위협하기 때문입니다\. 예를 들어 한 AI Agent의 환각 현상은 시스템 전체로 전파되어 부정확성을 증폭시키고 후속 결정을 오염시키는 \*\*'오류 연쇄 \(Error Cascades\)'\*\*로 이어질 수 있습니다\.
+<span>단일 AI Agent의 작은 결함이 Agentic AI 시스템 전체의 안정성을 위협하기 때문입니다. 예를 들어 한 AI Agent의 환각 현상은 시스템 전체로 전파되어 부정확성을 증폭시키고 후속 결정을 오염시키는 **'오류 연쇄 (Error Cascades)'**로 이어질 수 있습니다.</span>
 
-> **Agentic AI**의 주요 문제들
+> <span><strong>Agentic AI</strong></span><span>의 주요 문제들</span>
 > 
-> 1. **Amplified Causality Challenges**
-> : AI Agent도 가지고 있는 문제점인 인과 추론 분야에서 발생하는 오류가 Agentic AI에서는 다중 AI Agent를 활용하기에 더 확대됩니다\. 또한 한 AI Agent가 다른 AI Agent에 영향을 주는 inter-agent distributional shift가 발생하여 전체 시스템에 영향을 주는 문제가 있습니다\.
-> 2. **Communication and Coordination Bottlenecks**
-> : 목적이 서로 다른 AI Agent를 동시에 활용하기에 Agent간 Goal Misalignment 문제가 발생하게 됩니다\.	그리고 공통의 자원을 활용하기에 병렬 수행시 자원 경합 \(Resource Contention\)으로 인해 데드락 및 병목 현상이 발생하는 문제가 있습니다\.
-> 3. **Limited Long-Horizon Planning and Recovery**
-> : Agentic AI 역시 아직은 지속적이고 먼 미래에 대한 작업 계획 및 수행면에서 약한 모습을 보이며, 이는 더 많은 AI Agent가 사용될수록, 더 복잡한 목표와 작업을 수행해야 될수록 작업 수행을 완료하지 못하고 실패하는 모습을 보입니다\.
+> 1. <span><strong>Amplified Causality Challenges</strong></span><span><br />: AI Agent도 가지고 있는 문제점인 인과 추론 분야에서 발생하는 오류가 Agentic AI에서는 다중 AI Agent를 활용하기에 더 확대됩니다. 또한 한 AI Agent가 다른 AI Agent에 영향을 주는 inter-agent distributional shift가 발생하여 전체 시스템에 영향을 주는 문제가 있습니다.</span>
+> 2. <span><strong>Communication and Coordination Bottlenecks</strong></span><span><br />: 목적이 서로 다른 AI Agent를 동시에 활용하기에 Agent간 Goal Misalignment 문제가 발생하게 됩니다.	그리고 공통의 자원을 활용하기에 병렬 수행시 자원 경합 (Resource Contention)으로 인해 데드락 및 병목 현상이 발생하는 문제가 있습니다.</span>
+> 3. <span><strong>Limited Long-Horizon Planning and Recovery</strong></span><span><br />: Agentic AI 역시 아직은 지속적이고 먼 미래에 대한 작업 계획 및 수행면에서 약한 모습을 보이며, 이는 더 많은 AI Agent가 사용될수록, 더 복잡한 목표와 작업을 수행해야 될수록 작업 수행을 완료하지 못하고 실패하는 모습을 보입니다.</span>
 
-> 이 밖에도 **Ethical and Governance Challenges**, **Ethical and Governance Challenges**, **Immature Foundations and Research Gaps** 등 이미 AI Agent가 가지고 있는 문제가 증폭됨으로써 발생하는 여러 문제와 작업 목적이 복잡해지고 다변화됨으로써 발생하는 문제점이 존재합니다\.
+> <span>이 밖에도 </span><span><strong>Ethical and Governance Challenges</strong></span><span>, </span><span><strong>Ethical and Governance Challenges</strong></span><span>, </span><span><strong>Immature Foundations and Research Gaps</strong></span><span> 등 이미 AI Agent가 가지고 있는 문제가 증폭됨으로써 발생하는 여러 문제와 작업 목적이 복잡해지고 다변화됨으로써 발생하는 문제점이 존재합니다.</span>
 
-물론 이러한 한계점에 대해서 이 아티클의 저자는 다음과 같이 제시하고 있습니다\.
+<span>물론 이러한 한계점에 대해서 이 아티클의 저자는 다음과 같이 제시하고 있습니다.</span>
 
-시스템의 조정과 병목과 같은 협업 측면의 한계에 대해서는 **다중 에이전트 조정 \(Multi-Agent Orchestration\) 및 역할 전문화**와 **에이전트 루프 \(Agentic Loop\)** 등의 방식으로 협업 성능을 개선하는 것을 제안하고,
+<span>시스템의 조정과 병목과 같은 협업 측면의 한계에 대해서는 </span><span><strong>다중 에이전트 조정 (Multi-Agent Orchestration) 및 역할 전문화</strong></span><span>와 </span><span><strong>에이전트 루프 (Agentic Loop)</strong></span><span> 등의 방식으로 협업 성능을 개선하는 것을 제안하고,</span>
 
-추론의 한계성과 견고성 \(Robustness\)에 대해서는 \*\*인과 모델링 및 시뮬레이션 기반 계획 \(Causal Modeling and Simulation\)\*\*과 **검색 증강 생성 \(Retrieval-Augmented Generation, RAG\)** 등의 방식으로 Agentic AI의 기반이 되는 LLM의 환각 문제 개선과 인과 관계에 대한 이해 능력 향상을 제안하고 있습니다\. $^{Fig. \ 13.}$
+<span>추론의 한계성과 견고성 (Robustness)에 대해서는 **인과 모델링 및 시뮬레이션 기반 계획 (Causal Modeling and Simulation)**과 </span><span><strong>검색 증강 생성 (Retrieval-Augmented Generation, RAG)</strong></span><span> 등의 방식으로 Agentic AI의 기반이 되는 LLM의 환각 문제 개선과 인과 관계에 대한 이해 능력 향상을 제안하고 있습니다. </span>$^{Fig. \ 13.}$
 
-<figure>
-  <img src="/notion-assets/reading-note-ai-agents-vs-agentic-ai/39f14b84a0f280a48734e8d4fedf7ad2.png" alt="Source: author's Notion note" />
+<figure class="notion-figure">
+  <img src={"/notion-assets/reading-note-ai-agents-vs-agentic-ai/39f14b84a0f280a48734e8d4fedf7ad2.png"} alt={"Source: author's Notion note"} />
   <figcaption>Source: author's Notion note</figcaption>
 </figure>
 
-하지만 이 역시 잠재적인 해결책일 뿐 이 아티클에서는 이에 대한 검증이나 개선 사례는 언급하지 않고 있습니다\.
+<span>하지만 이 역시 잠재적인 해결책일 뿐 이 아티클에서는 이에 대한 검증이나 개선 사례는 언급하지 않고 있습니다.</span>
 
-# Ⅳ\. Conclusion
+# <span>Ⅳ. Conclusion</span>
 
-<figure>
-  <img src="/notion-assets/reading-note-ai-agents-vs-agentic-ai/39f14b84a0f28081ab9cda465aa7db74.png" alt="Source: author's Notion note" />
+<figure class="notion-figure">
+  <img src={"/notion-assets/reading-note-ai-agents-vs-agentic-ai/39f14b84a0f28081ab9cda465aa7db74.png"} alt={"Source: author's Notion note"} />
   <figcaption>Source: author's Notion note</figcaption>
 </figure>
 
-지금까지 AI Agent와 Agentic AI의 개념에 대해 소개해 보았고, $Table \ 1.$에서 다시 한번 두 개념의 특성을 파악할 수 있습니다\. 이렇듯 Agentic AI라는 개념은 더 복잡한 문제를 자동화 방식으로 해결하려는 시도로 볼 수 있고, 개인적으로 이런 방향성이 바로 현재 우리가 AI를 대하는 태도로 보인다고 생각합니다\.
+<span>지금까지 AI Agent와 Agentic AI의 개념에 대해 소개해 보았고, </span>$Table \ 1.$<span>에서 다시 한번 두 개념의 특성을 파악할 수 있습니다. 이렇듯 Agentic AI라는 개념은 더 복잡한 문제를 자동화 방식으로 해결하려는 시도로 볼 수 있고, 개인적으로 이런 방향성이 바로 현재 우리가 AI를 대하는 태도로 보인다고 생각합니다.</span>
 
-또한 \*\*다수의 Agent를 어떻게 효율적으로 조직하고 관리할 것인가?\*\*에 대한 고민은 단순히 기술적인 측면에 한정되는 것이 아니라 인적 자원에 대한 관리 측면으로도 고민해볼만한 문제라는 점에서 학제적인 성격을 띄고 있다고 생각됩니다\.
+<span>또한 **다수의 Agent를 어떻게 효율적으로 조직하고 관리할 것인가?**에 대한 고민은 단순히 기술적인 측면에 한정되는 것이 아니라 인적 자원에 대한 관리 측면으로도 고민해볼만한 문제라는 점에서 학제적인 성격을 띄고 있다고 생각됩니다.</span>
 
-물론 이 아티클에서는 언급된 두 개념의 차이 말고도 generative AI 와 Generative Agent에 대해서도 다루고, 블로그 글에서는 언급하지 않았던 각 개념의 특성과 한계점, 이에 대해 제시되는 해결책 등도 자세하게 다루고 있기에 관심이 있다면 한번 읽어보시길 추천드립니다\.
+<span>물론 이 아티클에서는 언급된 두 개념의 차이 말고도 generative AI 와 Generative Agent에 대해서도 다루고, 블로그 글에서는 언급하지 않았던 각 개념의 특성과 한계점, 이에 대해 제시되는 해결책 등도 자세하게 다루고 있기에 관심이 있다면 한번 읽어보시길 추천드립니다.</span>
 
-> 이번 글도 읽어주셔서 감사합니다\. 글과 관련하여 의견이 있으시다면 자유롭게 댓글로 남겨주시면 감사하겠습니다\.
+> <span>이번 글도 읽어주셔서 감사합니다. 글과 관련하여 의견이 있으시다면 자유롭게 댓글로 남겨주시면 감사하겠습니다.</span>

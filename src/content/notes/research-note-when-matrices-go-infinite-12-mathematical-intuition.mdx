@@ -13,191 +13,184 @@ date: "2025-09-27"
 notion: "https://app.notion.com/p/Research-Note-When-Matrices-Go-Infinite-1-2-Mathematical-Intuition-3a114b84a0f28039b7f3eea97f1d2758"
 ---
 
+import NotionBookmark from '../../components/notion/NotionBookmark.astro';
+import NotionCallout from '../../components/notion/NotionCallout.astro';
+import NotionColumns from '../../components/notion/NotionColumns.astro';
+import NotionToggle from '../../components/notion/NotionToggle.astro';
+
 {/* This file is generated from Notion. Do not edit directly. */}
 
-# 들어가며
+# <span>들어가며</span>
 
-> 이 글은 제가 학부 과정에서 배운 유한 행렬 \(finite matrices\)의 개념에서 행이나 열의 개수가 무한히 확장된 **무한 행렬 \(Infinite Matrices\)**의 개념으로 확장시키는 과정을 공유하기 위해 작성된 글입니다\.
+> <span>이 글은 제가 학부 과정에서 배운 유한 행렬 (finite matrices)의 개념에서 행이나 열의 개수가 무한히 확장된 </span><span><strong>무한 행렬 (Infinite Matrices)</strong></span><span>의 개념으로 확장시키는 과정을 공유하기 위해 작성된 글입니다.</span>
 > 
-> 이 글은 추상적인 무한대라는 개념이 어떻게 행렬이라는 개념에 편입되는지 나아가 ML 아키텍처에서의 활용으로 어떻게 연결되는지 탐구합니다\.
+> <span>이 글은 추상적인 무한대라는 개념이 어떻게 행렬이라는 개념에 편입되는지 나아가 ML 아키텍처에서의 활용으로 어떻게 연결되는지 탐구합니다.</span>
 > 
-> [Section 1: Mathematical Intuition](https://velog.io/@melon-chicken/Research-Note-When-Matrices-Go-Infinite-12-Mathematical-Intuition)에서는 무한 행렬의 기본 이론을 소개하고, 이를 **바나흐 공간 \(Banach space\)**에서 작용하는 **선형 유계 연산자 \(linear bounded operators\)**로 해석하는 직관을 살펴봅니다\. 특히, 컴퓨터 계산을 위해 무한 시스템을 유한 시스템으로 근사하고 해의 수렴성을 보장하는 **축소 방법 \(reduction method\)**에 집중할 예정입니다\.
+> <a href={"https://velog.io/@melon-chicken/Research-Note-When-Matrices-Go-Infinite-12-Mathematical-Intuition"}><span>Section 1: Mathematical Intuition</span></a><span>에서는 무한 행렬의 기본 이론을 소개하고, 이를 </span><span><strong>바나흐 공간 (Banach space)</strong></span><span>에서 작용하는 </span><span><strong>선형 유계 연산자 (linear bounded operators)</strong></span><span>로 해석하는 직관을 살펴봅니다. 특히, 컴퓨터 계산을 위해 무한 시스템을 유한 시스템으로 근사하고 해의 수렴성을 보장하는 </span><span><strong>축소 방법 (reduction method)</strong></span><span>에 집중할 예정입니다.</span>
 > 
-> [Section 2: ML Perspective](https://velog.io/@melon-chicken/Research-Note-When-Matrices-Go-Infinite-22-ML-Perspective)에서는 이 무한 개념이 머신러닝에 어떻게 적용되는지 조명합니다\. **특징 상호작용 공간 \(feature interaction space\)**의 차원을 무한 차원으로 확장하는 방법론을 다루며, 이는 RBF 커널을 통해 구성되는 **재현 커널 힐베르트 공간 \(Reproducing Kernel Hilbert Space, RKHS\)**을 활용하여 InfiNet을 소개해볼 예정입니다\.
+> <a href={"https://velog.io/@melon-chicken/Research-Note-When-Matrices-Go-Infinite-22-ML-Perspective"}><span>Section 2: ML Perspective</span></a><span>에서는 이 무한 개념이 머신러닝에 어떻게 적용되는지 조명합니다. </span><span><strong>특징 상호작용 공간 (feature interaction space)</strong></span><span>의 차원을 무한 차원으로 확장하는 방법론을 다루며, 이는 RBF 커널을 통해 구성되는 </span><span><strong>재현 커널 힐베르트 공간 (Reproducing Kernel Hilbert Space, RKHS)</strong></span><span>을 활용하여 InfiNet을 소개해볼 예정입니다.</span>
 
 ---
 
-# Section 1: Mathematical Intuition
+# <span>Section 1: Mathematical Intuition</span>
 
-> 만약 임의의 가역 연산자가 축소 방법을 허용하며 그 연산자가 무한 행렬로 표현가능하다면 이것은 무슨 의미인가
+> <span>만약 임의의 가역 연산자가 축소 방법을 허용하며 그 연산자가 무한 행렬로 표현가능하다면 이것은 무슨 의미인가</span>
 > 
-> "If arbitrary invertible operator admits the reduction method, assuming the operator is presented by an infinite matrix?"
+> <span>"If arbitrary invertible operator admits the reduction method, assuming the operator is presented by an infinite matrix?" </span>
 
-## Ⅰ\.1\. Concept of Infinite Matrices
+## <span>Ⅰ.1. Concept of Infinite Matrices</span>
 
-**행렬 \(Matrices\)**은 대부분의 과학분야에서 응용되는 개념으로 고전역학 \(Classical Mechanics\), 광학 \(Optics\), 양자 전자역학 \(Quantum Electrodynamics\) 등 다양한 물리학 분야에서 응용됩니다\. 컴퓨터 그래픽 분야에서는 3D 모델을 조작하고 이를 2차원 화면에 투사하는데 활용됩니다\.
+<span><strong>행렬 (Matrices)</strong></span><span>은 대부분의 과학분야에서 응용되는 개념으로 고전역학 (Classical Mechanics), 광학 (Optics), 양자 전자역학 (Quantum Electrodynamics) 등 다양한 물리학 분야에서 응용됩니다. 컴퓨터 그래픽 분야에서는 3D 모델을 조작하고 이를 2차원 화면에 투사하는데 활용됩니다. </span>
 
-행렬의 기본 개념이 익숙하지 않다면 Stanford의 [ENGR108](https://stanford.edu/class/engr108/index.html)의 교재인 [Introduction to Applied Linear Algebra](https://web.stanford.edu/~boyd/vmls/)처럼 기본 개념을 담은 선형대수학 책을 읽어보길 추천드립니다\. 이 글에서는 행렬에 대한 기본적인 이해가 있다는 전제하에 작성하는 글이기에 기본 개념은 상세하게 다루지는 않습니다\.
+<span>행렬의 기본 개념이 익숙하지 않다면 Stanford의 </span><a href={"https://stanford.edu/class/engr108/index.html"}><span>ENGR108</span></a><span>의 교재인 </span><a href={"https://web.stanford.edu/~boyd/vmls/"}><span>Introduction to Applied Linear Algebra</span></a><span>처럼 기본 개념을 담은 선형대수학 책을 읽어보길 추천드립니다. 이 글에서는 행렬에 대한 기본적인 이해가 있다는 전제하에 작성하는 글이기에 기본 개념은 상세하게 다루지는 않습니다.</span>
 
-**무한 행렬**이란 행 또는 열이 무한대로 존재하는 행렬로 공식적으로는 행 인덱스와 열 인덱스를 부여하는 모든 요소에 대해 행렬 요소가 명확하게 정의되는 \(well-defined matrix element\) 행렬을 말합니다\. 하지만 인덱스 집합이 자연수의 부분집합일 필요는 없습니다\.
+<span><strong>무한 행렬</strong></span><span>이란 행 또는 열이 무한대로 존재하는 행렬로 공식적으로는 행 인덱스와 열 인덱스를 부여하는 모든 요소에 대해 행렬 요소가 명확하게 정의되는 (well-defined matrix element) 행렬을 말합니다. 하지만 인덱스 집합이 자연수의 부분집합일 필요는 없습니다.</span>
 
-### Ⅰ\.1\.1\. From finite matrices to infinite matrices
+### <span>Ⅰ.1.1. From finite matrices to infinite matrices</span>
 
-이 행렬을 활용하기 위해서는 **유한 행렬**와 마찬가지로 무한 행렬에 대한 연산은 몇가지 조건이 필요하긴 하지만 정의내릴 수 있습니다\.
+<span>이 행렬을 활용하기 위해서는 </span><span><strong>유한 행렬</strong></span><span>와 마찬가지로 무한 행렬에 대한 연산은 몇가지 조건이 필요하긴 하지만 정의내릴 수 있습니다.</span>
 
-무한 차원에서의 영 행렬, 삼각 행렬, 대각 행렬, 유니터리 행렬, 전치 행렬은 유한 행렬과 매우 유사하게 \(analogously\) 정의될 수 있습니다\.
+<span>무한 차원에서의 영 행렬, 삼각 행렬, 대각 행렬, 유니터리 행렬, 전치 행렬은 유한 행렬과 매우 유사하게 (analogously) 정의될 수 있습니다.   </span>
 
-- **영행렬 \(Zero matrix\):** 모든 원소가 0인 행렬\. 무한 차원에서도 모든 원소가 0이면 영행렬로 정의됩니다\.
-- **삼각행렬 \(Triangular matrix\):** 상삼각 또는 하삼각 형태를 가지는 행렬\. 무한 차원에서도 특정 방향으로 원소가 0인 구조를 유지하면 삼각행렬로 간주됩니다\.
-- **대각행렬 \(Diagonal matrix\):** 대각선 외의 모든 원소가 0인 행렬\. 무한 차원에서도 대각선만 값을 가지면 대각행렬입니다\.
-- **유니터리 행렬 \(Unitary matrix\):** 자기 전치 행렬과 역행렬이 같은 행렬\. 무한 차원에서도 내적 보존 조건을 만족하면 유니터리 행렬로 정의됩니다\.
-- **전치 행렬 \(Transposed matrix\):** 행과 열을 바꾼 행렬\. 무한 차원에서도 동일한 방식으로 정의됩니다\.
+- <span><strong>영행렬 (Zero matrix):</strong></span><span> 모든 원소가 0인 행렬. 무한 차원에서도 모든 원소가 0이면 영행렬로 정의됩니다.</span>
+- <span><strong>삼각행렬 (Triangular matrix):</strong></span><span> 상삼각 또는 하삼각 형태를 가지는 행렬. 무한 차원에서도 특정 방향으로 원소가 0인 구조를 유지하면 삼각행렬로 간주됩니다.</span>
+- <span><strong>대각행렬 (Diagonal matrix):</strong></span><span> 대각선 외의 모든 원소가 0인 행렬. 무한 차원에서도 대각선만 값을 가지면 대각행렬입니다.</span>
+- <span><strong>유니터리 행렬 (Unitary matrix):</strong></span><span> 자기 전치 행렬과 역행렬이 같은 행렬. 무한 차원에서도 내적 보존 조건을 만족하면 유니터리 행렬로 정의됩니다.</span>
+- <span><strong>전치 행렬 (Transposed matrix):</strong></span><span> 행과 열을 바꾼 행렬. 무한 차원에서도 동일한 방식으로 정의됩니다.</span>
 
-### Ⅰ\.1\.2\. Multiplication in infinite matries
+### <span>Ⅰ.1.2. Multiplication in infinite matries</span>
 
-우리가 $A_{m×n}$ 행렬을 $B_{n×k}$ 행에 곱하려고 할 때 우리는 아래와 같은 정보를 얻을 수 있습니다
+<span>우리가 </span>$A_{m×n}$<span> 행렬을 </span>$B_{n×k}$<span> 행에 곱하려고 할 때 우리는 아래와 같은 정보를 얻을 수 있습니다</span>
 
-> $(a)$ $m=\infty,$ $n=\infty$일때 $AB=C_{\infty×\infty}$가 된다\. 다시 말해 무한 행렬간의 곱은 무한 행렬로 계산된다\.
+> $(a)$<span> </span>$m=\infty,$<span> </span>$n=\infty$<span>일때 </span>$AB=C_{\infty×\infty}$<span>가 된다. 다시 말해 무한 행렬간의 곱은 무한 행렬로 계산된다.</span>
 > 
-> $(b)$ $n=\infty$일때, $AB=C_{m×k}$ = $[c_{ij}]$이고 이때 각 원소 $c_{ij} = \Sigma^\infty_{l=1}a_{il}b_{lj} \ \ (1 ⩽ i ⩽ m, 1 ⩽j ⩽k)$ 꼴의 무한급수이고 이 급수는 반드시 수렴\(Convergent series\)해야 한다
+> $(b)$<span> </span>$n=\infty$<span>일때, </span>$AB=C_{m×k}$<span> = </span>$[c_{ij}]$<span>이고 이때 각 원소 </span>$c_{ij} = \Sigma^\infty_{l=1}a_{il}b_{lj} \ \ (1 ⩽ i ⩽ m, 1 ⩽j ⩽k)$<span> 꼴의 무한급수이고 이 급수는 반드시 수렴(Convergent series)해야 한다</span>
 > 
-> $(c)$ $A$와 $B$가 정사각 행렬 \(Square Matrix\)일 때, 두 행렬곱 $AB$는 정의되어 행렬 $C$가 성립한다\.
+> $(c)$<span> </span>$A$<span>와 </span>$B$<span>가 정사각 행렬 (Square Matrix)일 때, 두 행렬곱 </span>$AB$<span>는 정의되어 행렬 </span>$C$<span>가 성립한다.</span>
 > 
-> $(d)$ 만약 $A$와 $B$가 모두 무한의 차원에서 존재하는 행렬이며, $A$의 행의 개수는 $B$의 열의 수와 같을때 \(무한 차원에서 두 집합의 크기가 일대일 대응이 가능하여 동일할 때, $equinumerous$\), 두 행렬의 곱을 정의하기 위해서는 $A$의 행 집합과 $B$의 열 집합은 수렴해야 한다\.
+> $(d)$<span> 만약 </span>$A$<span>와 </span>$B$<span>가 모두 무한의 차원에서 존재하는 행렬이며, </span>$A$<span>의 행의 개수는 </span>$B$<span>의 열의 수와 같을때 (무한 차원에서 두 집합의 크기가 일대일 대응이 가능하여 동일할 때, </span>$equinumerous$<span>), 두 행렬의 곱을 정의하기 위해서는 </span>$A$<span>의 행 집합과 </span>$B$<span>의 열 집합은 수렴해야 한다.</span>
 
-### Ⅰ\.1\.3\. Linear Mapping in Infinite Matrices
+### <span>Ⅰ.1.3. Linear Mapping in Infinite Matrices</span>
 
-유한 행렬 \($m \times n$\)에서의 사상\(Mapping\)이란 $n$차원 공간 $F^n$의 벡터 $x$를 $m$차원 공간 $F^m$의 벡터 $f(x)$로 변환하는 규칙이며 무한 행렬에서 역시 무한 차원 공간 $F^n$의 벡터를 $F^m$의 벡터로 변환하는 규칙이 됩니다\. \[$f(x) = Ax$\]
+<span>유한 행렬 (</span>$m \times n$<span>)에서의 사상(Mapping)이란 </span>$n$<span>차원 공간 </span>$F^n$<span>의 벡터 </span>$x$<span>를 </span>$m$<span>차원 공간 </span>$F^m$<span>의 벡터 </span>$f(x)$<span>로 변환하는 규칙이며 무한 행렬에서 역시 무한 차원 공간 </span>$F^n$<span>의 벡터를 </span>$F^m$<span>의 벡터로 변환하는 규칙이 됩니다. [</span>$f(x) = Ax$<span>]</span>
 
-선형 사상 $f(x)=Ax$는 모든 벡터 $x$를 변형시키지만, 그 결과 벡터 $f(x)$가 도달할 수 있는 영역 \(image\)은 제한될 수 있습니다\.
+<span>선형 사상 </span>$f(x)=Ax$<span>는 모든 벡터 </span>$x$<span>를 변형시키지만, 그 결과 벡터 </span>$f(x)$<span>가 도달할 수 있는 영역 (image)은 제한될 수 있습니다.</span>
 
-> **랭크 \(Rank\)**: 사상을 통해 도달 가능한 영역 \(image\)의 크기
+> <span><strong>랭크 (Rank)</strong></span><span>: 사상을 통해 도달 가능한 영역 (image)의 크기</span>
 > 
-> - 행렬 $A$의 랭크는 이 선형 사상 $f$가 도달할 수 있는 **치역 \(Image, **$\text{Im}(f)$**\)**이라는 공간의 차원으로 정의된다\.
+> - <span>행렬 </span>$A$<span>의 랭크는 이 선형 사상 </span>$f$<span>가 도달할 수 있는 </span><span><strong>치역 (Image, </strong></span>$\text{Im}(f)$<span><strong>)</strong></span><span>이라는 공간의 차원으로 정의된다.</span>
 
-이 정의는 행렬이 명시적으로 주어지지 않더라도 임의의 선형 사상에 적용할 수 있는 장점을 가집니다\. 결국 랭크는 행렬 $A$의 '변환 능력' 또는 '도달 가능한 공간의 크기'를 나타냅니다\.
+<span>이 정의는 행렬이 명시적으로 주어지지 않더라도 임의의 선형 사상에 적용할 수 있는 장점을 가집니다. 결국 랭크는 행렬 </span>$A$<span>의 '변환 능력' 또는 '도달 가능한 공간의 크기'를 나타냅니다.</span>
 
-> 무한 행렬에서의 선형사상은 어떤 의미를 갖는가?
+> <span>무한 행렬에서의 선형사상은 어떤 의미를 갖는가?</span>
 
-선형 사상은 무한 연립 방정식 시스템을 해석하는 데 직접적으로 사용됩니다\.
+<span>선형 사상은 무한 연립 방정식 시스템을 해석하는 데 직접적으로 사용됩니다.</span>
 
-- 시스템: $Ax = b$ \(여기서 $A, x, b$는 무한 차원을 가질 수 있습니다\)\.
-- 이 시스템이 해 $x$를 가진다는 것은 \(Has a solution or solutions\), 타겟 벡터 $b$가 행렬 $A$의 변환 영역\($\text{Im}(f)$\) 안에 들어 있다는 의미와 같게 됩니다\. \($b \in \text{Im}(f)$\)\.
+- <span>시스템: </span>$Ax = b$<span> (여기서 </span>$A, x, b$<span>는 무한 차원을 가질 수 있습니다).</span>
+- <span>이 시스템이 해 </span>$x$<span>를 가진다는 것은 (Has a solution or solutions), 타겟 벡터 </span>$b$<span>가 행렬 </span>$A$<span>의 변환 영역(</span>$\text{Im}(f)$<span>) 안에 들어 있다는 의미와 같게 됩니다. (</span>$b \in \text{Im}(f)$<span>).</span>
 
-> **Rouché-Capelli Theorem \(Kronecker-Capelli Theorem\)**
-> : compatibility condition of solution in system of linear equations
+> <span><strong>Rouché-Capelli Theorem (Kronecker-Capelli Theorem)</strong></span><span><br />: compatibility condition of solution in system of linear equations</span>
 
-"Let $m,n ∈ N∪$\{$∞$\}\. A system of $m$ linear equations in n variables $Ax = b$ is compatible if and only if both the incomplete and complete matrices \($A$ and $[A|b]$ respectively\) are characterised by the same $rankA = rank[A|b]$\."
+<span>"Let </span>$m,n ∈ N∪$<span>&#123;</span>$∞$<span>&#125;. A system of </span>$m$<span> linear equations in n variables </span>$Ax = b$<span> is compatible if and only if both the incomplete and complete matrices (</span>$A$<span> and </span>$[A|b]$<span> respectively) are characterised by the same </span>$rankA = rank[A|b]$<span>."</span>
 
-> : 시스템이 해를 가질 필요충분조건은 불완전 행렬 \(or Coefficient Matrix\) $A$의 랭크와 완전 행렬 \(or Augmented Matrix\) $[A|b]$의 랭크가 같다는 것입니다\. 이는 타겟 벡터 \(결과값\) $b$가 행렬 $A$의 열 벡터들의 선형 결합으로 표현될 수 있다는 것을 의미합니다\.
+> <span>: 시스템이 해를 가질 필요충분조건은 불완전 행렬 (or Coefficient Matrix) </span>$A$<span>의 랭크와 완전 행렬 (or Augmented Matrix) </span>$[A|b]$<span>의 랭크가 같다는 것입니다. 이는 타겟 벡터 (결과값) </span>$b$<span>가 행렬 </span>$A$<span>의 열 벡터들의 선형 결합으로 표현될 수 있다는 것을 의미합니다.</span>
 
-### Ⅰ\.1\.4\. Invertiblity in Infinite Matrices
+### <span>Ⅰ.1.4. Invertiblity in Infinite Matrices</span>
 
-> **가역성 \(Invertibility\):**
-> 선형 사상의 가역성은 해당 행렬의 역행렬 존재 여부와 연결됩니다\.
+> <span><strong>가역성 (Invertibility):</strong></span><span><br />선형 사상의 가역성은 해당 행렬의 역행렬 존재 여부와 연결됩니다.</span>
 > 
-> - 선형 사상이 invertible하다의 의미
-> : 선형 사상 $f(x) = Ax$가 가역적일 필요충분조건은 \(iff\) 행렬 $A$가 $A^{-1}$가 존재하는 것이다\.
+> - <span>선형 사상이 invertible하다의 의미<br />: 선형 사상 </span>$f(x) = Ax$<span>가 가역적일 필요충분조건은 (iff) 행렬 </span>$A$<span>가 </span>$A^{-1}$<span>가 존재하는 것이다.</span>
 
-행렬이 가역적이라면, 무한 선형 시스템 $AX=B$의 해는 $X = A^{-1}B$로 유일하게 결정됩니다\. 무한 행렬의 역행렬을 찾기 위해서는 $|I-A| < 1$ 등과 같은 수렴 조건이 추가로 필요할 수 있습니다\.
+<span>행렬이 가역적이라면, 무한 선형 시스템 </span>$AX=B$<span>의 해는 </span>$X = A^{-1}B$<span>로 유일하게 결정됩니다. 무한 행렬의 역행렬을 찾기 위해서는 </span>$|I-A| < 1$<span> 등과 같은 수렴 조건이 추가로 필요할 수 있습니다.</span>
 
-> **선형 변환 행렬의 구성: 기저 벡터 \(basis vectors\)의 역할**
-> 어떤 선형 변환 $L: U \rightarrow V$가 주어졌을 때, **이 변환을 행렬 **$M$**로 표현**하는 방법은 기저를 설정하고 변환 확인 후 행렬을 구성하는 것이다\.
-> $L$ : 추상적 선형 사상 \(function\)
-> $M$ : 기저를 고른 뒤 얻어진 $L$의 구체적인 행렬 표현 \(coordinates of $L$\)
+> <span><strong>선형 변환 행렬의 구성: 기저 벡터 (basis vectors)의 역할</strong></span><span><br />어떤 선형 변환 </span>$L: U \rightarrow V$<span>가 주어졌을 때, </span><span><strong>이 변환을 행렬 </strong></span>$M$<span><strong>로 표현</strong></span><span>하는 방법은 기저를 설정하고 변환 확인 후 행렬을 구성하는 것이다.<br /></span>$L$<span> : 추상적 선형 사상 (function)<br /></span>$M$<span> : 기저를 고른 뒤 얻어진 </span>$L$<span>의 구체적인 행렬 표현 (coordinates of </span>$L$<span>)</span>
 
-기저 설정이란 입력 공간 \(domain\) $U$와 출력 공간\(codomain\) $V$ 각각에 기저 벡터 ${u_1, u_2, \ldots, u_m}$와 ${v_1, v_2, \ldots, v_n}$를 설정하는 것을 말합니다 \(여기서 $m$과 $n$은 무한할 수 있습니다\)\.
+<span>기저 설정이란 입력 공간 (domain) </span>$U$<span>와 출력 공간(codomain) </span>$V$<span> 각각에 기저 벡터 </span>${u_1, u_2, \ldots, u_m}$<span>와 </span>${v_1, v_2, \ldots, v_n}$<span>를 설정하는 것을 말합니다 (여기서 </span>$m$<span>과 </span>$n$<span>은 무한할 수 있습니다).</span>
 
-이를 통해 변환 $L$이 $U$의 각 기저 벡터 $u_i$에 어떻게 작용하는지 확인하며, 그 결과 $L(u_i)$는 $V$의 기저 벡터들의 선형 결합으로 표현됩니다\. \[$L(u_i) = \sum_{j=1}^{n} \alpha^{(i)}_{j} v_{j}$\]
+<span>이를 통해 변환 </span>$L$<span>이 </span>$U$<span>의 각 기저 벡터 </span>$u_i$<span>에 어떻게 작용하는지 확인하며, 그 결과 </span>$L(u_i)$<span>는 </span>$V$<span>의 기저 벡터들의 선형 결합으로 표현됩니다. [</span>$L(u_i) = \sum_{j=1}^{n} \alpha^{(i)}_{j} v_{j}$<span>]</span>
 
-이때, 변환 행렬 $M$은 이 선형 결합의 **계수\(**$\alpha^{(i)}_{j}$**\)**들을 사용하여 구성됩니다\. 즉, 행렬 $M$의 각 열은 입력 공간의 기저 벡터가 출력 공간의 기저 벡터들로 어떻게 '분해'되는지를 담고 있습니다\.
+<span>이때, 변환 행렬 </span>$M$<span>은 이 선형 결합의 </span><span><strong>계수(</strong></span>$\alpha^{(i)}_{j}$<span><strong>)</strong></span><span>들을 사용하여 구성됩니다. 즉, 행렬 </span>$M$<span>의 각 열은 입력 공간의 기저 벡터가 출력 공간의 기저 벡터들로 어떻게 '분해'되는지를 담고 있습니다.</span>
 
-> 결국 수렴 조건은 유한 행렬에서 무한 행렬로 확장하는데 가장 중요한 열쇠가 되며, 이러한 엄밀한 정의는 무한 행렬을 단순한 숫자의 나열을 넘어, 함수 공간에서 작용하는 Operator로 해석할 수 있는 길을 열어줍니다\.
+> <span>결국 수렴 조건은 유한 행렬에서 무한 행렬로 확장하는데 가장 중요한 열쇠가 되며, 이러한 엄밀한 정의는 무한 행렬을 단순한 숫자의 나열을 넘어, 함수 공간에서 작용하는 Operator로 해석할 수 있는 길을 열어줍니다.</span>
 
-## Ⅰ\.2\. Infinite Matrices in Banach Space
+## <span>Ⅰ.2. Infinite Matrices in Banach Space</span>
 
-> $standard\ basis$ $e_i$로 구성된 $Banach\ Space$에 존재하는 집합 $X$에 대하여 작용하는 **선형 유계 연산자 \(linear bounded operator\)** A는 무한 행렬로 표현될 수 있다\.
+> $standard\ basis$<span> </span>$e_i$<span>로 구성된 </span>$Banach\ Space$<span>에 존재하는 집합 </span>$X$<span>에 대하여 작용하는 </span><span><strong>선형 유계 연산자 (linear bounded operator)</strong></span><span> A는 무한 행렬로 표현될 수 있다.</span>
 > 
 > $A: X\rightarrow X$
 
-### Ⅰ\.2\.1\. Concept of Banach Space
+### <span>Ⅰ.2.1. Concept of Banach Space</span>
 
-- \*바나흐 공간 \(Banach Space\)\*\*에 대해 논하기 전에 먼저 \*\*노름 공간 \(Normed Space\)\*\*에 대해 알아야 합니다\.
+- <span><strong>바나흐 공간 (Banach Space)</strong></span><span>에 대해 논하기 전에 먼저 </span><span><strong>노름 공간 (Normed Space)</strong></span><span>에 대해 알아야 합니다.</span>
 
-> **노름 \(norm, **$||•||$**\)**
-> :벡터 공간 $X$의 원소 $x \in X$에 대해 $||x||$라고 쓰면, 벡터 $x$의 "길이" 또는 "크기"를 나타내는 실수값이다\.
+> <span><strong>노름 (norm, </strong></span>$||•||$<span><strong>)</strong></span><span><br />:벡터 공간 </span>$X$<span>의 원소 </span>$x \in X$<span>에 대해 </span>$||x||$<span>라고 쓰면, 벡터 </span>$x$<span>의 "길이" 또는 "크기"를 나타내는 실수값이다.</span>
 > 
-> 예시
+> <span>예시</span>
 > 
-> 1. 유클리드 공간 $\mathbb{R}^n$에서의 표준 노름\(=2-노름, Euclidean norm\):
-> $||x||_2 = \sqrt{x_1^2 + x_2^2 + \cdots + x_n^2}$
-> 2. 1-노름 \(Manhattan norm\):
-> $||x||_1 = |x_1| + |x_2| + \cdots + |x_n|$
-> 3. 무한대 노름 \(Max norm\):
-> $||x||_\infty = \max_i |x_i|$
+> 1. <span>유클리드 공간 </span>$\mathbb{R}^n$<span>에서의 표준 노름(=2-노름, Euclidean norm):<br /></span>$||x||_2 = \sqrt{x_1^2 + x_2^2 + \cdots + x_n^2}$
+> 2. <span>1-노름 (Manhattan norm):<br /></span>$||x||_1 = |x_1| + |x_2| + \cdots + |x_n|$
+> 3. <span>무한대 노름 (Max norm):<br /></span>$||x||_\infty = \max_i |x_i|$
 
-**노름 공간**이란 벡터 공간 $X$에 대하여 아래의 세 조건을 만족하는 $||•||$ :$X→\Reals$이 존재하면 $||•||$를 $X$의 놈 \($norm$\)이라 하고  \($X$, $||•||$ \)를 노름 공간이라고 합니다\.
+<span><strong>노름 공간</strong></span><span>이란 벡터 공간 </span>$X$<span>에 대하여 아래의 세 조건을 만족하는 </span>$||•||$<span> :</span>$X→\Reals$<span>이 존재하면 </span>$||•||$<span>를 </span>$X$<span>의 놈 (</span>$norm$<span>)이라 하고  (</span>$X$<span>, </span>$||•||$<span> )를 노름 공간이라고 합니다. </span>
 
-> $(a)$ $∥x∥≥0$, $∀x∈X$이고 $∥x∥=0⟺x=0$ \(iff\)
+> $(a)$<span> </span>$∥x∥≥0$<span>, </span>$∀x∈X$<span>이고 </span>$∥x∥=0⟺x=0$<span> (iff)</span>
 > 
-> $(b)$ $x ∈ X$ 이고 $c ∈ ℂ$일 때, $||cx|| = |c|||x||$
-> \(ℂ: 복소수 집합 \(Complex numbers set\)\)
+> $(b)$<span> </span>$x ∈ X$<span> 이고 </span>$c ∈ ℂ$<span>일 때, </span>$||cx|| = |c|||x||$<span><br />(ℂ: 복소수 집합 (Complex numbers set))</span>
 > 
-> $(c)$ $∀x, y ∈ X$일때 $||x + y|| ≤ ||x|| + ||y||$
+> $(c)$<span> </span>$∀x, y ∈ X$<span>일때 </span>$||x + y|| ≤ ||x|| + ||y||$
 
-이런 노름 공간 중 완비성 \(completeness\)을 갖춘 _**완비 노름 거리**_ 공간을 바나흐 공간이라고 합니다\. 완비 공간이란 모든 코시수열 \(Cauchy sequence\)이 수렴하는 공간을 말합니다\.
+<span>이런 노름 공간 중 완비성 (completeness)을 갖춘 </span><span><em><strong>완비 노름 거리</strong></em></span><span> 공간을 바나흐 공간이라고 합니다. 완비 공간이란 모든 코시수열 (Cauchy sequence)이 수렴하는 공간을 말합니다.</span>
 
-> **완비란 무엇인가**에 대해 설명하기 위해서는 이 글이 너무 길어질 수 있고 글의 방향성과도 맞지 않기에 우선은 거리공간 $X$의 $\Reals$에서 수렴하는 수열이 모두 $X$의 점으로 수렴하면 $X$를 완비 공간이라고 한다까지만 설명하겠습니다\. \(추후 완비 공간에 대해 다룬 글을 올리면 링크를 넣을 예정입니다\.\)
+> <span><strong>완비란 무엇인가</strong></span><span>에 대해 설명하기 위해서는 이 글이 너무 길어질 수 있고 글의 방향성과도 맞지 않기에 우선은 거리공간 </span>$X$<span>의 </span>$\Reals$<span>에서 수렴하는 수열이 모두 </span>$X$<span>의 점으로 수렴하면 </span>$X$<span>를 완비 공간이라고 한다까지만 설명하겠습니다. (추후 완비 공간에 대해 다룬 글을 올리면 링크를 넣을 예정입니다.)</span>
 
-바나흐 공간의 예로는 $C[a,b]$, $\Reals^n$,$ℂ^n$ 가 있으며 바나흐 공간은 함수를 함수들을 벡터처럼 다룰 수 있게 해주는 수학적 구조입니다\. 이 공간에서 선형 유계 연산자는 하나의 함수\(벡터\)를 다른 함수\(벡터\)로 변환하는 역할을 하며, 이 변환 과정이 바로 무한 행렬로 나타나는 것입니다\.
+<span>바나흐 공간의 예로는 </span>$C[a,b]$<span>, </span>$\Reals^n$<span>,</span>$ℂ^n$<span> 가 있으며 바나흐 공간은 함수를 함수들을 벡터처럼 다룰 수 있게 해주는 수학적 구조입니다. 이 공간에서 선형 유계 연산자는 하나의 함수(벡터)를 다른 함수(벡터)로 변환하는 역할을 하며, 이 변환 과정이 바로 무한 행렬로 나타나는 것입니다.</span>
 
-이런 연산자의 관점은 무한에 대한 시스템에 대해 추상화를 할 수 있게 합니다\. 예를 들면 무한 개의 변수와 무한 개의 방정식으로 이루어진 무한 연립 선형 방정식 시스템은 연산자 관점을 도입함으로써 $Ax = y$라는 매우 간결한 추상적 방정식으로 표현할 수 있습니다\.  이는 복잡한 개별 방정식들을 다루는 대신, $A$라는 연산자의 성질\(가역성, 노름 등\)을 분석하는 문제로 전환시켜 줍니다\.
+<span>이런 연산자의 관점은 무한에 대한 시스템에 대해 추상화를 할 수 있게 합니다. 예를 들면 무한 개의 변수와 무한 개의 방정식으로 이루어진 무한 연립 선형 방정식 시스템은 연산자 관점을 도입함으로써 </span>$Ax = y$<span>라는 매우 간결한 추상적 방정식으로 표현할 수 있습니다.  이는 복잡한 개별 방정식들을 다루는 대신, </span>$A$<span>라는 연산자의 성질(가역성, 노름 등)을 분석하는 문제로 전환시켜 줍니다.</span>
 
-하지만 이 이론적인 연산자 방정식 $Ax = y$는 그 자체로 컴퓨터를 통해 직접 계산할 수 없다는 명백한 한계를 가지는데, 무한한 계산을 유한한 시간 안에 수행할 수는 없기 때문입니다\. 그렇기 때문에 단순히 무한 행렬을 컴퓨터 자원을 활용해 물리적으로 구현하려는 시도는 비효율적인 선택지가 되어버립니다\. 따라서 실용적인 관점에서 무한 행렬을 연결하기 위해서는 무한한 문제를 유한한 문제로 **근사**하는 체계적인 방법론이 필요하게 되는 것이고, 그것이 바로 축소 \(Reduction\)입니다\.
+<span>하지만 이 이론적인 연산자 방정식 </span>$Ax = y$<span>는 그 자체로 컴퓨터를 통해 직접 계산할 수 없다는 명백한 한계를 가지는데, 무한한 계산을 유한한 시간 안에 수행할 수는 없기 때문입니다. 그렇기 때문에 단순히 무한 행렬을 컴퓨터 자원을 활용해 물리적으로 구현하려는 시도는 비효율적인 선택지가 되어버립니다. 따라서 실용적인 관점에서 무한 행렬을 연결하기 위해서는 무한한 문제를 유한한 문제로 </span><span><strong>근사</strong></span><span>하는 체계적인 방법론이 필요하게 되는 것이고, 그것이 바로 축소 (Reduction)입니다.</span>
 
-### Ⅰ\.2\.2\. Reduction Method in Infinite Matrices
+### <span>Ⅰ.2.2. Reduction Method in Infinite Matrices</span>
 
-> If a certain $x ∈ X$, $lim_{n→∞} A_nx = Ax$, and there is the sequence ${x_n}^∞_{n=1} ⊂ X$ such that $lim_{n→∞} x_n = x$ then $lim_{n→∞} A_nx = Ax$\.
+> <span>If a certain </span>$x ∈ X$<span>, </span>$lim_{n→∞} A_nx = Ax$<span>, and there is the sequence </span>${x_n}^∞_{n=1} ⊂ X$<span> such that </span>$lim_{n→∞} x_n = x$<span> then </span>$lim_{n→∞} A_nx = Ax$<span>. </span>
 
-축소의 단계는 두단계로 나누어 볼 수 있습니다\.
+<span>축소의 단계는 두단계로 나누어 볼 수 있습니다. </span>
 
-#### 1단계 \(절단, Truncation\)
+#### <span><strong>1단계 (절단, Truncation)</strong></span>
 
-먼저, 무한 연산자 방정식 $Ax = y$를 유한한 $n$차원 부분 공간으로 투영\(projection\)합니다\. 이는 곧 무한 행렬 A의 왼쪽 위 $n×n$ 부분 행렬만을 고려하여 $A_n = P_nAP_n$이라는 유한 연산자를 만드는 것과 같습니다\.
+<span>먼저, 무한 연산자 방정식 </span>$Ax = y$<span>를 유한한 </span>$n$<span>차원 부분 공간으로 투영(projection)합니다. 이는 곧 무한 행렬 A의 왼쪽 위 </span>$n×n$<span> 부분 행렬만을 고려하여 </span>$A_n = P_nAP_n$<span>이라는 유한 연산자를 만드는 것과 같습니다.</span>
 
-여기서 $P_n$은 $X_n$으로 표시되는 n차원 부분 공간으로의 프로젝터입니다\. 이렇게 변환된 유한 시스템은 $A_nx_n = P_ny$가 되며, 이는 우리가 컴퓨터로 풀 수 있는 유한 연립방정식이 됩니다\.
+<span>여기서 </span>$P_n$<span>은 </span>$X_n$<span>으로 표시되는 n차원 부분 공간으로의 프로젝터입니다. 이렇게 변환된 유한 시스템은 </span>$A_nx_n = P_ny$<span>가 되며, 이는 우리가 컴퓨터로 풀 수 있는 유한 연립방정식이 됩니다.</span>
 
-#### 2단계 \(수렴, Convergence\)
+#### <span><strong>2단계 (수렴, Convergence)</strong></span>
 
-이렇게 만들어진 유한 연산자 $A_n$들의 수열은 $n$이 무한대로 갈 때, 원래의 무한 연산자 A로 **강하게 수렴\(strongly converges\)**합니다\. 즉, n→∞일 때 $A_nx$가 모든 x에 대해 $Ax$로 수렴하게 됩니다\.
+<span>이렇게 만들어진 유한 연산자 </span>$A_n$<span>들의 수열은 </span>$n$<span>이 무한대로 갈 때, 원래의 무한 연산자 A로 </span><span><strong>강하게 수렴(strongly converges)</strong></span><span>합니다. 즉, n→∞일 때 </span>$A_nx$<span>가 모든 x에 대해 </span>$Ax$<span>로 수렴하게 됩니다.</span>
 
-> 강하게 수렴한다는 것은 곧 공간 $X$의 모든 벡터 $x$에 대해, $A_n x$라는 벡터 수열이 $A x$로 수렴한다는 것을 의미합니다\. 반대의 개념으로 [약한 수렴 \(Weak Convergence\)](https://en.wikipedia.org/wiki/Weak_convergence_(Hilbert_space%29)도 존재하지만 이 글에서는 다루지 않을 예정입니다\.
+> <span>강하게 수렴한다는 것은 곧 공간 </span>$X$<span>의 모든 벡터 </span>$x$<span>에 대해, </span>$A_n x$<span>라는 벡터 수열이 </span>$A x$<span>로 수렴한다는 것을 의미합니다. 반대의 개념으로 </span><a href={"https://en.wikipedia.org/wiki/Weak_convergence_(Hilbert_space)"}><span>약한 수렴 (Weak Convergence)</span></a><span>도 존재하지만 이 글에서는 다루지 않을 예정입니다.</span>
 
-> $(a)$ starting from a certain $N$, $∀n ≥ N$, the operators $A_n : X_n → X_n$
-> are invertible;
-> $(b)$ we have the estimate $||A^{−1}_n || ≤ C$ with constant $C$ non-depending on $n$;
-> $(c)$ the solution $x_n$ to the equation \(2\) converges to the solution x of the equation \(1\) under $n → ∞$ <sup>\[<a id="cite-2" href="\#ref-2">2</a>\]</sup>
+> $(a)$<span> starting from a certain </span>$N$<span>, </span>$∀n ≥ N$<span>, the operators </span>$A_n : X_n → X_n$<span><br />are invertible;<br /></span>$(b)$<span> we have the estimate </span>$||A^{−1}_n || ≤ C$<span> with constant </span>$C$<span> non-depending on </span>$n$<span>;<br /></span>$(c)$<span> the solution </span>$x_n$<span> to the equation (2) converges to the solution x of the equation (1) under </span>$n → ∞$<span> </span>
 
-만약 원래의 무한 연산자 $A$가 유계 역 연산자 $A⁻¹$를 가진다면, 다음 세 가지 중요한 결과가 보장됩니다\.
+<span>만약 원래의 무한 연산자 </span>$A$<span>가 유계 역 연산자 </span>$A⁻¹$<span>를 가진다면, 다음 세 가지 중요한 결과가 보장됩니다.</span>
 
-> **1\. 존재성:** 충분히 큰 $N$이 존재하여, 모든 $n ≥ N$에 대해 유한 연산자 $A_n$ 역시 역 연산자를 가진다\. 즉, 근사된 유한 시스템도 해를 가진다\.
+> <span><strong>1. 존재성:</strong></span><span> 충분히 큰 </span>$N$<span>이 존재하여, 모든 </span>$n ≥ N$<span>에 대해 유한 연산자 </span>$A_n$<span> 역시 역 연산자를 가진다. 즉, 근사된 유한 시스템도 해를 가진다.</span>
 > 
-> **2\. 안정성:** 유한 연산자의 역 $A_n^{⁻¹}$의 노름\(norm\)이 $n$의 크기에 관계없이 균일하게 유계 \($uniformly \ bounded$\)이다 \($||A_n^{⁻¹}|| ≤ C$\)\. 이는 $n$이 커져도 근사해의 안정성이 유지됨을 의미한다\.
+> <span><strong>2. 안정성:</strong></span><span> 유한 연산자의 역 </span>$A_n^{⁻¹}$<span>의 노름(norm)이 </span>$n$<span>의 크기에 관계없이 균일하게 유계 (</span>$uniformly \ bounded$<span>)이다 (</span>$||A_n^{⁻¹}|| ≤ C$<span>). 이는 </span>$n$<span>이 커져도 근사해의 안정성이 유지됨을 의미한다.</span>
 > 
-> **3\. 수렴성:** 유한 시스템의 해 $x_n$은 $n$이 무한대로 갈수록, 원래 무한 시스템의 정확한 해 $x$로 수렴한다\.
+> <span><strong>3. 수렴성:</strong></span><span> 유한 시스템의 해 </span>$x_n$<span>은 </span>$n$<span>이 무한대로 갈수록, 원래 무한 시스템의 정확한 해 </span>$x$<span>로 수렴한다.</span>
 
-결론적으로, 축소 방법은 무한이라는 추상적 개념을 유한한 자원을 가지고 있는 컴퓨팅 기술에 적용시키는 방법입니다\. [Section 2: ML Perspective](https://velog.io/@melon-chicken/Research-Note-When-Matrices-Go-Infinite-22-ML-Perspective)에서는 이러한 축소 방법론이 ML에서 어떻게 적용되는지 **재현 커널 힐베르트 공간 \(Reproducing Kernel Hilbert Space, RKHS\)**의 관점에서 분석해볼 예정입니다\.
+<span>결론적으로, 축소 방법은 무한이라는 추상적 개념을 유한한 자원을 가지고 있는 컴퓨팅 기술에 적용시키는 방법입니다. </span><a href={"https://velog.io/@melon-chicken/Research-Note-When-Matrices-Go-Infinite-22-ML-Perspective"}><span>Section 2: ML Perspective</span></a><span>에서는 이러한 축소 방법론이 ML에서 어떻게 적용되는지 </span><span><strong>재현 커널 힐베르트 공간 (Reproducing Kernel Hilbert Space, RKHS)</strong></span><span>의 관점에서 분석해볼 예정입니다.</span>
 
-# References
+# <span>References</span>
 
-1. Matysiak, L\., Przewoźniak, W\., & Rulińska, N\. \(2021\)\. Matrices of infinite dimensions and their applications\. Italian Journal of Pure and Applied Mathematics, \(46\), 1–8\. arXiv:2104\.13404\. [https://arxiv\.org/abs/2104\.13404](https://arxiv.org/abs/2104.13404)
-2. Vasilyev, A\. V\., Vasilyev, V\. B\., & Kamanda Bongay, A\. B\. \(2024\)\. On infinite matrices\. arXiv preprint arXiv:2403\.06445\. [https://arxiv\.org/abs/2403\.06445](https://arxiv.org/abs/2403.06445)
-3. Adams, R\. A\., & Fournier, J\. J\. F\. \(2003\)\. Sobolev spaces \(2nd ed\.\)\. Academic Press\. [https://books\.google\.co\.kr/books?id=R5A65Koh-EoC&printsec=frontcover&redir\_esc=y\#v=onepage&q=normed&f=false](https://books.google.co.kr/books?id=R5A65Koh-EoC&printsec=frontcover&redir_esc=y#v=onepage&q=normed&f=false)
-4. William R\. Wade, An Introduction to Analysis \(4th Edition, 2010\)
+1. <span>Matysiak, L., Przewoźniak, W., &amp; Rulińska, N. (2021). Matrices of infinite dimensions and their applications. Italian Journal of Pure and Applied Mathematics, (46), 1–8. arXiv:2104.13404. </span><a href={"https://arxiv.org/abs/2104.13404"}><span>https://arxiv.org/abs/2104.13404</span></a>
+2. <span>Vasilyev, A. V., Vasilyev, V. B., &amp; Kamanda Bongay, A. B. (2024). On infinite matrices. arXiv preprint arXiv:2403.06445. </span><a href={"https://arxiv.org/abs/2403.06445"}><span>https://arxiv.org/abs/2403.06445</span></a>
+3. <span>Adams, R. A., &amp; Fournier, J. J. F. (2003). Sobolev spaces (2nd ed.). Academic Press. </span><a href={"https://books.google.co.kr/books?id=R5A65Koh-EoC&printsec=frontcover&redir_esc=y#v=onepage&q=normed&f=false"}><span>https://books.google.co.kr/books?id=R5A65Koh-EoC&amp;printsec=frontcover&amp;redir_esc=y#v=onepage&amp;q=normed&amp;f=false</span></a>
+4. <span>William R. Wade, An Introduction to Analysis (4th Edition, 2010)</span>
 
-#### 같이 보면 좋은 블로그 글/유튜브
+#### <span>같이 보면 좋은 블로그 글/유튜브</span>
 
-1. [생새우 초밥집](https://freshrimpsushi.github.io/ko/categories/%EB%B0%94%EB%82%98%ED%9D%90%EA%B3%B5%EA%B0%84/)
-2. [Zundamon's Theorem](https://youtu.be/b-GpwCGtuwA?si=96bx7bkN1arP_Tlp)
+1. <a href={"https://freshrimpsushi.github.io/ko/categories/%EB%B0%94%EB%82%98%ED%9D%90%EA%B3%B5%EA%B0%84/"}><span>생새우 초밥집</span></a>
+2. <a href={"https://youtu.be/b-GpwCGtuwA?si=96bx7bkN1arP_Tlp"}><span>Zundamon's Theorem</span></a>
 
-> 긴 글 읽어주셔서 감사합니다\. 이 글에 대해 의견이 있다면 댓글로 남겨주세요\.
+> <span>긴 글 읽어주셔서 감사합니다. 이 글에 대해 의견이 있다면 댓글로 남겨주세요.</span>
+
+<p class="notion-empty" aria-hidden="true"></p>

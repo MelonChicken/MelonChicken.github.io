@@ -14,147 +14,151 @@ date: "2026-07-13"
 notion: "https://app.notion.com/p/Animal-Behaviour-Analysis-Weekly-Brief-2026-07-13-39c14b84a0f28025aed4d730a4781ea9"
 ---
 
+import NotionBookmark from '../../components/notion/NotionBookmark.astro';
+import NotionCallout from '../../components/notion/NotionCallout.astro';
+import NotionColumns from '../../components/notion/NotionColumns.astro';
+import NotionToggle from '../../components/notion/NotionToggle.astro';
+
 {/* This file is generated from Notion. Do not edit directly. */}
 
-# Weekly Research Briefing — Animal Behaviour Analysis
+# <span>Weekly Research Briefing — Animal Behaviour Analysis</span>
 
-## 1\. 이번 주 한눈에 보기
+## <span>1. 이번 주 한눈에 보기</span>
 
-이번 주 핵심은 완전 자동 행동 인식 SOTA보다 **labeling workflow 자동화**입니다\.
+<span>이번 주 핵심은 완전 자동 행동 인식 SOTA보다 </span><span><strong>labeling workflow 자동화</strong></span><span>입니다.</span>
 
-- 반드시 볼 자료: **SqueakPose Studio**
-- 이유: manual labeling → model-assisted labeling → YOLO pose training → prediction review → video inference 흐름이 사용자의 관심사와 직접 연결됨
-- 지금 바로 할 것: 짧은 동물 영상으로 **소량 라벨 → pseudo-label → human review → 재학습 후보 선정** 루프 만들기
-- 나중에 볼 것: BEAST3D, WildBox
+- <span>반드시 볼 자료: </span><span><strong>SqueakPose Studio</strong></span>
+- <span>이유: manual labeling → model-assisted labeling → YOLO pose training → prediction review → video inference 흐름이 사용자의 관심사와 직접 연결됨</span>
+- <span>지금 바로 할 것: 짧은 동물 영상으로 </span><span><strong>소량 라벨 → pseudo-label → human review → 재학습 후보 선정</strong></span><span> 루프 만들기</span>
+- <span>나중에 볼 것: BEAST3D, WildBox</span>
 
-## 2\. 이번 주 핵심 트렌드
+## <span>2. 이번 주 핵심 트렌드</span>
 
-### Labeling 자동화는 human-in-the-loop로 가고 있음
+### <span>Labeling 자동화는 human-in-the-loop로 가고 있음</span>
 
-- 무엇이 바뀌었는가: SqueakPose Studio가 annotation, training, prediction review를 통합
-- 왜 중요한가: 동물 행동은 종·환경·행동 정의가 달라 완전 자동화가 어렵기 때문
-- 연결: pseudo-labeling, active learning, 자동 annotation workflow의 실험 출발점
-- 우선순위: High
+- <span>무엇이 바뀌었는가: SqueakPose Studio가 annotation, training, prediction review를 통합</span>
+- <span>왜 중요한가: 동물 행동은 종·환경·행동 정의가 달라 완전 자동화가 어렵기 때문</span>
+- <span>연결: pseudo-labeling, active learning, 자동 annotation workflow의 실험 출발점</span>
+- <span>우선순위: High</span>
 
-### 무라벨 multi-view video 기반 3D 표현학습
+### <span>무라벨 multi-view video 기반 3D 표현학습</span>
 
-- 무엇이 바뀌었는가: BEAST3D가 unlabeled multi-view video에서 3D-aware representation 학습
-- 왜 중요한가: 3D pose label 없이도 downstream pose estimation으로 전이 가능
-- 연결: 장기적으로 keypoint sequence와 행동 representation 학습에 중요
-- 우선순위: Medium
+- <span>무엇이 바뀌었는가: BEAST3D가 unlabeled multi-view video에서 3D-aware representation 학습</span>
+- <span>왜 중요한가: 3D pose label 없이도 downstream pose estimation으로 전이 가능</span>
+- <span>연결: 장기적으로 keypoint sequence와 행동 representation 학습에 중요</span>
+- <span>우선순위: Medium</span>
 
-### Wildlife foundation model 전이는 아직 제한적
+### <span>Wildlife foundation model 전이는 아직 제한적</span>
 
-- 무엇이 바뀌었는가: WildBox가 drone wildlife 3D detection benchmark 제시
-- 왜 중요한가: generic foundation model이 animal/wildlife domain을 바로 해결하지 못함
-- 연결: wildlife behavior recognition, trajectory, group behavior 분석
-- 우선순위: Medium
+- <span>무엇이 바뀌었는가: WildBox가 drone wildlife 3D detection benchmark 제시</span>
+- <span>왜 중요한가: generic foundation model이 animal/wildlife domain을 바로 해결하지 못함</span>
+- <span>연결: wildlife behavior recognition, trajectory, group behavior 분석</span>
+- <span>우선순위: Medium</span>
 
-## 3\. 추천 논문
+## <span>3. 추천 논문</span>
 
-### SqueakPose Studio
+### <span>SqueakPose Studio</span>
 
-- 링크: [https://elifesciences\.org/reviewed-preprints/111308v1](https://elifesciences.org/reviewed-preprints/111308v1)
-- 시점: 2026-06-16
-- 분야: animal pose estimation, model-assisted labeling
-- 핵심 문제: 라벨링, 학습, 검토, inference가 분리되어 있음
-- 핵심 아이디어: 하나의 GUI에서 dataset creation, annotation, YOLO pose training, prediction review, video inference 제공
-- 모델 구조: image/video → keypoint labeling → YOLO pose training → prediction → human review → corrected dataset
-- 한계: 행동 segmentation 자체를 완전히 해결하지는 않음
-- 내 관심사 연결: labeling 자동화와 pseudo-label review에 직접 연결
-- 읽기 우선순위: High
-- 구현 난이도: 보통
-- 포트폴리오 포인트: “human-in-the-loop animal pose annotation pipeline 구현”
+- <span>링크: </span><a href={"https://elifesciences.org/reviewed-preprints/111308v1"}><span>https://elifesciences.org/reviewed-preprints/111308v1</span></a>
+- <span>시점: 2026-06-16</span>
+- <span>분야: animal pose estimation, model-assisted labeling</span>
+- <span>핵심 문제: 라벨링, 학습, 검토, inference가 분리되어 있음</span>
+- <span>핵심 아이디어: 하나의 GUI에서 dataset creation, annotation, YOLO pose training, prediction review, video inference 제공</span>
+- <span>모델 구조: image/video → keypoint labeling → YOLO pose training → prediction → human review → corrected dataset</span>
+- <span>한계: 행동 segmentation 자체를 완전히 해결하지는 않음</span>
+- <span>내 관심사 연결: labeling 자동화와 pseudo-label review에 직접 연결</span>
+- <span>읽기 우선순위: High</span>
+- <span>구현 난이도: 보통</span>
+- <span>포트폴리오 포인트: “human-in-the-loop animal pose annotation pipeline 구현”</span>
 
-### WildBox
+### <span>WildBox</span>
 
-- 링크: [https://arxiv\.org/abs/2606\.21309](https://arxiv.org/abs/2606.21309)
-- 시점: 2026-06-19
-- 분야: wildlife 3D detection, drone video
-- 핵심 문제: 드론 영상에서 야생동물 3D 위치·크기 추정이 어려움
-- 핵심 아이디어: African savanna wildlife 3D detection benchmark 제공
-- 모델 구조: drone frame → 3D detector → 3D bounding box, class, identity
-- 한계: pose/keypoint가 아니라 bounding box 중심
-- 내 관심사 연결: animal foundation model 전이의 한계 이해
-- 읽기 우선순위: Medium
-- 구현 난이도: 어려움
+- <span>링크: </span><a href={"https://arxiv.org/abs/2606.21309"}><span>https://arxiv.org/abs/2606.21309</span></a>
+- <span>시점: 2026-06-19</span>
+- <span>분야: wildlife 3D detection, drone video</span>
+- <span>핵심 문제: 드론 영상에서 야생동물 3D 위치·크기 추정이 어려움</span>
+- <span>핵심 아이디어: African savanna wildlife 3D detection benchmark 제공</span>
+- <span>모델 구조: drone frame → 3D detector → 3D bounding box, class, identity</span>
+- <span>한계: pose/keypoint가 아니라 bounding box 중심</span>
+- <span>내 관심사 연결: animal foundation model 전이의 한계 이해</span>
+- <span>읽기 우선순위: Medium</span>
+- <span>구현 난이도: 어려움</span>
 
-## 4\. 추천 repo / tool
+## <span>4. 추천 repo / tool</span>
 
-### SqueakPose Studio
+### <span>SqueakPose Studio</span>
 
-- 링크: [https://github\.com/dlhagger/SqueakPoseStudio](https://github.com/dlhagger/SqueakPoseStudio)
-- 기능: annotation, YOLO dataset creation, model training, prediction review, video inference
-- 난이도: 보통
-- 당장 실험: 30~50 frame 라벨링 후 prediction review loop 만들기
+- <span>링크: </span><a href={"https://github.com/dlhagger/SqueakPoseStudio"}><span>https://github.com/dlhagger/SqueakPoseStudio</span></a>
+- <span>기능: annotation, YOLO dataset creation, model training, prediction review, video inference</span>
+- <span>난이도: 보통</span>
+- <span>당장 실험: 30~50 frame 라벨링 후 prediction review loop 만들기</span>
 
-### AnimalTA
+### <span>AnimalTA</span>
 
-- 링크: [https://github\.com/VioletteChiara/AnimalTA](https://github.com/VioletteChiara/AnimalTA)
-- 기능: 동물 movement tracking 및 trajectory analysis
-- 난이도: 쉬움~보통
-- 당장 실험: pose 없이 centroid trajectory, speed, zone occupancy feature 추출
+- <span>링크: </span><a href={"https://github.com/VioletteChiara/AnimalTA"}><span>https://github.com/VioletteChiara/AnimalTA</span></a>
+- <span>기능: 동물 movement tracking 및 trajectory analysis</span>
+- <span>난이도: 쉬움~보통</span>
+- <span>당장 실험: pose 없이 centroid trajectory, speed, zone occupancy feature 추출</span>
 
-### DeepLabCut 3\.0
+### <span>DeepLabCut 3.0</span>
 
-- 링크: [https://github\.com/DeepLabCut/DeepLabCut/releases](https://github.com/DeepLabCut/DeepLabCut/releases)
-- 기능: markerless animal pose estimation
-- 난이도: 보통
-- 당장 실험: SuperAnimal 또는 Model Zoo로 keypoint CSV 생성
+- <span>링크: </span><a href={"https://github.com/DeepLabCut/DeepLabCut/releases"}><span>https://github.com/DeepLabCut/DeepLabCut/releases</span></a>
+- <span>기능: markerless animal pose estimation</span>
+- <span>난이도: 보통</span>
+- <span>당장 실험: SuperAnimal 또는 Model Zoo로 keypoint CSV 생성</span>
 
-## 5\. 이번 주 미니프로젝트
+## <span>5. 이번 주 미니프로젝트</span>
 
-- 제목: 소량 라벨 기반 동물 행동 pseudo-label review pipeline
-- 목표: 짧은 동물 영상에서 일부 frame만 라벨링하고 prediction review 루프 만들기
-- 데이터: 공개 동물 영상 30~60초
-- 도구: AnimalTA 또는 SqueakPose Studio
-- 최소 구현:
-    1. 영상 준비
-    2. 30 frame 라벨링 또는 tracking 설정
-    3. prediction 생성
-    4. 오류 frame 10개 검토
-    5. 재라벨링 기준 작성
-- 산출물:
-    - Notion 정리
-    - Velog 글
-    - GitHub README
-    - notebook
-    - demo image/video
-- 포트폴리오 한 줄:
-“동물 행동 분석에서 라벨링 비용을 줄이기 위해 소량 수동 라벨, 모델 예측, confidence/error 기반 human review를 연결한 mini pseudo-labeling pipeline을 구현했다\.”
-- 예상 시간: 6~10시간
-- 실패 시 대체: AnimalTA로 trajectory-only baseline 만들기
+- <span>제목: 소량 라벨 기반 동물 행동 pseudo-label review pipeline</span>
+- <span>목표: 짧은 동물 영상에서 일부 frame만 라벨링하고 prediction review 루프 만들기</span>
+- <span>데이터: 공개 동물 영상 30~60초</span>
+- <span>도구: AnimalTA 또는 SqueakPose Studio</span>
+- <span>최소 구현:</span>
+    1. <span>영상 준비</span>
+    2. <span>30 frame 라벨링 또는 tracking 설정</span>
+    3. <span>prediction 생성</span>
+    4. <span>오류 frame 10개 검토</span>
+    5. <span>재라벨링 기준 작성</span>
+- <span>산출물:</span>
+    - <span>Notion 정리</span>
+    - <span>Velog 글</span>
+    - <span>GitHub README</span>
+    - <span>notebook</span>
+    - <span>demo image/video</span>
+- <span>포트폴리오 한 줄:<br />“동물 행동 분석에서 라벨링 비용을 줄이기 위해 소량 수동 라벨, 모델 예측, confidence/error 기반 human review를 연결한 mini pseudo-labeling pipeline을 구현했다.”</span>
+- <span>예상 시간: 6~10시간</span>
+- <span>실패 시 대체: AnimalTA로 trajectory-only baseline 만들기</span>
 
-## 6\. 읽기 루틴
+## <span>6. 읽기 루틴</span>
 
-- 1회독: SqueakPose Studio workflow만 확인
-- 2회독: annotation → training → prediction review가 어떻게 연결되는지 확인
-- 3회독: 내 프로젝트에서 active learning 후보 frame을 어떻게 고를지 정리
+- <span>1회독: SqueakPose Studio workflow만 확인</span>
+- <span>2회독: annotation → training → prediction review가 어떻게 연결되는지 확인</span>
+- <span>3회독: 내 프로젝트에서 active learning 후보 frame을 어떻게 고를지 정리</span>
 
-질문:
+<span>질문:</span>
 
-1. 완전 자동 annotation보다 human-in-the-loop가 현실적인 이유는 무엇인가?
-2. trajectory feature와 keypoint feature는 각각 언제 유리한가?
-3. pseudo-label을 신뢰할 수 없을 때 어떤 frame을 사람이 검토해야 하는가?
+1. <span>완전 자동 annotation보다 human-in-the-loop가 현실적인 이유는 무엇인가?</span>
+2. <span>trajectory feature와 keypoint feature는 각각 언제 유리한가?</span>
+3. <span>pseudo-label을 신뢰할 수 없을 때 어떤 frame을 사람이 검토해야 하는가?</span>
 
-## 7\. 다음 주 watchlist
+## <span>7. 다음 주 watchlist</span>
 
-키워드:
+<span>키워드:</span>
 
-- model-assisted animal behavior annotation
-- pseudo-labeling animal pose estimation
-- self-supervised animal pose representation
-- multi-animal tracking identity preservation
-- VLM animal behavior recognition
+- <span>model-assisted animal behavior annotation</span>
+- <span>pseudo-labeling animal pose estimation</span>
+- <span>self-supervised animal pose representation</span>
+- <span>multi-animal tracking identity preservation</span>
+- <span>VLM animal behavior recognition</span>
 
-Repo/tool:
+<span>Repo/tool:</span>
 
-- SqueakPose Studio
-- DeepLabCut
-- SLEAP
+- <span>SqueakPose Studio</span>
+- <span>DeepLabCut</span>
+- <span>SLEAP</span>
 
-Open questions:
+<span>Open questions:</span>
 
-1. SqueakPose Studio 설치와 inference workflow가 포트폴리오 수준에서 재현 가능한가?
-2. AnimalTA/DeepLabCut/SLEAP output을 공통 feature schema로 묶을 수 있는가?
-3. VLM 기반 animal behavior annotation은 실제 expert review 시간을 줄이는가?
+1. <span>SqueakPose Studio 설치와 inference workflow가 포트폴리오 수준에서 재현 가능한가?</span>
+2. <span>AnimalTA/DeepLabCut/SLEAP output을 공통 feature schema로 묶을 수 있는가?</span>
+3. <span>VLM 기반 animal behavior annotation은 실제 expert review 시간을 줄이는가?</span>
