@@ -2,6 +2,11 @@ type RichTextItem = {
   type?: string;
   plain_text?: string;
   href?: string | null;
+  text?: {
+    link?: {
+      url?: string;
+    } | null;
+  };
   equation?: {
     expression?: string;
   };
@@ -36,7 +41,8 @@ export function richTextToMarkdown(richText: RichTextItem[] = []) {
       if (annotations.italic) text = `_${text}_`;
       if (annotations.strikethrough) text = `~~${text}~~`;
       if (annotations.underline) text = `<u>${text}</u>`;
-      if (item.href) text = `[${text}](${escapeUrl(item.href)})`;
+      const href = item.href || item.text?.link?.url;
+      if (href) text = `[${text}](${escapeUrl(href)})`;
 
       return text;
     })
@@ -50,7 +56,7 @@ function mathInline(expression: string) {
 }
 
 export function escapeMarkdownInline(value: string) {
-  return value.replace(/([\\`*_{}\[\]()#+.!|])/g, '\\$1');
+  return value.replace(/([\\`*_{}\[\]()#+.!|$])/g, '\\$1');
 }
 
 export function escapeMdxAttribute(value: string) {

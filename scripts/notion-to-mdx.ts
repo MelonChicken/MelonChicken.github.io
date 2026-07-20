@@ -3,6 +3,10 @@ import { downloadNotionAsset } from './notion-assets';
 import { escapeMarkdownInline, escapeMdxAttribute, richTextToMarkdown, richTextToPlain } from './notion-rich-text';
 
 type Frontmatter = Record<string, unknown>;
+export type NotionBlockNode = {
+  block: AnyNotionObject;
+  children: NotionBlockNode[];
+};
 
 const statusValues = ['idea', 'work-in-progress', 'completed', 'archived'] as const;
 const projectGroups = ['research', 'ml', 'product', 'archived'] as const;
@@ -75,41 +79,92 @@ export function shouldSyncPage(page: AnyNotionObject, target: SyncTargetKey) {
 }
 
 export async function blocksToMdx(blockId: string, slug: string): Promise<string> {
+  const nodes = await listBlockTree(blockId);
+  return nodesToMdx(nodes, slug);
+}
+
+export async function listBlockTree(blockId: string, seen = new Set<string>()): Promise<NotionBlockNode[]> {
+  if (seen.has(blockId)) return [];
+
+  const nextSeen = new Set(seen);
+  nextSeen.add(blockId);
   const blocks = await listBlockChildren(blockId);
+
+  return Promise.all(blocks.map(async (block) => ({
+    block,
+    children: block.has_children ? await listBlockTree(block.id, nextSeen) : [],
+  })));
+}
+
+export async function blocksToMdxFromBlocks(blocks: AnyNotionObject[], slug: string): Promise<string> {
+  return nodesToMdx(blocks.map(blockToNode), slug);
+}
+
+function blockToNode(block: AnyNotionObject): NotionBlockNode {
+  return {
+    block,
+    children: Array.isArray(block.children) ? block.children.map(blockToNode) : [],
+  };
+}
+
+async function nodesToMdx(nodes: NotionBlockNode[], slug: string, listDepth = 0): Promise<string> {
   const lines: string[] = [];
 
-  for (const block of blocks) {
-    const mdx = await blockToMdx(block, slug);
+  for (let index = 0; index < nodes.length; index += 1) {
+    const node = nodes[index];
+    const block = node.block;
+    if (isListBlock(block)) {
+      const listType = block.type;
+      const listNodes = [node];
+      while (index + 1 < nodes.length && nodes[index + 1].block.type === listType) {
+        listNodes.push(nodes[index + 1]);
+        index += 1;
+      }
+
+      lines.push(await listBlockGroupToMdx(listType, listNodes, slug, listDepth));
+      continue;
+    }
+
+    const mdx = await blockToMdx(node, slug);
     if (mdx) lines.push(mdx);
   }
 
   return lines.join('\n\n').trim();
 }
 
-async function blockToMdx(block: AnyNotionObject, slug: string): Promise<string> {
+async function blockToMdx(node: NotionBlockNode, slug: string): Promise<string> {
+  const { block } = node;
   const value = block[block.type] || {};
 
   switch (block.type) {
     case 'paragraph':
-      return withChildren(richTextToMarkdown(value.rich_text), block, slug);
+      return withChildren(richTextToMarkdown(value.rich_text), node, slug);
     case 'heading_1':
       return `# ${escapeMarkdownInline(richTextToPlain(value.rich_text))}`;
     case 'heading_2':
       return `## ${escapeMarkdownInline(richTextToPlain(value.rich_text))}`;
     case 'heading_3':
       return `### ${escapeMarkdownInline(richTextToPlain(value.rich_text))}`;
+    case 'heading_4':
+      return `#### ${escapeMarkdownInline(richTextToPlain(value.rich_text))}`;
+    case 'heading_1_toggle':
+      return detailsBlock(value.rich_text, node, slug, 'h1');
+    case 'heading_2_toggle':
+      return detailsBlock(value.rich_text, node, slug, 'h2');
+    case 'heading_3_toggle':
+      return detailsBlock(value.rich_text, node, slug, 'h3');
     case 'bulleted_list_item':
-      return listItem('-', value.rich_text, block, slug);
+      return listBlockGroupToMdx('bulleted_list_item', [node], slug);
     case 'numbered_list_item':
-      return listItem('1.', value.rich_text, block, slug);
+      return listBlockGroupToMdx('numbered_list_item', [node], slug);
     case 'to_do':
-      return listItem(`- [${value.checked ? 'x' : ' '}]`, value.rich_text, block, slug);
+      return listItem(`- [${value.checked ? 'x' : ' '}]`, value.rich_text, node, slug);
     case 'toggle':
-      return detailsBlock(value.rich_text, block, slug);
+      return detailsBlock(value.rich_text, node, slug);
     case 'quote':
-      return quoteBlock(value.rich_text, block, slug);
+      return quoteBlock(value.rich_text, node, slug);
     case 'callout':
-      return calloutBlock(value.rich_text, block, slug);
+      return calloutBlock(value.rich_text, node, slug);
     case 'code':
       return codeBlock(value);
     case 'equation':
@@ -118,6 +173,8 @@ async function blockToMdx(block: AnyNotionObject, slug: string): Promise<string>
       return '---';
     case 'image':
       return assetBlockToMdx(block, value, slug, 'image');
+    case 'video':
+    case 'audio':
     case 'file':
     case 'pdf':
       return assetBlockToMdx(block, value, slug, 'file');
@@ -125,52 +182,100 @@ async function blockToMdx(block: AnyNotionObject, slug: string): Promise<string>
     case 'link_preview':
       return linkBlock(value);
     case 'table':
-      return tableBlock(block, value, slug);
+      return tableBlock(node, value, slug);
     case 'table_row':
       return tableRow(value);
+    case 'column_list':
+      return columnListBlock(node, slug);
+    case 'column':
+      return columnBlock(node, slug);
+    case 'synced_block':
+      return syncedBlock(node, slug);
     case 'child_page':
-      return `## ${escapeMarkdownInline(value.title || 'Child page')}`;
+      return notionChildReference('Child page', value.title, block);
+    case 'child_database':
+      return notionChildReference('Child database', value.title, block);
+    case 'table_of_contents':
+      return `{/* Notion table_of_contents skipped: site TOC is generated from rendered headings. */}`;
+    case 'breadcrumb':
+      return `{/* Notion breadcrumb skipped: site navigation provides context. */}`;
     case 'unsupported':
       return `{/* Unsupported Notion block skipped: ${block.id} */}`;
     default:
       return value.rich_text
-        ? withChildren(richTextToMarkdown(value.rich_text), block, slug)
+        ? withChildren(richTextToMarkdown(value.rich_text), node, slug)
         : `{/* Unsupported Notion block type: ${block.type} (${block.id}) */}`;
   }
 }
 
-async function withChildren(markdown: string, block: AnyNotionObject, slug: string) {
-  const child = block.has_children ? await blocksToMdx(block.id, slug) : '';
+async function withChildren(markdown: string, node: NotionBlockNode, slug: string) {
+  const child = node.children.length ? await nodesToMdx(node.children, slug) : '';
   return [markdown, child].filter(Boolean).join('\n\n');
 }
 
-async function listItem(marker: string, richText: AnyNotionObject[] = [], block: AnyNotionObject, slug: string) {
-  const child = block.has_children ? await blocksToMdx(block.id, slug) : '';
+async function listItem(marker: string, richText: AnyNotionObject[] = [], node: NotionBlockNode, slug: string) {
+  const child = node.children.length ? await nodesToMdx(node.children, slug) : '';
   const text = richTextToMarkdown(richText);
-  return `${marker} ${text}${child ? `\n${indent(child, '  ')}` : ''}`;
+  return `${marker} ${text}${child ? `\n${indent(child, '    ')}` : ''}`;
 }
 
-async function detailsBlock(richText: AnyNotionObject[] = [], block: AnyNotionObject, slug: string) {
+function isListBlock(block: AnyNotionObject) {
+  return block.type === 'numbered_list_item' || block.type === 'bulleted_list_item';
+}
+
+async function listBlockGroupToMdx(
+  listType: 'numbered_list_item' | 'bulleted_list_item',
+  nodes: NotionBlockNode[],
+  slug: string,
+  listDepth = 0,
+) {
+  const items = await Promise.all(nodes.map((node, index) => listBlockItemToMdx(listType, node, slug, listDepth, index)));
+  return items.join('\n');
+}
+
+async function listBlockItemToMdx(
+  listType: 'numbered_list_item' | 'bulleted_list_item',
+  node: NotionBlockNode,
+  slug: string,
+  listDepth: number,
+  index: number,
+) {
+  const { block } = node;
+  const value = block[block.type] || {};
+  const marker = listType === 'bulleted_list_item' ? '-' : `${Number(value.list_start_index ?? (index + 1))}.`;
+  const baseIndent = '    '.repeat(listDepth);
+  const text = richTextToMarkdown(value.rich_text || []);
+  const child = node.children.length ? await nodesToMdx(node.children, slug) : '';
+  return `${baseIndent}${marker} ${text}${child ? `\n${indent(child, '    ')}` : ''}`;
+}
+
+async function detailsBlock(richText: AnyNotionObject[] = [], node: NotionBlockNode, slug: string, headingTag = '') {
   const summary = escapeMdxAttribute(richTextToPlain(richText) || 'Toggle');
-  const child = block.has_children ? await blocksToMdx(block.id, slug) : '';
-  return `<details>\n  <summary>${summary}</summary>\n\n${child}\n</details>`;
+  const child = node.children.length ? await nodesToMdx(node.children, slug) : '';
+  const summaryContent = headingTag ? `<${headingTag}>${summary}</${headingTag}>` : summary;
+  return `<details class="notion-toggle">\n  <summary>${summaryContent}</summary>\n\n${child}\n</details>`;
 }
 
-async function quoteBlock(richText: AnyNotionObject[] = [], block: AnyNotionObject, slug: string) {
-  const child = block.has_children ? await blocksToMdx(block.id, slug) : '';
+async function quoteBlock(richText: AnyNotionObject[] = [], node: NotionBlockNode, slug: string) {
+  const child = node.children.length ? await nodesToMdx(node.children, slug) : '';
   const content = [richTextToMarkdown(richText), child].filter(Boolean).join('\n\n');
   return prefixLines(content, '> ');
 }
 
-async function calloutBlock(richText: AnyNotionObject[] = [], block: AnyNotionObject, slug: string) {
-  const child = block.has_children ? await blocksToMdx(block.id, slug) : '';
+async function calloutBlock(richText: AnyNotionObject[] = [], node: NotionBlockNode, slug: string) {
+  const value = node.block.callout || {};
+  const icon = notionIconToText(value.icon);
+  const color = String(value.color || 'default').replace(/[^a-zA-Z0-9_-]/g, '');
+  const child = node.children.length ? await nodesToMdx(node.children, slug) : '';
   const content = [richTextToMarkdown(richText), child].filter(Boolean).join('\n\n');
-  return prefixLines(content, '> ');
+  return `<aside class="notion-callout notion-color-${color}">\n  <div class="notion-callout-icon" aria-hidden="true">${escapeMdxAttribute(icon)}</div>\n  <div class="notion-callout-body">\n${indent(content, '    ')}\n  </div>\n</aside>`;
 }
 
 function codeBlock(value: AnyNotionObject) {
   const language = String(value.language || '').replace(/[^a-zA-Z0-9_+-]/g, '');
-  return `\`\`\`${language}\n${richTextToPlain(value.rich_text)}\n\`\`\``;
+  const caption = richTextToMarkdown(value.caption || []);
+  const code = `\`\`\`${language}\n${richTextToPlain(value.rich_text)}\n\`\`\``;
+  return caption ? `${code}\n\n_${caption}_` : code;
 }
 
 function equationBlock(value: AnyNotionObject) {
@@ -199,9 +304,9 @@ function linkBlock(value: AnyNotionObject) {
   return url ? `[${escapeMarkdownInline(url)}](${url})` : '';
 }
 
-async function tableBlock(block: AnyNotionObject, value: AnyNotionObject, _slug: string) {
-  const rows = block.has_children ? await listBlockChildren(block.id) : [];
-  const renderedRows = rows.filter((row) => row.type === 'table_row').map((row) => tableRow(row.table_row));
+async function tableBlock(node: NotionBlockNode, value: AnyNotionObject, _slug: string) {
+  const rows = node.children.map((child) => child.block);
+  const renderedRows = rows.filter((row) => row.type === 'table_row').map((row) => tableRow(row.table_row, value));
   if (renderedRows.length === 0) return '';
 
   const firstRowCellCount = renderedRows[0].split('|').length - 2;
@@ -214,9 +319,45 @@ async function tableBlock(block: AnyNotionObject, value: AnyNotionObject, _slug:
   return [separator, ...renderedRows].join('\n');
 }
 
-function tableRow(value: AnyNotionObject) {
-  const cells = (value.cells || []).map((cell: AnyNotionObject[]) => richTextToMarkdown(cell).replace(/\|/g, '\\|'));
+function tableRow(value: AnyNotionObject, table: AnyNotionObject = {}) {
+  const cells = (value.cells || []).map((cell: AnyNotionObject[], index: number) => {
+    const content = richTextToMarkdown(cell).replace(/\|/g, '\\|');
+    return table.has_row_header && index === 0 ? `**${content}**` : content;
+  });
   return `| ${cells.join(' | ')} |`;
+}
+
+async function columnListBlock(node: NotionBlockNode, slug: string) {
+  const columns = await Promise.all(node.children.map((child) => columnBlock(child, slug)));
+  return `<div class="notion-columns">\n${columns.join('\n')}\n</div>`;
+}
+
+async function columnBlock(node: NotionBlockNode, slug: string) {
+  const value = node.block.column || {};
+  const width = Number(value.width_ratio);
+  const style = Number.isFinite(width) && width > 0 ? ` style="--notion-column-ratio:${width}"` : '';
+  const content = node.children.length ? await nodesToMdx(node.children, slug) : '';
+  return `  <div class="notion-column"${style}>\n${indent(content, '    ')}\n  </div>`;
+}
+
+async function syncedBlock(node: NotionBlockNode, slug: string) {
+  const value = node.block.synced_block || {};
+  const child = node.children.length ? await nodesToMdx(node.children, slug) : '';
+  if (child) return child;
+  const sourceId = value.synced_from?.block_id;
+  return `{/* Synced Notion block reference skipped${sourceId ? `: ${sourceId}` : ''}. */}`;
+}
+
+function notionChildReference(kind: string, title: string, block: AnyNotionObject) {
+  const label = escapeMarkdownInline(title || kind);
+  return block.url ? `### [${label}](${block.url})` : `### ${label}`;
+}
+
+function notionIconToText(icon: AnyNotionObject = {}) {
+  if (icon.type === 'emoji') return icon.emoji || '';
+  if (icon.type === 'external') return icon.external?.url ? 'link' : '';
+  if (icon.type === 'file') return 'file';
+  return '';
 }
 
 async function buildFrontmatter(page: AnyNotionObject, target: SyncTargetKey, title: string, slug: string): Promise<Frontmatter> {
