@@ -1,0 +1,420 @@
+---
+title: "[Reading Note] Two-Stream Convolutional Networks for Action Recognition in Videos"
+slug: "reading-note-two-stream-convolutional-networks-for-action-recognition-in-videos"
+generated: true
+status: "idea"
+domain: 
+  - "Action Recognition"
+  - "Video Understanding"
+  - "Computer Vision"
+summary: "정지 프레임의 외형 정보를 학습하는 공간 스트림과 다중 프레임 optical flow의 움직임 정보를 학습하는 시간 스트림을 분리한 뒤, 두 예측을 후기 융합하여 비디오 행동을 인식하는 Two-Stream ConvNet을 제안한다."
+type: "paper-review"
+methods: 
+  - "Two-Stream ConvNet"
+  - "Spatial Stream"
+  - "Temporal Stream"
+  - "Dense Optical Flow"
+date: "2026-07-23"
+relatedProject: "be-more-duck-vision-language-embodied-agent"
+notion: "https://app.notion.com/p/Reading-Note-Two-Stream-Convolutional-Networks-for-Action-Recognition-in-Videos-3a114b84a0f280dfae46c7177832a6ba"
+---
+
+import NotionBookmark from '../../components/notion/NotionBookmark.astro';
+import NotionCallout from '../../components/notion/NotionCallout.astro';
+import NotionColumns from '../../components/notion/NotionColumns.astro';
+import NotionToggle from '../../components/notion/NotionToggle.astro';
+
+{/* This file is generated from Notion. Do not edit directly. */}
+
+> <span>읽은 일시 : 2026.07.18.-2026.07.23.</span>
+
+## <span>Paper Information</span>
+
+> <span><strong>Title:</strong></span><span> Two-Stream Convolutional Networks for Action Recognition in Videos</span>
+> 
+> <span><strong>Authors:</strong></span><span> Karen Simonyan, Andrew Zisserman</span>
+> 
+> <span><strong>Affiliation:</strong></span><span> Visual Geometry Group, University of Oxford</span>
+> 
+> <span><strong>arXiv ID:</strong></span><span> 1406.2199</span>
+> 
+> <span><strong>Topic:</strong></span><span> Video Action Recognition, Two-Stream ConvNet, Optical Flow, Spatial-Temporal Modeling, Video Understanding</span>
+> 
+> <span><strong>Venue:</strong></span><span> Advances in Neural Information Processing Systems 27, NIPS 2014</span>
+> 
+> <span><strong>Pages:</strong></span><span> 568–576</span>
+
+## <span>1. One-line Summary</span>
+
+> <span>정지 프레임의 외형 정보를 학습하는 공간 스트림과 다중 프레임 optical flow의 움직임 정보를 학습하는 시간 스트림을 분리한 뒤, 두 예측을 후기 융합하여 비디오 행동을 인식하는 Two-Stream ConvNet을 제안한다.</span>
+
+## <span>2. Problem</span>
+
+<span><strong>영상에는 정지 프레임의 appearance와 프레임 사이의 motion이라는 서로 다른 정보가 존재하며, 이를 효과적으로 포착하고 결합하는 것이 어렵다.</strong></span>
+
+<span>→ 정적 이미지 분류와 비교했을때 영상의 시간정보는 인식에 추가적이고 중요한 실마리를 제공하는데, 많은 동작의 경우 움직임 (motion) 정보에 의해 신뢰도 있게 인식되었기 때문. + 개별 비디오 프레임을 분류할 때 사용 가능한 자연스러운 데이터 증강 효과를 제공한다</span>
+
+> <span>Additionally, video provides natural data augmentation (</span><span><strong>jittering</strong></span><span>) for single image (video frame) classification</span>
+
+- <span><code>jittering</code></span><span>은 프레임마다 나타나는 </span><span><strong>작은 자연적 변동</strong></span>
+
+<p class="notion-empty" aria-hidden="true"></p>
+
+## <span>3. Method &amp; Background Concept</span>
+
+<figure class="notion-figure">
+  <img src={"/notion-assets/reading-note-two-stream-convolutional-networks-for-action-recognition-in-videos/3a414b84a0f280e4bb00ee5ce0365b3b.png"} alt={"Source: author's Notion note"} />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+### <span><strong>3.1. Discriminative와 generative의 차이</strong></span>
+
+1. <span>Discriminative model : 입력 x가 주어졌을 때 클래스 y를 예측하는 데 집중</span>
+    $P(y∣x)$
+    
+    > <span>예: 이 영상이 주어졌을 때 </span><span><strong>행동이 달리기일 확률</strong></span><span>은 얼마인가?</span>
+2. <span>Generative model : 각 클래스의 데이터가 어떻게 생성되는지까지 모델링</span>
+    $P(x∣y)$<span> 또는 </span>$P(x,y)$<span> </span>
+    
+    > <span>예: 달리기 영상은 일반적으로 </span><span><strong>어떤 모습과 움직임</strong></span><span>을 가지는가?</span>
+
+### <span>3.2. Optical Flow란? (광류)</span>
+
+> <span>실제 물체의 운동 그 자체가 아니라, 영상 평면에서 관찰되는 겉보기 운동의 추정치</span>
+> 
+> <span>→ 각 픽셀이 어느 방향으로 얼마나 이동했는지를 추정한 2차원 벡터장</span>
+
+> <span><strong>still frame</strong></span><span>은 비디오에서 뽑아낸 </span><span><strong>한 장의 정지된 이미지 프레임</strong></span><span> </span>
+> 
+> - <span><strong>Still image</strong></span><span>: 일반적인 정지 이미지</span>
+> - <span><strong>Still frame</strong></span><span>: 비디오에서 특정 시점의 프레임 한 장을 정지 이미지처럼 사용한 것</span>
+> - <span><strong>Video clip</strong></span><span>: 여러 연속 프레임으로 이루어진 짧은 영상 구간</span>
+
+### <span>3.3. late fusion이란? (후기 융합, 후단 융합)</span>
+
+> <span>공간 스트림과 시간 스트림이 각각 독립적으로 행동을 예측한 뒤, </span><span><strong>네트워크의 마지막 출력 단계에서 두 예측 결과를 결합하는 방식</strong></span>
+
+<span>각 네트워크는 마지막 softmax 층에서 행동별 점수를 독립적으로 출력한다.  (</span>$s_x$<span>) 그 후 이 점수들을 합쳐 최종 행동을 결정.</span>
+
+<span>예를 들어 행동 클래스가 “달리기, 수영, 테니스” 세 개라고 설정할때, </span>
+
+<span>공간 스트림의 출력:  </span>$s_{\text{spatial}}=[0.2,\;0.1,\;0.7]$
+
+> <span>공간 스트림은 라켓과 코트 같은 외형을 보고 </span><span><code>테니스</code></span><span>일 가능성을 높게 판단</span>
+
+<span>시간 스트림의 출력: </span>$s_{\text{temporal}} =[0.1,\;0.2,\;0.7]$
+
+> <span>시간 스트림도 팔과 라켓의 움직임을 보고 </span><span><code>테니스</code></span><span>라고 판단</span>
+
+<span>평균을 사용하는 late fusion의 예시 : </span>
+
+$s_{\text{final}} = \frac{s_{\text{spatial}}+s_{\text{temporal}}}{2}
+= [0.15,\;0.15,\;0.7]$<span> → 최종적으로 테니스라고 제시</span>
+
+<span><strong>논문에서는 어떻게 사용되었는가?</strong></span>
+
+#### <span><strong>1. Averaging</strong></span>
+
+<span> : 두 스트림의 클래스별 softmax 점수를 평균. 가장 단순한 방법이며, 두 스트림의 중요도는 동일</span>
+
+$s_{\text{final}} = \frac{s_{\text{spatial}}+s_{\text{temporal}}}{2}$
+
+### <span>2. Linear SVM</span>
+
+<span>두 스트림의 L2-normalised softmax 점수를 연결한 뒤, 이를 특징 벡터로 사용해 별도의 다중 클래스 선형 SVM을 학습 → 평균처럼 고정된 규칙을 쓰는 대신 SVM이 어떤 점수 조합이 어떤 행동에 중요한지 학습</span>
+
+$z=[s_{\text{spatial}};\;s_{\text{temporal}}]$
+
+$\hat y=\operatorname{SVM}(z)$
+
+<span>→ 논문의 실험에서는 평균 융합보다 SVM 기반 융합이 더 좋은 성능을 냈다.</span>
+
+<span><strong>반대의 개념으로 Early Fusion도 존재한다.</strong></span>
+
+<span>입력이나 낮은 수준의 특징을 초기에 결합해 두 정보 사이의 세밀한 상호작용을 일찍 학습할 수 있지만, 입력 구조와 학습이 복잡해진다. </span><span><strong><code>RGB 특징 + Optical-flow 특징</code></strong></span><span><strong> → </strong></span><span><strong><code>하나의 통합 네트워크</code></strong></span><span><strong> → </strong></span><span><strong><code>행동 예측</code></strong></span><span><strong> </strong></span>
+
+## <span>4. Key Idea</span>
+
+<span>이 연구의 목표</span>
+
+> <span>정적 이미지에서 SOTA인 ConvNets를 활용해서 영상 데이터 속 행동 인식에 적용한다.</span>
+
+1. <span><strong>공간 스트림과 시간 스트림 </strong></span><span>네트워크로 구성된 Two-Stream ConvNet 아키텍처 제시</span>
+    > <span>First, we propose a two-stream ConvNet architecture which incorporates spatial and temporal networks. </span>
+2. <span>여러 프레임에 걸친 </span><span><strong>밀집 광류를 입력으로 학습</strong></span><span>한 ConvNet이 제한된 양의 학습 데이터에도 불구하고 매우 우수한 성능을 낼 수 있음을 보인다.</span>
+    > <span>Second, we demonstrate that a ConvNet trained on multi-frame dense optical flow is able to achieve very good performance in spite of limited training data. </span>
+    
+    - <span><code>dense optical flow</code></span><span> 영상의 일부 특징점만이 아니라, </span><span><strong>거의 모든 픽셀 위치에서 이동 벡터를 계산한 광류</strong></span>
+    
+    <span>→ 데이터가 적을수록, 문제에 적합한 입력 표현이나 inductive bias가 학습을 쉽게 만들 수 있다. </span>
+3. <span>마지막으로, 서로 다른 두 동작 분류 데이터셋에 </span><span><strong>멀티태스크 학습</strong></span><span>을 적용하면 </span><span><strong>활용 가능한 학습 데이터의 양을 늘리고 두 데이터셋 모두에서 성능을 향상시킬 수 있음</strong></span><span>을 보인다.</span>
+    > <span>Finally, we show that multitask learning, applied to two different action classification datasets, can be used to increase the amount of training data and improve the performance on both</span>
+    
+    <span>→ “활용 가능한 학습 데이터의 양을 늘리고”의 의미</span>
+    
+    <span>: 한 데이터셋의 모델이 다른 데이터셋의 영상도 공통 특징 추출기 학습에 활용할 수 있다.</span>
+
+<figure class="notion-figure">
+  <img src={"/notion-assets/reading-note-two-stream-convolutional-networks-for-action-recognition-in-videos/3a414b84a0f2808c9bffc1643ce68ca8.png"} alt={"Source: author's Notion note"} />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+### <span>4.1. Spatial Stream ConvNet</span>
+
+> <span>개별 프레임에 대해서 작동하며 정적 이미지로부터 행동 인식에 효과적임</span>
+
+- <span>사실 action classification의 경우 still frames 만으로도 경쟁력이 있는 성능이 나온다.</span>
+
+### <span>4.2. Optical Flow ConvNet</span>
+
+<figure class="notion-figure">
+  <img src={"/notion-assets/reading-note-two-stream-convolutional-networks-for-action-recognition-in-videos/3a514b84a0f2808481fedcb8a50079d2.png"} alt={"Source: author's Notion note"} />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+> <span>연속적인 프레임 간의 광류 변위장들을 채널 방향으로 쌓아 만든다(stacking optical flow displacement fields)</span>
+
+- <span>optical flow 는 영상의 모든 위치에서 </span><span><strong>픽셀이 얼마나 이동했는지</strong></span>
+- <span>한 픽셀이 아니라 영상 전체에 계산하므로 </span><span><strong>변위장(displacement field)</strong></span>
+    <span>→ 영상 프레임간 움직임을명시적으로 묘사한다</span>
+    
+    <span>→ 인식에 더 도움이 됨</span>
+    
+    <span>→ </span><span><strong>주어진 움직임 패턴이 어떤 행동을 뜻하는지</strong></span><span>에 더 집중</span>
+
+#### <span>그러면 optical flow를 추출했다는 가정 하에 어떻게 이를 입력값으로 모델에 넣는가?</span>
+
+> <span>이미 계산된 여러 flow의 </span>$x,y$<span>성분을 CNN의 </span>$2L$<span>개 채널로 쌓는다. 그럼 flow는 어떻게 읽어오는가?</span>
+
+<figure class="notion-figure">
+  <img src={"/notion-assets/reading-note-two-stream-convolutional-networks-for-action-recognition-in-videos/3a514b84a0f280a6821ac7343b0276c1.png"} alt={"Source: author's Notion note"} />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+$d_t(u, v)$<span> : displacement vector at the point </span>$(u, v)$<span> in the frame </span>$t$
+
+$\{d_t\}$<span>: a set of displacement vector fields</span>
+
+$d^x_t, d^y_t$<span> : horizontal and vertical components of the vector field</span>
+
+<NotionCallout icon={"💡"} color={"gray_background"}>
+
+<span>프레임 </span>$t$<span>의 좌표 </span>$(u,v)$<span>에 있는 영상 패턴이 다음 프레임 </span>$t+1$<span>에서 얼마나 이동했는지</span>
+
+$d_t(u,v)=\left(d_t^x(u,v),d_t^y(u,v)\right)$
+
+- $d_t^x(u,v)$<span>: 수평 이동량</span>
+- $d_t^y(u,v)$<span>: 수직 이동량</span>
+
+<span>e.g. </span>$d_t(100,50)=(3,-2)$<span> : 좌표 </span>$(100,50)$<span>의 영상 패턴이 다음 프레임에서 대략 오른쪽으로 3픽셀, 위쪽으로 2픽셀 이동</span>
+
+</NotionCallout>
+
+$I : Input \; \;  u = [1; w], v = [1; h], k = [1; L]$
+
+1. <span><strong>Optical Flow Stacking </strong></span><span>: 여러 시점의 flow field에서 동일한 영상 좌표의 값을 읽는 방식 (</span><span><strong>Figure 3 - left</strong></span><span>)</span>
+    > $I_τ(u,v,2k−1)=d_{τ+k−1}^x(u,v)$
+    > 
+    > $I_\tau(u,v,2k)=d_{\tau+k-1}^{y}(u,v)$
+    
+    <span>앞서 설정한 displacement vector fields </span>$L$<span>개의 optical flow displacement field을 쌓는다 </span>
+    
+    <span>→ </span>$2L$<span>개의 Input Channels  달성 (horizontal + vertical)</span>
+    
+    <span>→ a ConvNet input volume </span>$I_τ ∈ R^{w×h×2L}$
+2. <span><strong>Trajectory Stacking :</strong></span><span> 움직이는 점의 이동을 따라간다 </span><span><strong>(Figure 3 - right)</strong></span>
+    <span>trajectory-based descriptors에 모티브를 얻음</span>
+    
+    > $I_τ(u,v,2k−1)=d_{τ+k−1}^x(p_k)$
+    > 
+    > $I_\tau(u,v,2k)=d_{\tau+k-1}^{y}(p_k)$
+    
+    $p_k$<span> : 시작점 </span>$(u, v)$<span>에서 </span>$k^{th}$<span> 점의 위치이고 그다음 위치는 현재 optical flow만큼 이동</span>
+    
+    $p_1 = (u, v); p_k = p_{k−1} + d_{τ+k−2}(p_{k−1}), k > 1.$
+
+<span>이 밖에도 양방향을 모두 고려하는 </span><span><strong>Bi-directional optical flow,<br /></strong></span><span>카메라의 움직임을 고려해 각 </span>$d$<span> (displacement field)에서 평균 벡터를 빼서 완화하는 </span><span><strong>Mean flow subtraction</strong></span><span> 전략도 존재한다</span>
+
+<span>→ Result에서 언급되겠지만 Mean flow subtraction 전략이 유효했음</span>
+
+> <span>Temporal ConvNet은 기존의 수작업 motion feature를 완전히 버린 것이 아니라, 그 특징들을 학습 가능한 ConvNet 안에서 일반화한 모델이다.</span>
+
+### <span>4.3. Multi-task learning for Optical Flow (Temporal ConvNet)</span>
+
+<figure class="notion-figure">
+  <img src={"/notion-assets/reading-note-two-stream-convolutional-networks-for-action-recognition-in-videos/3a314b84a0f2803b8721d8cee29abd5b.png"} alt={"Source: author's Notion note"} />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+<span><strong>등장 배경</strong></span>
+
+> <span>temporal ConvNet은 spatial stream ConvNet과 다르게 입력이 multi-frame optical flow이므로, RGB 정지 이미지를 사용하는 ImageNet 사전학습 모델을 이 논문의 설정에서 직접 이용하기 어렵다.더군다나 그 중 영상 Action 분류를 위한 데이터는 더 적다</span>
+> 
+> - <span>split당 training videos ⇒ UCF-101 : </span><span><code>9.5K</code></span><span>, HMDB-51 : </span><span><code>3.7K</code></span><span> </span>
+> 
+> <span>→ Overfitting의 위험성</span>
+> 
+> <span>서로 다른 데이터셋을 합쳐 규모를 키워보려해도 클래스 조합의 교집합이 존재하고 이를 어떻게 분류할 것인가 (동일 행동? 유사행동?)가 수작업 판단이 필요하다</span>
+> 
+> <span>→ multi-task learning의 등장</span>
+
+- <span>데이터셋별 softmax head와 loss는 분리됨</span>
+- <span>하지만 마지막 fully connected layer 아래의 ConvNet backbone은 공유됨</span>
+- <span>전체 손실은 두 task loss의 합</span>
+- <span><strong>공유 backbone</strong></span><span>은 양쪽 데이터셋의 gradient를 모두 받아 업데이트됨</span>
+
+## <span>5. Result</span>
+
+<span>평가는 UCF-101과 HMDB-51에 대하여 진행되었고 이 두개는 라벨링이 된 영상 데이터셋 중 가장 큰 것 들이다. 101과 51은 각 데이터셋의 행동 클래스 수이다.</span>
+
+- <span>UCF-101 : 13K videos (180 frames/video on average)</span>
+    <span>UCF-101의 경우 비슷한 배경, 비슷한 뷰포인트처럼 공통적인 특성으로 묶여 25개의 그룹이 존재한다고 한다. 그리고 이 그룹은 동일한 분할에서 테스트/훈련 데이터에 둘 다 존재하지 않는다→ 모델이 행동 자체보다 배경이나 뷰포인트와 같은 것을 학습해 성능이 부풀려질 수 있기 때문</span>
+    
+    > <span>The videos in 101 action categories are grouped into 25 groups, where each group can consist of 4-7 videos of an action. The videos from the same group may share some common features, such as similar background, similar viewpoint, etc.</span>
+- <span>HMDB-51 : 6.8K videos</span>
+
+<span><strong>Evaluation Protocol</strong></span>
+
+- <span>두 데이터셋 모두 학습/테스트 데이터를 3개의 분할으로 나누어서 제공한다</span>
+    - <span>UCF-101은 각 분할당 9.5K개의 영상을, HMDB-51은 분할당 3.7K개의 영상을 학습 데이터로 사용한다.</span>
+- <span>성능은 각각의 분할에서 평가된 분류 정확도(Accuracy)에 대해서 평균을 계산하는 방법으로 측정된다.</span>
+
+### <span>5.1. Spatial ConvNets and Temporal ConvNets</span>
+
+<figure class="notion-figure">
+  <img src={"/notion-assets/reading-note-two-stream-convolutional-networks-for-action-recognition-in-videos/3aa14b84a0f28000bdd0e372d1eb538f.png"} alt={"Source: author's Notion note"} />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+<span>(a) Spatial ConvNet</span>
+
+1. <span>Training from scratch on UCF-101</span>
+2. <span>pre-training on ILSVRC-2012 followed by fine-tuning on UCF-101</span>
+3. <span>keeping the pre-trained network fixed and only </span><span><strong>training the last (classification) layer on UCF-101</strong></span>
+
+<span>→ ConvNet을 UCF-101에만 학습시키는건 성능이 좋게는 나오지 않았고 대규모 데이터셋인 ILSVRC-2012에 사전 학습을 진행하는 것이 더 효과적이었음</span>
+
+<span>→ 또한 fine-tuning을 전체 네트워크에 하는 것과 사전학습 네트워크를 고정하고 마지막 classification layer만 학습하는 것은 큰 차이가 있지 않았음</span>
+
+<span>(b) Temporal ConvNet에서는 아래의 요소를 검증함</span>
+
+> <span>공통적으로 dropout은 0.9로 설정해 일반화 능력을 높이고자 하였음 또한 ILSVRC-2012 없이 UCF-101에 대해서만 학습된 상태 (from scratch)</span>
+
+1. <span>using multiple (L = &#123;5, 10&#125;) stacked optical flows</span>
+2. <span>trajectory stacking</span>
+3. <span>mean displacement subtraction</span>
+4. <span>using the bi-directional optical flow</span>
+
+<span>→ 1. 결과적으로 광류를 쌓았을때 (Stacking Optical Flow, </span>$L > 1$<span>)가 확실하게 이득인데 이유가 long-term motion information을 저장할 수 있기 때문이라고 하고 이게 frame간의 흐름을 보여주는 것보다 훨씬 구체적인 정보라고 한다. </span>
+
+> <span>하지만 L을 늘린다고 해서 반드시 성능 향상이 폭발적으로 늘어나는 것은 아니었고, L이 커질 수록 그 성장 폭은 점점 줄어들었다. (</span>$L$<span>이 10 이상으로는 실험이 안된 이유)</span>
+
+<span>→ 2. mean subtraction 방식이 프레임간 전역적 움직임의 효과 (e.g. 카메라 자체의 흔들림)를 억제하는 효과를 보여줘서 성능에 유의미한 향상이 있었음 </span>
+
+<span>→ 최종적으로 실험 결과에 따르면 Spatial ConvNet보다 Temporal ConvNet이 훨씬 유의미한 성능을 보여주었음</span>
+
+<figure class="notion-figure">
+  <img src={"/notion-assets/reading-note-two-stream-convolutional-networks-for-action-recognition-in-videos/3aa14b84a0f280899d23cf274fd12960.png"} alt={"Source: author's Notion note"} />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+<figure class="notion-figure">
+  <img src={"/notion-assets/reading-note-two-stream-convolutional-networks-for-action-recognition-in-videos/3aa14b84a0f280adaf09d9c0b4b1a0e6.png"} alt={"Source: author's Notion note"} />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+### <span>5.2. Multi-task learning of temporal ConvNets</span>
+
+> <span>이제 UCF-101을 기준으로 성능을 확인했으니 본격적으로 HMDB-51을 활용하면서 multi-task learning의 데이터 풍부화 효과를 노린다.</span>
+
+<span>→ 하지만 한가지 문제점이 HMDB-51은 UCF-101에 비해 training split이 2.6배정도 더 작다. </span>
+
+<span>→ 연구자들은 이에 효과적인 training set size를 증가시키기 위해 다양한 전략을 시도해봄</span>
+
+1. <span>fine-tuning a temporal network pre-trained on UCF-101</span>
+2. <span>adding </span><span><strong>78 classes from UCF-101</strong></span><span>, which are </span><span><strong>manually selected </strong></span><span>so that there is </span><span><strong>no intersection between these classes and the native HMDB-51 classes</strong></span><span>;</span>
+3. <span>using the multi-task formulation to learn a video representation, </span><span><strong>shared between the UCF-101 and HMDB-51 classification tasks</strong></span>
+
+<figure class="notion-figure">
+  <img src={"/notion-assets/reading-note-two-stream-convolutional-networks-for-action-recognition-in-videos/3aa14b84a0f2802bb237feb30e2728b6.png"} alt={"Source: author's Notion note"} />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+<span>→ 결과적으로 3번 선택지, multi-task learning formulation을 도입하는 것이 가장 성능이 높았다. (훈련 데이터를 전부 활용할 수 있었기 때문으로 추측됨.)</span>
+
+<figure class="notion-figure">
+  <img src={"/notion-assets/reading-note-two-stream-convolutional-networks-for-action-recognition-in-videos/3aa14b84a0f2809786eec29873852eff.png"} alt={"Source: author's Notion note"} />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+### <span>5.3. Two-stream ConvNets</span>
+
+<figure class="notion-figure">
+  <img src={"/notion-assets/reading-note-two-stream-convolutional-networks-for-action-recognition-in-videos/3aa14b84a0f280559c36e279f8716c3f.png"} alt={"Source: author's Notion note"} />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+> <span>두개의 스트림을 하나로 결합하는데 있어 가장 먼저 제시되는건 공간 네트워크와 시간 네트워크의 </span><span><code>full6</code></span><span> 또는 </span><span><code>full7</code></span><span> 층 위에 공동 fully connected layer들을 쌓아 학습하는 것.</span>
+> 
+> <span>→ 고차원 특징을 합친 뒤 새로운 fully connected layer들을 추가로 학습하는 방법을 시도했지만 과적합 문제로 인해 활용되지 않았다.</span>
+> 
+> <span>→ 얌전히 softmax score를 활용하기로 했다.</span>
+> 
+> <span>→ 문제는 어떻게 softmax score를 합칠 것인가?</span>
+
+1. <span>averaging softmax score</span>
+2. <span>linear SVM</span>
+
+<span><strong>결론</strong></span>
+
+1. <span>애초에 두 스트림은 상호 보완적이었다 (합성시 두 개의 단일 스트림 모델에 대해 모두 성능이 향상되었기 때문)</span>
+    <span>→ 융합 모델이 Temporal stream 단독보다 약 </span><span><code>6%p</code></span><span>, Spatial stream 단독보다 약 </span><span><code>14%p</code></span><span> 높은 성능을 기록했다.</span>
+    
+    > <span>Temporal and spatial recognition streams are </span><span><strong>complementary</strong></span><span>, as their fusion significantly improves on both (6% over temporal and 14% over spatial nets)</span>
+2. <span>SVM 기반의 softmax score 합성은 단순히 평균을 내는 것보다 좋은 성능을 보인다</span>
+    > <span>SVM-based fusion of softmax scores outperforms fusion by averaging</span>
+3. <span>양방향 플로우를 활용하는건 이번 ConvNet 합성 사례에서는 추가 이득이 없었다</span>
+    > <span>Using bi-directional flow is not beneficial in the case of ConvNet fusion</span>
+4. <span>multi-task learning을 활용하여 학습된 temporal ConvNet의 경우 단일로 사용되나 Spatial Net과 합쳐지나 최고의 성능을 보인다.</span>
+    > <span>Temporal ConvNet, trained using multi-task learning, performs the best both alone and when fused with a spatial net</span>
+
+<figure class="notion-figure">
+  <img src={"/notion-assets/reading-note-two-stream-convolutional-networks-for-action-recognition-in-videos/3aa14b84a0f280f2b9d1c05725ae978b.png"} alt={"Source: author's Notion note"} />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+> <span>UCF-101, HMDB-51 데이터셋에 대한 SOTA 모델들과 성능을 비교해본 결과, 경쟁 가능한 수준을 보여주었다</span>
+
+<p class="notion-empty" aria-hidden="true"></p>
+
+<figure class="notion-figure">
+  <img src={"/notion-assets/reading-note-two-stream-convolutional-networks-for-action-recognition-in-videos/3aa14b84a0f2806a9d2dc6adb4f3d162.png"} alt={"Source: author's Notion note"} />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+## <span>6. Limitation</span>
+
+### <span>6.1. Trajectory-aware pooling의 부재</span>
+
+- <span>Trajectory stacking은 optical flow를 움직임 궤적을 따라 샘플링한다.</span>
+- <span>그러나 ConvNet 내부의 spatial pooling은 고정된 공간 영역에서 수행되며, 궤적의 이동을 따라가지 않는다.</span>
+- <span>따라서 입력 단계에서는 움직이는 점을 추적하지만, 특징을 집계하는 단계에서는 동일한 객체나 신체 부위를 지속적으로 정렬해 처리하지 못한다.</span>
+- <span>향후에는 궤적 중심의 spatio-temporal tube를 따라 특징을 pooling하는 구조가 필요하다.</span>
+
+### <span>6.2. 단순한 카메라 모션 보정</span>
+
+- <span>Optical flow에는 객체의 움직임과 카메라의 움직임이 함께 포함된다.</span>
+- <span>본 논문은 각 flow에서 평균 변위 벡터를 빼는 mean displacement subtraction으로 전역 움직임을 완화한다.</span>
+- <span>그러나 이 방식은 카메라의 평행 이동을 근사적으로 줄일 뿐, 회전·확대·축소·원근 변화와 같은 복잡한 카메라 모션을 명시적으로 모델링하지 못한다.</span>
+- <span>향후에는 카메라 모션을 별도로 추정하고 제거하는 정교한 보정 방법이 필요하다.</span>
+
+> <span>이 논문의 Temporal ConvNet은 trajectory stacking을 통해 궤적을 따라 optical flow를 입력으로 구성하지만,</span><span><strong> 네트워크 내부의 spatial pooling은 궤적을 고려하지 않는다</strong></span><span>는 한계가 있다. </span>
+> 
+> <span>또한 카메라 움직임을 </span><span><strong>평균 변위 벡터 차감</strong></span><span>으로만 단순하게 보정하므로, 복잡한 전역 카메라 모션을 충분히 제거하지 못한다. 따라서 향후에는 trajectory-aligned spatio-temporal pooling과 명시적인 camera motion compensation이 필요하다.</span>
+
+## <span>7. Connection to My Research &amp; What I Can Apply</span>
+
+- <span>BMOD 프로젝트를 진행할때 temporal feature에 대한 고려가 부족했는데 optical flow에 대한 temporal stream ConvNet의 방식을 활용할 수 있겠다 생각 </span>
+- <span>서로 다른 데이터셋을 활용하여 전체 학습 데이터셋의 규모를 키우는 방식 또한 행동 인식, 특히 비인간동물에 대한 학습데이터셋은 제한적인데 이 multi-task learning 전략을 활용해 보는것도 유용할 수 있겠다 생각함.</span>
+
+<p class="notion-empty" aria-hidden="true"></p>
