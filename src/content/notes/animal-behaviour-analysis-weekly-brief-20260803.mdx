@@ -1,0 +1,761 @@
+---
+title: "Animal Behaviour Analysis Weekly Brief — 2026.08.03."
+slug: "animal-behaviour-analysis-weekly-brief-20260803"
+generated: true
+status: "completed"
+type: "weekly-brief"
+date: "2026-08-03"
+notion: "https://app.notion.com/p/Animal-Behaviour-Analysis-Weekly-Brief-2026-08-03-3b114b84a0f28024a4d6c154b7a77073"
+---
+
+import NotionBookmark from '../../components/notion/NotionBookmark.astro';
+import NotionCallout from '../../components/notion/NotionCallout.astro';
+import NotionColumns from '../../components/notion/NotionColumns.astro';
+import NotionToggle from '../../components/notion/NotionToggle.astro';
+
+{/* This file is generated from Notion. Do not edit directly. */}
+
+# <span>Animal Behaviour Analysis Weekly Research Briefing</span>
+
+<span><strong>기준일:</strong></span><span> 2026년 8월 3일<br /></span><span><strong>우선 조사 기간:</strong></span><span> 2026년 7월 20일~8월 3일<br /></span><span><strong>분야:</strong></span><span> Animal Behaviour Analysis / Computational Ethology / Animal Pose Estimation / Animal Behavior Recognition</span>
+
+> <span><strong>이번 주 핵심:</strong></span><span> 이번 주에는 행동을 이미 정의된 class로 분류하는 연구보다, pose sequence로부터 미래 행동을 생성·예측하는 </span><span><strong>animal behavior forecasting</strong></span><span> 흐름이 중요했습니다. 가장 우선해서 볼 논문은 </span><span><strong>Agent-Centric Animal Pose Forecasting</strong></span><span>입니다. 여러 동물의 사회적 행동을 중앙집중식 group model이 아니라, 각 개체가 자기 시점에서 주변을 감지하고 움직임을 생성하는 방식으로 모델링합니다. (</span><a href={"https://arxiv.org/html/2607.19548v1"}><span>arXiv</span></a><span>)</span>
+
+---
+
+## <span>1. 이번 주 한눈에 보기</span>
+
+- <span>2026년 7월 21일 공개된 </span><span><strong>Agent-Centric Animal Pose Forecasting</strong></span><span>은 tracked pose에서 미래 pose와 행동을 autoregressive하게 생성하는 framework를 제안했습니다. 단일 개체뿐 아니라, 여러 개체가 서로를 감지하고 반응하는 social behavior까지 모델링합니다. (</span><a href={"https://arxiv.org/abs/2607.19548?utm_source=chatgpt.com"}><span>arXiv</span></a><span>)</span>
+- <span>모델은 world-coordinate의 전체 상태를 그대로 입력받지 않습니다. 각 개체의 위치와 방향을 기준으로 변환한 </span><span><strong>egocentric sensory observation</strong></span><span>을 입력하고, 다음 순간의 </span><span><strong>egocentric movement</strong></span><span>를 출력합니다. (</span><a href={"https://arxiv.org/html/2607.19548v1"}><span>arXiv</span></a><span>)</span>
+- <span>저자들은 Python·PyTorch 기반 </span><span><strong>AnimalPoseForecasting</strong></span><span> library도 공개했습니다. world-frame pose, agent-centric pose, sensory feature, discretized token 사이의 변환을 composable·invertible operation으로 관리합니다. 다만 공식 README가 아직 “under construction”이라고 명시하는 초기 repo입니다. (</span><a href={"https://github.com/kristinbranson/AnimalPoseForecasting"}><span>GitHub</span></a><span>)</span>
+- <span>2026년 7월 24일 공개된 tracking-summary 비교 preprint는 단순 trajectory aggregation부터 Keypoint-MoSeq 기반 unsupervised segmentation까지 여러 행동 표현 방식을 비교합니다. 복잡한 모델을 사용하기 전에 단순 feature baseline을 검증해야 한다는 점에서 중요합니다. (</span><a href={"https://www.biorxiv.org/content/10.64898/2026.07.20.739643v1.full.pdf?utm_source=chatgpt.com"}><span>bioRxiv</span></a><span>)</span>
+- <span>도구 측면에서는 Neuroinformatics Unit의 </span><span><strong>movement</strong></span><span>, </span><span><strong>poseinterface</strong></span><span>, </span><span><strong>ethology</strong></span><span> repo가 2026년 8월 1~2일까지 활발하게 업데이트되었습니다. 특히 </span><span><code>movement</code></span><span>는 DLC·SLEAP 등에서 생성한 pose track을 통합적으로 정제·시각화·정량화하는 도구입니다. (</span><a href={"https://github.com/orgs/neuroinformatics-unit/repositories"}><span>GitHub</span></a><span>)</span>
+
+### <span>Labeling 자동화 / 데이터 강화 관점에서 중요한 점</span>
+
+<span>이번 주 핵심 논문은 직접적인 active learning이나 pseudo-labeling 방법을 제안하지 않습니다. 대신 다음과 같은 데이터 활용 방향이 중요합니다.</span>
+
+1. <span>이미 추적된 대규모 pose sequence를 별도 행동 label 없이 forecasting model 학습에 활용</span>
+2. <span>continuous pose를 discretized token으로 변환해 transformer 계열 모델에서 학습</span>
+3. <span>생성된 행동 sequence와 실제 sequence의 통계 분포를 비교해 모델 품질 평가</span>
+4. <span>예측 오차가 큰 구간을 추후 annotation 우선 대상으로 활용</span>
+5. <span>pose framework 간 입출력 형식을 통합해 labeling·tracking 결과 재사용성 향상</span>
+
+### <span>이번 주 반드시 볼 자료</span>
+
+<span><strong>Agent-Centric Animal Pose Forecasting</strong></span>
+
+<span>사용자의 장기 목표인 </span><span><code>pose estimation → behavior classification → behavior prediction</code></span><span> 중 세 번째 단계인 </span><span><strong>behavior prediction</strong></span><span>을 직접 다룹니다. 단순히 행동 label을 맞히는 것이 아니라, 주어진 과거 pose와 주변 개체 정보로부터 앞으로 어떤 움직임이 발생할지를 생성합니다.</span>
+
+---
+
+## <span>2. 이번 주 핵심 트렌드</span>
+
+### <span>2.1 Animal Behavior Recognition에서 Behavior Forecasting으로 확장</span>
+
+- <span><strong>무엇이 바뀌었는가:</strong></span><span> 기존 행동 분석은 현재 구간을 walking, grooming, feeding 등으로 분류하는 데 집중했습니다. 이번 연구는 현재까지의 sensory·pose history를 바탕으로 미래 움직임 sequence 자체를 생성합니다.</span>
+- <span><strong>왜 중요한가:</strong></span><span> 행동 분류는 “무슨 행동인가”를 답하지만, forecasting은 “다음에 무엇을 할 것인가”를 모델링합니다.</span>
+- <span><strong>Animal Behaviour Analysis 연결:</strong></span><span> 행동 전환 예측, 위험 행동 조기 탐지, social interaction 예측, 이상 행동 감지로 확장할 수 있습니다.</span>
+- <span><strong>내가 지금 신경 써야 하는가:</strong></span><span> </span><span><strong>High</strong></span>
+- <span><strong>신뢰도:</strong></span><span> arXiv preprint. peer-reviewed 결과는 아닙니다. (</span><a href={"https://arxiv.org/abs/2607.19548?utm_source=chatgpt.com"}><span>arXiv</span></a><span>)</span>
+
+### <span>2.2 Multi-animal behavior를 중앙집중식 group model보다 agent-centric하게 모델링</span>
+
+- <span><strong>무엇이 바뀌었는가:</strong></span><span> 모든 개체의 pose를 하나의 global tensor로 입력하는 대신, 각 개체가 자신을 기준으로 주변 개체와 환경을 관찰하도록 변환합니다.</span>
+- <span><strong>왜 중요한가:</strong></span><span> 실제 동물은 world-coordinate 전체를 아는 것이 아니라, 자신의 시야·촉각·상대 위치를 기반으로 반응합니다.</span>
+- <span><strong>Animal Behaviour Analysis 연결:</strong></span><span> courting, following, chasing, avoidance 같은 interaction을 개체별 sensory-to-motor mapping으로 해석할 수 있습니다.</span>
+- <span><strong>내가 지금 신경 써야 하는가:</strong></span><span> </span><span><strong>High</strong></span>
+
+### <span>2.3 Pose sequence를 token처럼 다루는 연구 증가</span>
+
+- <span><strong>무엇이 바뀌었는가:</strong></span><span> continuous keypoint movement를 그대로 regression하거나, 움직임 값을 discrete bin으로 나눠 token classification 문제로 변환하는 방식이 비교됩니다.</span>
+- <span><strong>왜 중요한가:</strong></span><span> transformer는 discrete token prediction에 강하지만, pose는 continuous하고 multidimensional합니다. 어떤 representation을 선택하느냐가 모델 안정성과 rollout 품질을 좌우합니다.</span>
+- <span><strong>Animal Behaviour Analysis 연결:</strong></span><span> keypoint sequence를 language-like token sequence로 바꿔 MAE, transformer, autoregressive model에 적용할 수 있습니다.</span>
+- <span><strong>내가 지금 신경 써야 하는가:</strong></span><span> </span><span><strong>High</strong></span>
+- <span>논문은 continuous regression, discrete binning, static pose prediction, velocity prediction 등을 비교합니다. (</span><a href={"https://arxiv.org/html/2607.19548v1"}><span>arXiv</span></a><span>)</span>
+
+### <span>2.4 단순 trajectory feature와 복잡한 unsupervised representation의 비교 필요</span>
+
+- <span><strong>무엇이 바뀌었는가:</strong></span><span> 최근 tracking-summary 비교 연구는 parametric aggregation과 Keypoint-MoSeq 같은 unsupervised segmentation을 동일한 downstream discrimination 문제에서 평가합니다.</span>
+- <span><strong>왜 중요한가:</strong></span><span> 복잡한 sequence model이 항상 단순 속도·거리·영역 점유 feature보다 좋은 것은 아닙니다.</span>
+- <span><strong>Animal Behaviour Analysis 연결:</strong></span><span> BMOD 프로젝트에서도 먼저 trajectory baseline을 만들고, 이후 pose sequence model을 추가해야 성능 향상의 원인을 해석할 수 있습니다.</span>
+- <span><strong>내가 지금 신경 써야 하는가:</strong></span><span> </span><span><strong>High</strong></span><span> (</span><a href={"https://www.biorxiv.org/content/10.64898/2026.07.20.739643v1.full.pdf?utm_source=chatgpt.com"}><span>bioRxiv</span></a><span>)</span>
+
+### <span>2.5 Pose 결과를 분석하는 공통 data layer가 중요해짐</span>
+
+- <span><strong>무엇이 바뀌었는가:</strong></span><span> </span><span><code>movement</code></span><span>는 DeepLabCut과 SLEAP 등 여러 pose framework의 track을 공통 interface에서 cleaning, visualization, motion quantification할 수 있도록 설계되었습니다.</span>
+- <span><strong>왜 중요한가:</strong></span><span> pose model을 바꿀 때마다 분석 코드를 다시 작성하면 실험 비교가 어려워집니다.</span>
+- <span><strong>Animal Behaviour Analysis 연결:</strong></span><span> 여러 pose model의 결과를 동일한 feature extraction과 behavior classifier로 비교하는 데 사용할 수 있습니다.</span>
+- <span><strong>내가 지금 신경 써야 하는가:</strong></span><span> </span><span><strong>High</strong></span>
+- <span><code>movement</code></span><span> repo는 2026년 8월 2일까지 업데이트되었고, </span><span><code>poseinterface</code></span><span>와 </span><span><code>ethology</code></span><span>도 8월 1일까지 업데이트되었습니다. (</span><a href={"https://github.com/orgs/neuroinformatics-unit/repositories"}><span>GitHub</span></a><span>)</span>
+
+---
+
+## <span>3. 추천 논문 1~2편</span>
+
+## <span>3.1 Agent-Centric Animal Pose Forecasting</span>
+
+- <span><strong>논문 링크:</strong></span><span> </span><a href={"https://arxiv.org/abs/2607.19548"}><span>https://arxiv.org/abs/2607.19548</span></a>
+- <span><strong>HTML:</strong></span><span> </span><a href={"https://arxiv.org/html/2607.19548"}><span>https://arxiv.org/html/2607.19548</span></a>
+- <span><strong>GitHub:</strong></span><span> </span><a href={"https://github.com/kristinbranson/AnimalPoseForecasting"}><span>https://github.com/kristinbranson/AnimalPoseForecasting</span></a>
+- <span><strong>보조 영상:</strong></span><span> </span><a href={"https://figshare.com/articles/media/Supplementary_videos_from_the_paper_Agent-Centric_Animal_Pose_Forecasting_/33043934"}><span>https://figshare.com/articles/media/Supplementary_videos_from_the_paper_Agent-Centric_Animal_Pose_Forecasting_/33043934</span></a>
+- <span><strong>공개 시점:</strong></span><span> 2026년 7월 21일</span>
+- <span><strong>저자:</strong></span><span> Eyrun Eyjolfsdottir, Kristin Branson</span>
+- <span><strong>소속:</strong></span><span> HHMI Janelia Research Campus</span>
+- <span><strong>분야:</strong></span><span> animal pose forecasting, generative behavior modeling, multi-agent social behavior</span>
+- <span><strong>출판 상태:</strong></span><span> </span><span><strong>arXiv preprint</strong></span><span> (</span><a href={"https://arxiv.org/abs/2607.19548?utm_source=chatgpt.com"}><span>arXiv</span></a><span>)</span>
+
+### <span>핵심 문제</span>
+
+<span>동물 행동을 단순 class label로 분류하는 것을 넘어, 동물이 현재 무엇을 보고 있고 과거에 어떻게 움직였는지를 바탕으로 다음 행동과 pose를 생성하는 문제가 필요합니다.</span>
+
+<span>특히 multi-animal 상황에서는 각 개체가 다른 개체의 움직임에 반응하므로, 여러 개체의 행동을 동시에 모델링해야 합니다.</span>
+
+### <span>핵심 아이디어</span>
+
+<span>각 동물을 하나의 독립된 agent로 간주합니다.</span>
+
+<span>각 agent는 다음을 수행합니다.</span>
+
+1. <span>자신의 위치와 방향을 기준으로 환경을 관찰</span>
+2. <span>주변 개체와 arena에 대한 sensory feature 생성</span>
+3. <span>과거 pose와 sensory history 입력</span>
+4. <span>다음 순간의 움직임 예측</span>
+5. <span>예측 움직임을 world coordinate로 되돌림</span>
+6. <span>변경된 환경에서 sensory input을 다시 계산</span>
+7. <span>autoregressive하게 다음 frame 반복 생성</span>
+
+<span>Social behavior는 모든 개체를 하나의 중앙 model이 직접 제어해서 발생하는 것이 아니라, 각 개체가 서로를 감지하고 반응하는 과정에서 나타납니다. (</span><a href={"https://arxiv.org/html/2607.19548v1"}><span>arXiv</span></a><span>)</span>
+
+### <span>모델 구조: 입력–처리–출력</span>
+
+#### <span>입력</span>
+
+- <span>과거 tracked keypoint sequence</span>
+- <span>각 개체의 위치와 orientation</span>
+- <span>arena boundary</span>
+- <span>주변 개체의 상대 위치</span>
+- <span>vision·touch를 근사한 handcrafted sensory feature</span>
+
+#### <span>처리</span>
+
+1. <span>world-frame keypoint를 agent-centric coordinate로 변환</span>
+2. <span>pose와 주변 환경에서 sensory representation 생성</span>
+3. <span>velocity 또는 pose 값을 normalization</span>
+4. <span>continuous 값을 그대로 사용하거나 discrete bin으로 token화</span>
+5. <span>transformer 기반 autoregressive model에 temporal context 입력</span>
+6. <span>다음 pose 또는 velocity 예측</span>
+7. <span>예측을 다시 world frame으로 변환</span>
+8. <span>다른 개체와 환경 상태를 갱신한 뒤 다음 step 반복</span>
+
+#### <span>출력</span>
+
+- <span>다음 frame의 keypoint 또는 velocity</span>
+- <span>여러 frame에 걸친 future pose rollout</span>
+- <span>multi-agent simulated behavior</span>
+- <span>실제 행동과 생성 행동의 feature distribution 비교 결과</span>
+
+### <span>입력 데이터</span>
+
+<span>주요 실험은 courting Drosophila group의 multi-animal pose trajectory를 사용합니다. 각 male fly의 움직임을 simulation하고, female fly의 움직임은 실제 trajectory로 유지하는 실험도 포함됩니다. supplementary video에는 실제 fly trajectory와 model simulation이 제공됩니다. (</span><a href={"https://figshare.com/articles/media/Supplementary_videos_from_the_paper_Agent-Centric_Animal_Pose_Forecasting_/33043934?utm_source=chatgpt.com"}><span>Figshare</span></a><span>)</span>
+
+### <span>기존 방법과의 차이</span>
+
+<span>일반 trajectory forecasting은 전체 scene의 정보를 하나의 model에 입력하거나, graph·attention으로 모든 agent 관계를 직접 모델링합니다.</span>
+
+<span>이 논문은 다음 차이가 있습니다.</span>
+
+- <span>각 agent가 자신의 egocentric coordinate를 사용</span>
+- <span>입력 정보를 실제 동물이 감지할 수 있는 sensory feature로 제한</span>
+- <span>출력도 agent 자신의 movement coordinate로 정의</span>
+- <span>social interaction은 중앙 control 없이 agent 간 반응으로 생성</span>
+- <span>pose representation 변환 과정을 composable·invertible operation으로 관리</span>
+
+### <span>실험한 주요 model variant</span>
+
+<span>논문과 repo는 다음 variant를 비교합니다.</span>
+
+- <span>agent-centric vs world-centric representation</span>
+- <span>handcrafted pose feature vs raw keypoint</span>
+- <span>continuous regression vs discretized movement</span>
+- <span>next pose prediction vs velocity prediction</span>
+- <span>긴 temporal context vs 짧은 temporal context</span>
+- <span>body-centric keypoint representation</span>
+
+<span>논문은 handcrafted angle decomposition 없이 </span><span><strong>keypoint coordinate velocity만으로도 유사한 성능을 낼 수 있다</strong></span><span>는 관찰을 보고합니다. (</span><a href={"https://arxiv.org/html/2607.19548v1"}><span>arXiv</span></a><span>)</span>
+
+### <span>성능 또는 주요 결과</span>
+
+<span>저자들은 생성된 fly behavior가 실제 social behavior의 분포를 여러 scale에서 재현한다고 보고합니다.</span>
+
+<span>평가는 단순 미래 좌표 오차만 보는 것이 아니라 다음을 포함합니다.</span>
+
+- <span>실제·생성 trajectory의 feature distribution 비교</span>
+- <span>real-vs-simulated discriminator</span>
+- <span>behavior pattern frequency</span>
+- <span>model internal representation에 대한 linear probe</span>
+- <span>실험 조건별 행동 차이 재현 여부</span>
+
+<span>다만 아직 preprint이며, 새로운 species와 촬영 조건에서 독립적으로 재현된 결과는 없습니다. (</span><a href={"https://arxiv.org/html/2607.19548v1"}><span>arXiv</span></a><span>)</span>
+
+### <span>한계점</span>
+
+- <span>Drosophila 중심으로 검증</span>
+- <span>sensory feature가 일부 handcrafted</span>
+- <span>pose tracking error가 forecasting error로 누적될 수 있음</span>
+- <span>autoregressive rollout에서 장기 drift 발생 가능</span>
+- <span>행동 class를 직접 출력하지 않음</span>
+- <span>행동 label automation보다는 행동 생성 모델에 가까움</span>
+- <span>repo documentation이 아직 미완성</span>
+- <span>실제 학습 환경과 dataset 준비가 복잡함</span>
+
+### <span>내 관심사와의 연결</span>
+
+<span><strong>매우 높음</strong></span>
+
+<span>사용자의 장기 연구 방향은 다음과 같습니다.</span>
+
+<span><code>동물 영상 → pose estimation → behavior classification → behavior prediction</code></span>
+
+<span>이 논문은 마지막 단계인 behavior prediction을 직접 다룹니다. 또한 keypoint sequence, trajectory, multi-animal interaction, long-horizon modeling과 모두 연결됩니다.</span>
+
+### <span>읽기 우선순위</span>
+
+<span><strong>High</strong></span>
+
+### <span>읽을 때 집중할 부분</span>
+
+1. <span>world-frame과 agent-centric frame의 차이</span>
+2. <span>sensory feature 정의</span>
+3. <span>pose가 아니라 velocity를 예측하는 이유</span>
+4. <span>discretization 방식</span>
+5. <span>teacher forcing과 autoregressive rollout 차이</span>
+6. <span>rollout error 누적 처리</span>
+7. <span>생성 행동 평가 지표</span>
+8. <span>temporal context ablation</span>
+9. <span>새로운 species에 필요한 operation 수정 범위</span>
+
+### <span>구현 난이도</span>
+
+<span><strong>어려움</strong></span>
+
+### <span>현실적인 선행 학습</span>
+
+- <span>PyTorch Dataset/DataLoader</span>
+- <span>transformer encoder 또는 decoder 기본 구조</span>
+- <span>autoregressive sequence modeling</span>
+- <span>teacher forcing</span>
+- <span>coordinate normalization</span>
+- <span>local/global coordinate transformation</span>
+- <span>velocity 계산과 cumulative sum</span>
+- <span>multi-agent data representation</span>
+
+### <span>포트폴리오 또는 연구실 지원 포인트</span>
+
+> <span>Agent-Centric Animal Pose Forecasting을 분석하고, 동물의 과거 trajectory를 local coordinate로 변환한 뒤 다음 위치를 예측하는 경량 autoregressive baseline을 구현했습니다. 이후 다른 개체의 상대 위치를 추가해 social interaction forecasting으로 확장했습니다.</span>
+
+---
+
+## <span>3.2 Comparison of Multiple Video Tracking-Based Behavioral Summary Approaches for Compound Discrimination</span>
+
+- <span><strong>논문 링크:</strong></span><span> </span><a href={"https://www.biorxiv.org/content/10.64898/2026.07.20.739643v1"}><span>https://www.biorxiv.org/content/10.64898/2026.07.20.739643v1</span></a>
+- <span><strong>공개 시점:</strong></span><span> 2026년 7월 24일</span>
+- <span><strong>분야:</strong></span><span> animal tracking, behavior representation, unsupervised segmentation</span>
+- <span><strong>출판 상태:</strong></span><span> </span><span><strong>bioRxiv preprint</strong></span><span> (</span><a href={"https://www.biorxiv.org/content/10.64898/2026.07.20.739643v1.full.pdf?utm_source=chatgpt.com"}><span>bioRxiv</span></a><span>)</span>
+
+### <span>핵심 문제</span>
+
+<span>동물 tracking data를 얻은 뒤 이를 어떤 representation으로 요약해야 실험 조건이나 compound 차이를 가장 잘 구분할 수 있는지 명확하지 않습니다.</span>
+
+<span>복잡한 unsupervised behavior segmentation이 단순 trajectory statistics보다 항상 유리한지 검증할 필요가 있습니다.</span>
+
+### <span>핵심 아이디어</span>
+
+<span>같은 video tracking 결과에 여러 summary 방법을 적용하고 downstream compound discrimination 성능을 비교합니다.</span>
+
+<span>비교 대상에는 다음이 포함됩니다.</span>
+
+- <span>predefined trajectory statistics</span>
+- <span>시간 단위 feature aggregation</span>
+- <span>state 또는 motif frequency</span>
+- <span>Keypoint-MoSeq 기반 unsupervised behavioral syllable</span>
+- <span>기타 tracking-derived summary representation</span>
+
+### <span>모델 구조: 입력–처리–출력</span>
+
+#### <span>입력</span>
+
+- <span>video에서 추출한 animal track</span>
+- <span>pose 또는 trajectory time series</span>
+- <span>실험 조건 또는 compound label</span>
+
+#### <span>처리</span>
+
+1. <span>tracking 결과 정제</span>
+2. <span>속도·거리·영역 점유 등의 parametric feature 생성</span>
+3. <span>또는 unsupervised segmentation으로 behavior state 발견</span>
+4. <span>개체별 summary vector 생성</span>
+5. <span>condition/compound classifier 학습</span>
+6. <span>representation별 discrimination 성능 비교</span>
+
+#### <span>출력</span>
+
+- <span>행동 summary feature</span>
+- <span>discovered behavior state</span>
+- <span>condition classification 성능</span>
+- <span>representation complexity와 해석 가능성 비교</span>
+
+### <span>기존 방법과의 차이</span>
+
+<span>새로운 단일 SOTA 모델을 제안하기보다, 실제 연구자가 tracking data를 어떤 형태로 요약해야 하는지를 비교합니다.</span>
+
+### <span>한계점</span>
+
+- <span>특정 compound discrimination 실험에 의존</span>
+- <span>다른 species와 행동 taxonomy에 그대로 일반화되지 않을 수 있음</span>
+- <span>preprint</span>
+- <span>세부 결과는 full paper table과 method를 직접 확인해야 함</span>
+
+### <span>내 관심사와의 연결</span>
+
+<span><strong>높음</strong></span>
+
+<span>Duck 프로젝트에서 다음 세 접근을 비교하는 근거가 됩니다.</span>
+
+1. <span>CLIP appearance embedding</span>
+2. <span>단순 trajectory feature</span>
+3. <span>keypoint sequence 기반 unsupervised state</span>
+
+### <span>읽기 우선순위</span>
+
+<span><strong>High</strong></span>
+
+### <span>읽을 때 집중할 부분</span>
+
+1. <span>trajectory preprocessing</span>
+2. <span>summary feature 목록</span>
+3. <span>Keypoint-MoSeq 설정</span>
+4. <span>train/test split 기준</span>
+5. <span>개체 단위 leakage 방지</span>
+6. <span>class imbalance</span>
+7. <span>단순 feature와 unsupervised state의 성능 차이</span>
+8. <span>해석 가능성 비교</span>
+
+### <span>구현 난이도</span>
+
+- <span>단순 trajectory baseline: </span><span><strong>쉬움</strong></span>
+- <span>Keypoint-MoSeq 적용: </span><span><strong>보통~어려움</strong></span>
+- <span>전체 논문 재현: </span><span><strong>어려움</strong></span>
+
+### <span>포트폴리오 포인트</span>
+
+> <span>동일한 동물 tracking sequence를 parametric trajectory feature와 unsupervised behavior state로 각각 표현하고, 행동 조건 분류 성능과 해석 가능성을 비교했습니다.</span>
+
+---
+
+## <span>4. 추천 GitHub repo / tool</span>
+
+## <span>4.1 AnimalPoseForecasting</span>
+
+- <span><strong>이름:</strong></span><span> Animal Pose Forecasting Library</span>
+- <span><strong>링크:</strong></span><span> </span><a href={"https://github.com/kristinbranson/AnimalPoseForecasting"}><span>https://github.com/kristinbranson/AnimalPoseForecasting</span></a>
+- <span><strong>무엇을 하는가:</strong></span><span> tracked pose에서 agent-centric autoregressive animal behavior model을 학습·simulation·평가합니다.</span>
+- <span><strong>최근 업데이트 여부:</strong></span><span> 2026년 7월 논문과 함께 공개된 신규 repo입니다.</span>
+- <span><strong>구현 언어:</strong></span><span> Python, PyTorch</span>
+- <span><strong>연구적으로 중요한 이유:</strong></span><span> world-frame, egocentric, sensory, ML-friendly representation 사이의 변환을 operation object로 관리합니다. 각 operation은 composition, inversion, serialization이 가능하도록 설계되었습니다. (</span><a href={"https://github.com/kristinbranson/AnimalPoseForecasting"}><span>GitHub</span></a><span>)</span>
+- <span><strong>Animal Behaviour Analysis 적용 가능성:</strong></span><span> </span><span><strong>High</strong></span>
+- <span><strong>설치/실행 난이도:</strong></span><span> </span><span><strong>어려움</strong></span>
+- <span><strong>내가 당장 실험해볼 수 있는 부분:</strong></span>
+    - <span>README의 model variant flow 비교</span>
+    - <span>global pose → local pose 변환 코드 확인</span>
+    - <span>velocity operation 확인</span>
+    - <span>notebook에서 단일 animal trajectory 변환</span>
+    - <span>pretrained 학습보다 RatInABox 예제 구조 분석</span>
+- <span><strong>주의할 점:</strong></span>
+    - <span>README가 under construction 상태</span>
+    - <span>공식 release 없음</span>
+    - <span>별도 dataset 준비 필요</span>
+    - <span>6 stars, 0 forks 수준의 초기 repo</span>
+    - <span>전체 fly model 재현보다 operation 구조부터 보는 것이 적절함 (</span><a href={"https://github.com/kristinbranson/AnimalPoseForecasting"}><span>GitHub</span></a><span>)</span>
+
+## <span>4.2 movement</span>
+
+- <span><strong>이름:</strong></span><span> movement</span>
+- <span><strong>링크:</strong></span><span> </span><a href={"https://github.com/neuroinformatics-unit/movement"}><span>https://github.com/neuroinformatics-unit/movement</span></a>
+- <span><strong>문서:</strong></span><span> </span><a href={"https://movement.neuroinformatics.dev/"}><span>https://movement.neuroinformatics.dev</span></a>
+- <span><strong>무엇을 하는가:</strong></span><span> DeepLabCut, SLEAP 등에서 생성한 동물 motion track을 정리·분석·시각화하는 Python toolbox입니다.</span>
+- <span><strong>최근 업데이트 여부:</strong></span><span> 2026년 8월 2일까지 업데이트되었습니다. (</span><a href={"https://github.com/orgs/neuroinformatics-unit/repositories"}><span>GitHub</span></a><span>)</span>
+- <span><strong>연구적으로 중요한 이유:</strong></span><span> pose framework에 종속되지 않는 공통 motion-analysis layer를 제공합니다.</span>
+- <span><strong>Animal Behaviour Analysis 적용 가능성:</strong></span><span> </span><span><strong>High</strong></span>
+- <span><strong>설치/실행 난이도:</strong></span><span> </span><span><strong>쉬움~보통</strong></span>
+- <span><strong>설치 예시:</strong></span>
+
+```bash
+conda create -n movement-env -c conda-forge movement napari pyqt6
+conda activate movement-env
+```
+
+- <span><strong>내가 당장 실험해볼 수 있는 부분:</strong></span>
+    - <span>pose track 로드</span>
+    - <span>missing keypoint 확인</span>
+    - <span>confidence 기반 filtering</span>
+    - <span>trajectory visualization</span>
+    - <span>velocity와 movement range 계산</span>
+    - <span>여러 영상의 coordinate normalization</span>
+- <span><strong>주의할 점:</strong></span><span> 행동 class를 자동 생성하는 tool은 아닙니다. pose 결과를 downstream 분석에 사용하기 좋게 정리하는 도구입니다. (</span><a href={"https://github.com/neuroinformatics-unit/movement"}><span>GitHub</span></a><span>)</span>
+
+## <span>4.3 poseinterface / ethology</span>
+
+- <span><strong>poseinterface:</strong></span><span> </span><a href={"https://github.com/neuroinformatics-unit/poseinterface"}><span>https://github.com/neuroinformatics-unit/poseinterface</span></a>
+- <span><strong>ethology:</strong></span><span> </span><a href={"https://github.com/neuroinformatics-unit/ethology"}><span>https://github.com/neuroinformatics-unit/ethology</span></a>
+- <span><strong>무엇을 하는가:</strong></span>
+    - <span><code>poseinterface</code></span><span>: 여러 framework에서 pose estimation을 실행하기 위한 공통 interface</span>
+    - <span><code>ethology</code></span><span>: animal behavior analysis용 computer-vision component를 조합하는 framework</span>
+- <span><strong>최근 업데이트 여부:</strong></span><span> 두 repo 모두 2026년 8월 1일까지 업데이트되었습니다. (</span><a href={"https://github.com/orgs/neuroinformatics-unit/repositories"}><span>GitHub</span></a><span>)</span>
+- <span><strong>연구적으로 중요한 이유:</strong></span><span> pose 모델과 downstream analysis를 loose coupling 구조로 분리할 수 있습니다.</span>
+- <span><strong>Animal Behaviour Analysis 적용 가능성:</strong></span><span> </span><span><strong>Medium~High</strong></span>
+- <span><strong>설치/실행 난이도:</strong></span><span> </span><span><strong>보통</strong></span>
+- <span><strong>내가 당장 실험해볼 수 있는 부분:</strong></span><span> BMOD pipeline을 </span><span><code>video input → pose backend → common output → behavior module</code></span><span> 구조로 나누는 architecture 참고</span>
+- <span><strong>주의할 점:</strong></span><span> 아직 생태계가 비교적 초기 단계이며, 모든 pose framework가 동일 수준으로 지원되는지 확인해야 합니다.</span>
+
+---
+
+## <span>5. 이번 주 미니프로젝트 제안</span>
+
+### <span>프로젝트 제목</span>
+
+<span><strong>Agent-Centric Duck Trajectory Forecasting Baseline</strong></span>
+
+### <span>목표</span>
+
+<span>과거 2~3초의 duck trajectory를 입력받아 다음 1초의 이동 경로를 예측하는 간단한 autoregressive model을 구현합니다.</span>
+
+<span>전체 keypoint forecasting이 아니라 bounding-box center 또는 centroid로 시작합니다.</span>
+
+### <span>배경</span>
+
+<span>Agent-Centric Animal Pose Forecasting의 전체 구조는 복잡하지만, 핵심 아이디어는 작게 재현할 수 있습니다.</span>
+
+<span>핵심은 다음입니다.</span>
+
+- <span>global coordinate 대신 animal-centered coordinate 사용</span>
+- <span>현재 방향을 기준으로 trajectory 회전</span>
+- <span>position 대신 velocity 예측</span>
+- <span>한 step씩 autoregressive rollout</span>
+- <span>실제 trajectory와 생성 trajectory 비교</span>
+
+### <span>사용할 데이터 또는 대체 데이터</span>
+
+<span>우선순위:</span>
+
+1. <span>현재 Duck 영상의 bounding-box trajectory</span>
+2. <span>YOLO + ByteTrack으로 생성한 duck centroid</span>
+3. <span>기존 BMOD segment</span>
+4. <span>대체 데이터로 RatInABox synthetic trajectory</span>
+5. <span>단순하게 직접 생성한 2D random-walk trajectory</span>
+
+### <span>사용할 모델/tool/repo</span>
+
+- <span>Python</span>
+- <span>NumPy</span>
+- <span>pandas</span>
+- <span>PyTorch</span>
+- <span>scikit-learn baseline</span>
+- <span>선택적으로 </span><span><code>movement</code></span>
+- <span>참고 repo: AnimalPoseForecasting</span>
+
+### <span>최소 구현 범위</span>
+
+1. <span>각 frame에서 중심 좌표 </span><span><code>(x, y)</code></span><span> 준비</span>
+2. <span>좌표를 frame width·height로 정규화</span>
+3. <span>position을 velocity로 변환</span>
+4. <span>과거 20 frame을 입력 sequence로 생성</span>
+5. <span>다음 5 frame velocity를 예측</span>
+6. <span>작은 GRU 또는 LSTM 학습</span>
+7. <span>predicted velocity를 cumulative sum해 trajectory 복원</span>
+8. <span>ADE와 FDE 계산</span>
+9. <span>실제·예측 trajectory 시각화</span>
+
+### <span>권장 baseline</span>
+
+#### <span>Baseline 1: Constant Velocity</span>
+
+<span>마지막 velocity가 계속 유지된다고 가정합니다.</span>
+
+#### <span>Baseline 2: Linear Regression</span>
+
+<span>과거 여러 frame의 속도로 다음 위치를 예측합니다.</span>
+
+#### <span>Baseline 3: GRU</span>
+
+<span>과거 velocity sequence로 다음 velocity를 autoregressive하게 예측합니다.</span>
+
+### <span>확장 구현 범위</span>
+
+- <span>animal heading을 추정해 local coordinate로 회전</span>
+- <span>feeding area·water area의 상대 위치를 sensory input으로 추가</span>
+- <span>두 번째 duck의 상대 위치 추가</span>
+- <span>behavior label을 context feature로 추가</span>
+- <span>multiple plausible future를 sampling</span>
+- <span>prediction error가 높은 구간을 annotation queue로 전송</span>
+- <span>resting·feeding·exploring별 forecasting error 비교</span>
+
+### <span>예상 산출물</span>
+
+- <span>Notion 연구 정리</span>
+- <span>Velog 글</span>
+- <span>GitHub README</span>
+- <span>Jupyter notebook</span>
+- <span>실제·예측 trajectory plot</span>
+- <span>ADE/FDE 비교표</span>
+- <span>autoregressive rollout GIF</span>
+- <span>오류 segment 분석</span>
+
+### <span>포트폴리오에 남길 수 있는 한 줄 설명</span>
+
+> <span>동물의 과거 tracking trajectory를 agent-centric velocity sequence로 변환하고 GRU 기반 autoregressive model로 미래 경로를 예측하여, constant-velocity baseline과 비교했습니다.</span>
+
+### <span>예상 소요 시간</span>
+
+<span><strong>8~12시간</strong></span>
+
+### <span>실패 가능성이 높은 부분</span>
+
+- <span>trajectory가 짧거나 noisy함</span>
+- <span>camera motion이 포함됨</span>
+- <span>velocity 값이 불안정함</span>
+- <span>미래 trajectory가 여러 가지라 MSE 예측이 평균 경로로 수렴함</span>
+- <span>train/test segment가 같은 원본 영상에서 나와 leakage 발생</span>
+- <span>GRU가 constant-velocity baseline보다 성능이 낮을 수 있음</span>
+
+### <span>실패했을 때 대체 목표</span>
+
+<span>딥러닝 모델을 포기하고 다음까지만 완료합니다.</span>
+
+1. <span>constant velocity</span>
+2. <span>moving average</span>
+3. <span>linear regression</span>
+4. <span>local coordinate 변환 전후 비교</span>
+
+<span>딥러닝이 baseline을 이기지 못한 이유를 분석하는 것만으로도 연구적 가치가 있습니다.</span>
+
+---
+
+## <span>6. 이번 주 읽기 루틴</span>
+
+### <span>1회독: 전체 문제만 이해</span>
+
+<span>Agent-Centric Animal Pose Forecasting에서 다음만 확인합니다.</span>
+
+- <span>Figure 1</span>
+- <span>abstract</span>
+- <span>contribution 세 가지</span>
+- <span>agent-centric 의미</span>
+- <span>입력과 출력</span>
+- <span>Drosophila experiment</span>
+- <span>model variant 이름</span>
+- <span>Discussion</span>
+
+<span>이 단계에서는 수식과 operation 세부 구현을 건너뜁니다.</span>
+
+### <span>2회독: 모델 구조에서 볼 부분</span>
+
+- <span>world coordinate → egocentric coordinate</span>
+- <span>sensory operation</span>
+- <span>global pose와 local pose</span>
+- <span>velocity representation</span>
+- <span>discretization</span>
+- <span>transformer backbone</span>
+- <span>teacher forcing</span>
+- <span>autoregressive rollout</span>
+- <span>inverse operation</span>
+- <span>평가 지표</span>
+
+<span>특히 다음 flow를 직접 그려보는 것이 좋습니다.</span>
+
+```plaintext
+World-frame keypoints
+        ↓
+Agent-centric transformation
+        ↓
+Sensory + pose history
+        ↓
+Transformer
+        ↓
+Next-step local velocity
+        ↓
+Inverse transformation
+        ↓
+Updated world-frame pose
+        ↓
+Repeat
+```
+
+### <span>3회독: 내 프로젝트 아이디어로 연결</span>
+
+<span>다음 질문을 Duck 프로젝트에 적용합니다.</span>
+
+- <span>duck의 heading을 어떻게 정의할 것인가?</span>
+- <span>keypoint가 없으면 bounding-box trajectory로 시작할 수 있는가?</span>
+- <span>feeding area를 sensory input으로 표현할 수 있는가?</span>
+- <span>behavior class별로 forecasting model을 따로 만들 것인가?</span>
+- <span>prediction error가 행동 전환점에서 커지는가?</span>
+- <span>large error segment를 active labeling 대상으로 사용할 수 있는가?</span>
+
+### <span>정리할 질문 3개</span>
+
+1. <span>world-coordinate 예측보다 agent-centric coordinate 예측이 cross-video generalization에 유리한 이유는 무엇인가?</span>
+2. <span>미래 pose를 직접 예측하는 것과 velocity를 예측한 뒤 적분하는 것은 어떤 차이가 있는가?</span>
+3. <span>하나의 deterministic future를 예측하는 model로 여러 가능한 animal behavior를 표현할 수 있는가?</span>
+
+---
+
+## <span>7. 다음 주 Watchlist</span>
+
+### <span>추적 키워드 5개</span>
+
+1. <span>agent-centric animal behavior forecasting</span>
+2. <span>autoregressive animal pose prediction</span>
+3. <span>generative model computational ethology</span>
+4. <span>multi-animal social behavior simulation</span>
+5. <span>uncertainty-based animal trajectory annotation</span>
+
+### <span>추적할 repo/tool 3개</span>
+
+1. <span>AnimalPoseForecasting</span>
+2. <span>movement</span>
+3. <span>poseinterface / ethology</span>
+
+### <span>다음 주에 다시 확인할 open question 3개</span>
+
+1. <span>AnimalPoseForecasting repo에 installation guide, dataset download, pretrained checkpoint가 추가되는가?</span>
+2. <span>forecasting error를 behavior transition detection이나 active labeling에 사용할 수 있는가?</span>
+3. <span>trajectory forecasting model이 다른 species와 camera setup으로 일반화되는가?</span>
+
+---
+
+# <span>Notion / Velog / 포트폴리오 게시용 자료</span>
+
+## <span>제목</span>
+
+<span>동물 행동을 분류하는 것을 넘어 예측하기: Agent-Centric Animal Pose Forecasting</span>
+
+## <span>요약문</span>
+
+<span>이번 주 computational ethology에서 가장 중요한 연구는 Agent-Centric Animal Pose Forecasting이다. 이 연구는 과거 pose sequence를 이용해 미래 움직임을 autoregressive하게 생성한다. 각 동물은 world-coordinate 전체를 입력받는 것이 아니라, 자신의 위치와 방향을 기준으로 주변 환경과 다른 개체를 감지한다. 모델은 egocentric sensory observation과 과거 움직임을 입력받아 다음 local movement를 출력하고, 이를 world-coordinate로 변환한 뒤 다음 step을 반복한다. 이번 주 미니프로젝트에서는 전체 fly social-behavior model을 재현하는 대신, duck의 centroid trajectory를 velocity sequence로 변환해 다음 1초의 이동 경로를 예측하는 GRU baseline을 구현한다.</span>
+
+## <span>태그</span>
+
+<span><code>#AnimalBehaviourAnalysis#ComputationalEthology#AnimalPoseEstimation#BehaviorForecasting#TrajectoryPrediction#MultiAnimalBehavior#KeypointSequence#AutoregressiveModel#PyTorch#AnimalPoseForecasting</code></span>
+
+---
+
+## <span>GitHub README 초안</span>
+
+```markdown
+# Agent-Centric Animal Trajectory Forecasting
+
+## Overview
+
+This project implements a lightweight autoregressive forecasting model for animal trajectories.
+
+The project is inspired by *Agent-Centric Animal Pose Forecasting*, which models each animal as an independent agent that observes its surroundings and predicts movements in its own egocentric coordinate system.
+
+## Research Question
+
+Does an agent-centric velocity representation improve short-term animal trajectory forecasting compared with world-coordinate position prediction?
+
+## Pipeline
+
+1.Extract animal trajectories from video.
+2.Normalize coordinates by frame size.
+3.Convert positions to velocities.
+4.Transform trajectories into an agent-centric coordinate system.
+5.Use past motion as model input.
+6.Predict future velocities autoregressively.
+7.Recover future positions using cumulative sums.
+8.Compare predictions with the ground truth.
+
+## Baselines
+
+-Constant velocity
+-Moving average velocity
+-Linear regression
+-GRU trajectory forecaster
+
+## Input
+
+-Past trajectory: 20 frames
+-Features:
+  -x velocity
+  -y velocity
+  -speed
+  -heading
+  -optional environmental context
+
+## Output
+
+-Future trajectory: 5 frames
+
+## Evaluation
+
+-Average Displacement Error
+-Final Displacement Error
+-Per-behavior forecasting error
+-Rollout stability
+
+## Expected Outputs
+
+-trajectory preprocessing notebook
+-model training code
+-baseline comparison table
+-prediction plots
+-autoregressive rollout GIF
+-error analysis
+
+## Extensions
+
+-social context from another animal
+-feeding and water-zone context
+-probabilistic future prediction
+-uncertainty-based labeling queue
+-full keypoint pose forecasting
+
+## Portfolio Statement
+
+Built an agent-centric autoregressive model that forecasts future animal trajectories from tracked motion and compared it against constant-velocity and linear baselines.
+```
+
+---
+
+## <span>간결한 블로그 초안</span>
+
+### <span>동물 행동을 분류하는 것에서 예측하는 것으로</span>
+
+<span>동물 행동 분석 연구에서는 일반적으로 영상의 특정 구간을 feeding, grooming, resting과 같은 행동 class로 분류한다. 하지만 실제 동물 행동을 이해하려면 현재 행동뿐 아니라 다음에 어떤 움직임이 나타날지도 모델링해야 한다.</span>
+
+<span>최근 공개된 Agent-Centric Animal Pose Forecasting은 tracked pose에서 미래 행동을 생성하는 framework를 제안한다. 이 연구에서 각 동물은 독립적인 agent다. 모델은 전체 arena의 절대 좌표를 직접 입력받지 않고, 각 동물의 위치와 방향을 기준으로 변환된 sensory observation을 사용한다.</span>
+
+<span>예를 들어 한 동물이 다른 동물과 얼마나 떨어져 있는지, 어느 방향에 위치하는지, arena boundary가 어느 방향에 있는지를 자신의 시점에서 표현한다. 이후 transformer는 과거 sensory·pose sequence를 입력받아 다음 순간의 movement를 예측한다.</span>
+
+<span>예측된 movement는 다시 world-coordinate로 변환된다. 모든 agent의 위치가 갱신되면 새로운 sensory observation이 계산되고, 같은 과정이 반복된다. 따라서 social behavior는 하나의 중앙 model이 여러 동물을 직접 제어해서 발생하는 것이 아니라, 각 agent가 서로를 감지하고 반응하는 과정에서 나타난다.</span>
+
+<span>이 연구는 사용자의 장기 목표인 </span><span><code>pose estimation → behavior classification → behavior prediction</code></span><span>에서 마지막 단계를 직접 다룬다. 하지만 전체 model은 Drosophila multi-animal pose, sensory operation, coordinate transformation, transformer rollout을 포함해 구현 난이도가 높다.</span>
+
+<span>따라서 첫 실험은 centroid trajectory forecasting으로 축소하는 것이 적절하다. Duck 영상에서 bounding-box center를 추출하고, position을 velocity로 변환한다. 과거 20 frame의 velocity를 GRU에 입력해 다음 5 frame의 움직임을 예측한다.</span>
+
+<span>가장 중요한 것은 GRU만 학습하는 것이 아니다. constant-velocity baseline과 비교해야 한다. 단순 baseline보다 성능이 낮다면, 현재 데이터에서는 복잡한 sequence model이 필요하지 않다는 의미일 수 있다.</span>
+
+<span>향후에는 feeding area의 상대 위치나 다른 개체의 위치를 sensory input으로 추가할 수 있다. 예측 오차가 급격히 증가하는 구간을 행동 전환 후보로 간주하거나, 사람이 우선 확인해야 할 annotation 구간으로 선택하는 것도 가능하다.</span>
+
+---
+
+## <span>주요 출처</span>
+
+- <span>Agent-Centric Animal Pose Forecasting 논문: </span><a href={"https://arxiv.org/abs/2607.19548"}><span>https://arxiv.org/abs/2607.19548</span></a>
+- <span>AnimalPoseForecasting GitHub: </span><a href={"https://github.com/kristinbranson/AnimalPoseForecasting"}><span>https://github.com/kristinbranson/AnimalPoseForecasting</span></a>
+- <span>Supplementary videos: </span><a href={"https://figshare.com/articles/media/Supplementary_videos_from_the_paper_Agent-Centric_Animal_Pose_Forecasting_/33043934"}><span>https://figshare.com/articles/media/Supplementary_videos_from_the_paper_Agent-Centric_Animal_Pose_Forecasting_/33043934</span></a>
+- <span>Tracking-summary comparison: </span><a href={"https://www.biorxiv.org/content/10.64898/2026.07.20.739643v1"}><span>https://www.biorxiv.org/content/10.64898/2026.07.20.739643v1</span></a>
+- <span>movement: </span><a href={"https://github.com/neuroinformatics-unit/movement"}><span>https://github.com/neuroinformatics-unit/movement</span></a>
+- <span>poseinterface: </span><a href={"https://github.com/neuroinformatics-unit/poseinterface"}><span>https://github.com/neuroinformatics-unit/poseinterface</span></a>
+- <span>ethology: </span><a href={"https://github.com/neuroinformatics-unit/ethology"}><span>https://github.com/neuroinformatics-unit/ethology</span></a>
