@@ -219,6 +219,8 @@ $h_t(1-z_t)\odot h_{t-1}+z_t\odot\tilde{h}_t$
 
 > <span>Self-attention에서는 각 단어가 </span><span><strong>같은 문장 안의 다른 모든 단어를 참고한다.</strong></span>
 > 
+> > <span>Self Attention은 일종의 soft한 dictionary. </span>
+> 
 > <figure class="notion-figure">
 >   <img src={"/notion-assets/reading-note-attention-is-all-you-need/3b114b84a0f2803da8acebb7360866ba.png"} alt={"Source: author's Notion note"} />
 >   <figcaption>Source: author's Notion note</figcaption>
@@ -347,6 +349,8 @@ $h_t(1-z_t)\odot h_{t-1}+z_t\odot\tilde{h}_t$
 >     > <span>attention distribution을 통해 해석가능하다 </span>
 >     > 
 >     > <span>→ 각각의 attention head가 서로 다른 기능을 학습할 뿐만 아니라, 많은 head가 문장의 문법적 구조와 의미적 구조에 관련된 행동을 보이는 것으로 나타난다.</span>
+> 
+> <span class="notion-color-blue"><strong>고전적인 RNN encoder–decoder에서는 입력 시퀀스의 정보를 최종 hidden state와 같은 제한된 표현에 압축하는 병목이 발생할 수 있다. 반면 Transformer는 각 입력 토큰의 문맥화된 표현을 유지하고, Decoder가 cross-attention을 통해 필요한 위치의 정보를 직접 참조한다.</strong></span>
 
 <figure class="notion-figure">
   <img src={"/notion-assets/reading-note-attention-is-all-you-need/3b114b84a0f280699118f1923f46dbe2.png"} alt={"Source: author's Notion note"} />
