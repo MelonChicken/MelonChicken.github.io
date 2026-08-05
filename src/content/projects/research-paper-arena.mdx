@@ -1,0 +1,519 @@
+---
+title: "Research Paper Arena"
+slug: "research-paper-arena"
+generated: true
+status: "idea"
+summary: "연구 브리핑 Markdown에서 논문 후보를 추출하고, 외부 학술 자료를 교차검증하여 최근 1~2년의 유사 연구 대비 위치와 연구 가치를 평가한 뒤, 이번 주에 읽을 논문 1편을 선정하도록 돕는 웹 서비스"
+date: "2025-08-28"
+group: "product"
+stack: 
+  - "Google AI Studio"
+  - "Gemini API"
+  - "Vanila JS"
+  - "node.js"
+  - "TypeScript"
+roles: 
+  - "👤 Project Management"
+output: "🌐 Web"
+notion: "https://app.notion.com/p/Research-Paper-Arena-3b314b84a0f2808c9fdbfca72b18f68d"
+featured: false
+problem: "연구 브리핑 Markdown에서 논문 후보를 추출하고, 외부 학술 자료를 교차검증하여 최근 1~2년의 유사 연구 대비 위치와 연구 가치를 평가한 뒤, 이번 주에 읽을 논문 1편을 선정하도록 돕는 웹 서비스"
+---
+
+import NotionBookmark from '../../components/notion/NotionBookmark.astro';
+import NotionCallout from '../../components/notion/NotionCallout.astro';
+import NotionColumns from '../../components/notion/NotionColumns.astro';
+import NotionToggle from '../../components/notion/NotionToggle.astro';
+
+{/* This file is generated from Notion. Do not edit directly. */}
+
+# <span>Paper Quest</span>
+
+> <span><strong>한 줄 설명:</strong></span><span> 연구 브리핑 Markdown에서 논문 후보를 추출하고, 외부 학술 자료와 최근 연구를 교차검증하여 이번 주에 읽을 논문 1편을 선정하도록 돕는 AI 기반 논문 평가 웹 서비스</span>
+
+---
+
+## <span>1. 프로젝트 개요</span>
+
+<span>Paper Quest는 최신 연구 브리핑에 포함된 여러 논문 중 어떤 논문을 우선해서 읽어야 하는지 판단하기 어려운 학부 연구생과 초보 연구자를 위한 웹 서비스이다.</span>
+
+<span>사용자가 주간 연구 브리핑을 Markdown 형식으로 입력하면, AI가 문서에서 논문·데이터셋·연구 도구를 구분하고 평가 대상 논문을 최대 5편까지 추출한다. 이후 논문 원문, 공식 학회·저널 페이지, 학술 데이터베이스, 공식 GitHub 등 외부 자료를 조사하고 최근 1~2년의 유사 연구와 비교한다.</span>
+
+<span>각 논문은 성능 경쟁력, 방법론적 신규성, 연구 흐름상 중요도, 학술적 유의미성, 실무·연구 적용 가치, 재현 가능성의 여섯 기준으로 평가된다. 서비스는 평가 결과를 육각형 그래프와 비교표로 시각화하고, 이번 주에 읽을 논문 1편과 그 이유를 추천한다. 최종 선택은 AI가 아닌 사용자가 수행한다.</span>
+
+---
+
+## <span>2. 해결하려는 문제</span>
+
+<span>연구 브리핑은 최신 논문을 빠르게 발견하는 데 유용하지만, 브리핑에 포함된 요약만으로 실제로 읽을 논문을 결정하기는 어렵다.</span>
+
+<span>기존 방식에서는 사용자가 다음 작업을 직접 수행해야 한다.</span>
+
+- <span>브리핑에서 논문 후보를 다시 정리</span>
+- <span>논문 원문과 초록 확인</span>
+- <span>학회 또는 저널 정보 검색</span>
+- <span>학회 위상과 저널 IF·JCR Quartile 확인</span>
+- <span>코드와 데이터 공개 여부 확인</span>
+- <span>최근 유사 연구 탐색</span>
+- <span>성능과 방법론의 차이 비교</span>
+- <span>최종 읽기 우선순위 결정</span>
+
+<span>이 과정은 시간이 오래 걸릴 뿐 아니라, 논문마다 다른 기준을 적용하거나 브리핑의 설명을 검증 없이 신뢰할 가능성이 있다. 특히 최신 preprint는 신규성과 최신성은 높지만 peer review가 완료되지 않았을 수 있으며, 높은 성능을 주장하더라도 동일한 데이터셋과 평가 조건에서 비교되지 않았다면 실제 SOTA인지 판단하기 어렵다.</span>
+
+<span>Paper Quest는 이 조사와 비교 과정을 구조화하여, 사용자가 일관된 근거를 바탕으로 논문을 선택할 수 있도록 지원한다.</span>
+
+---
+
+## <span>3. 프로젝트 목적</span>
+
+<span>이 프로젝트의 최종 목적은 </span><span><strong>사용자가 이번 주에 읽을 논문 한 편을 합리적으로 결정하도록 돕는 것</strong></span><span>이다.</span>
+
+<span>세부 목적은 다음과 같다.</span>
+
+- <span>연구 브리핑에서 논문 후보를 자동으로 추출한다.</span>
+- <span>논문과 데이터셋, GitHub 도구, 일반 연구 동향을 구분한다.</span>
+- <span>입력된 브리핑만 신뢰하지 않고 외부 학술 자료를 조사한다.</span>
+- <span>최근 1~2년의 유사 연구와 비교하여 논문의 분야 내 위치를 판단한다.</span>
+- <span>논문의 성능뿐 아니라 신규성, 유의미성, 활용 가치도 함께 평가한다.</span>
+- <span>평가 사실과 AI의 해석을 명확히 분리한다.</span>
+- <span>확인하지 못한 정보는 추정하지 않고 추가 확인 대상으로 남긴다.</span>
+- <span>AI 추천과 사용자의 최종 결정을 구분한다.</span>
+- <span>결과를 연구 노트로 다시 활용할 수 있는 Markdown 형태로 제공한다.</span>
+
+---
+
+## <span>4. 주요 사용자</span>
+
+### <span>주요 사용자</span>
+
+- <span>컴퓨터 비전, 머신러닝, 동물 행동 분석 등의 분야를 공부하는 학부 연구생</span>
+- <span>최신 논문을 정기적으로 읽어야 하는 초보 연구자</span>
+- <span>연구 브리핑이나 뉴스레터를 받아보지만 읽기 우선순위를 정하기 어려운 사용자</span>
+
+### <span>사용 상황</span>
+
+- <span>주간 연구 브리핑을 받은 직후</span>
+- <span>연구실 미팅 전 읽을 논문을 선정할 때</span>
+- <span>여러 최신 논문의 중요도를 빠르게 비교할 때</span>
+- <span>최신 preprint가 실제로 읽을 가치가 있는지 검토할 때</span>
+- <span>새로운 연구 흐름을 파악하기 위한 대표 논문을 선택할 때</span>
+
+---
+
+## <span>5. 핵심 기능</span>
+
+### <span>5.1 Markdown 기반 연구 브리핑 입력</span>
+
+<span>사용자가 정해진 구조의 주간 연구 브리핑 Markdown을 입력한다.</span>
+
+<span>입력 문서에는 다음 자료가 함께 포함될 수 있다.</span>
+
+- <span>논문</span>
+- <span>데이터셋</span>
+- <span>GitHub repository</span>
+- <span>연구 도구</span>
+- <span>연구 동향</span>
+- <span>미니프로젝트 제안</span>
+- <span>참고 링크</span>
+
+### <span>5.2 연구 자료 유형 분류</span>
+
+<span>AI가 입력 문서를 분석하여 자료를 다음 유형으로 분류한다.</span>
+
+- <span>평가 대상 논문</span>
+- <span>데이터셋</span>
+- <span>GitHub 도구</span>
+- <span>일반 연구 동향</span>
+- <span>기타 참고자료</span>
+
+<span>논문 후보는 한 번에 최대 5편까지만 평가한다.</span>
+
+### <span>5.3 논문 기본정보 검증</span>
+
+<span>각 논문에서 가능한 경우 다음 정보를 확인한다.</span>
+
+- <span>제목</span>
+- <span>저자</span>
+- <span>출판 연도</span>
+- <span>DOI</span>
+- <span>arXiv 또는 bioRxiv ID</span>
+- <span>공식 논문 링크</span>
+- <span>발표 학회 또는 저널</span>
+- <span>peer review 상태</span>
+- <span>코드 공개 여부</span>
+- <span>데이터 공개 여부</span>
+
+### <span>5.4 외부 학술 자료 조사</span>
+
+<span>입력된 브리핑의 설명만으로 평가하지 않고 다음 출처를 확인한다.</span>
+
+1. <span>논문 원문</span>
+2. <span>공식 학회 페이지</span>
+3. <span>공식 저널 페이지</span>
+4. <span>arXiv 또는 bioRxiv</span>
+5. <span>저자 및 연구실 공식 페이지</span>
+6. <span>공식 GitHub</span>
+7. <span>Semantic Scholar, OpenAlex 등의 학술 데이터베이스</span>
+
+<span>가능한 경우 둘 이상의 출처를 비교하여 정보를 교차검증한다.</span>
+
+### <span>5.5 최근 유사 연구 비교</span>
+
+<span>논문의 핵심 주제와 방법론을 추출한 뒤 최근 1~2년 사이에 발표된 동일하거나 유사한 연구를 탐색한다.</span>
+
+<span>비교 항목은 다음과 같다.</span>
+
+- <span>연구 문제</span>
+- <span>기존 방법의 한계</span>
+- <span>제안 방법의 차이</span>
+- <span>사용 데이터셋</span>
+- <span>평가 지표</span>
+- <span>성능</span>
+- <span>실험 설계</span>
+- <span>코드 및 데이터 공개 여부</span>
+- <span>최근 연구 흐름과의 관계</span>
+
+### <span>5.6 육각형 논문 평가</span>
+
+<span>각 논문을 다음 6개 기준으로 1~5점 평가한다.</span>
+
+| <span>평가 기준</span> | <span>평가 내용</span> |
+| --- | --- |
+| <span>성능 경쟁력</span> | <span>동일하거나 유사한 benchmark에서 기존 방법 대비 경쟁력 있는 성능을 보이는가</span> |
+| <span>방법론적 신규성</span> | <span>새로운 문제 정의, 모델 구조 또는 표현 방식을 제안했는가</span> |
+| <span>연구 흐름상 중요도</span> | <span>최근 1~2년의 주요 연구 방향과 연결되며 후속 연구 가능성이 있는가</span> |
+| <span>학술적 유의미성</span> | <span>기존 방법의 한계를 해결하고 타당한 실험과 후속 질문을 제공하는가</span> |
+| <span>실무·연구 적용 가치</span> | <span>실제 실험, 구현, 학습 또는 후속 연구에 활용할 수 있는가</span> |
+| <span>재현 가능성</span> | <span>코드, 데이터, 실행 문서와 실험 세부정보가 충분히 공개되어 있는가</span> |
+
+<span>평가 결과는 게임의 능력치 화면과 유사한 육각형 레이더 차트로 표시한다.</span>
+
+### <span>5.7 출판 신뢰도와 최신성 평가</span>
+
+<span>연구 내용과 출판 상태를 혼합하지 않기 위해 다음 두 항목은 육각형 평가와 별도로 표시한다.</span>
+
+- <span><strong>출판 신뢰도:</strong></span><span> 학회 위상, 저널 IF, JCR Quartile, peer review 여부</span>
+- <span><strong>최신성:</strong></span><span> 공개 시점과 최근 연구 흐름과의 연결 정도</span>
+
+<span>컴퓨터 비전과 머신러닝 논문은 학회 위상을 우선 평가하고, 저널 논문은 Impact Factor와 JCR Quartile을 함께 확인한다.</span>
+
+### <span>5.8 근거 유형 분리</span>
+
+<span>각 평가의 근거는 다음 세 가지로 구분한다.</span>
+
+- <span><strong>논문 원문:</strong></span><span> 논문 본문, 표, 그림, 실험 결과에서 직접 확인한 정보</span>
+- <span><strong>외부 출처:</strong></span><span> 학회·저널 페이지, 공식 GitHub, 학술 데이터베이스 등에서 확인한 정보</span>
+- <span><strong>AI 해석:</strong></span><span> 원문과 외부 자료를 종합하여 AI가 내린 비교 및 판단</span>
+
+### <span>5.9 논문 추천과 사용자 선택</span>
+
+<span>AI는 전체 평가를 바탕으로 이번 주에 읽을 논문 1편을 추천한다.</span>
+
+<span>추천 결과에는 다음이 포함된다.</span>
+
+- <span>추천 논문</span>
+- <span>추천 이유</span>
+- <span>주요 강점</span>
+- <span>주요 한계</span>
+- <span>최근 연구에서의 위치</span>
+- <span>추가 확인이 필요한 정보</span>
+- <span>논문을 읽을 때 확인할 질문</span>
+
+<span>사용자는 AI의 추천을 참고해 직접 최종 논문을 선택한다.</span>
+
+### <span>5.10 Markdown 결과 기록</span>
+
+<span>최종 결과를 복사 가능한 Markdown으로 제공한다.</span>
+
+<span>기록 항목은 다음과 같다.</span>
+
+- <span>분석 기준일</span>
+- <span>추출된 논문 목록</span>
+- <span>논문별 평가 점수</span>
+- <span>출판 신뢰도와 최신성</span>
+- <span>AI 추천 논문</span>
+- <span>AI 추천 이유</span>
+- <span>사용자 최종 선택</span>
+- <span>주요 한계</span>
+- <span>추가 확인 필요 사항</span>
+- <span>읽기 질문</span>
+- <span>후속 연구 질문</span>
+
+---
+
+## <span>6. 서비스 워크플로우</span>
+
+```plaintext
+연구 브리핑 Markdown 입력
+        ↓
+논문·데이터셋·도구 분류
+        ↓
+논문 후보 최대 5편 추출
+        ↓
+논문 기본정보 및 출판 상태 검증
+        ↓
+최근 1~2년 유사 연구 탐색
+        ↓
+6개 기준 논문 평가
+        ↓
+육각형 그래프 및 비교표 출력
+        ↓
+AI 추천 논문 1편 제시
+        ↓
+사용자 최종 선택
+        ↓
+읽기 질문 및 Markdown 기록 생성
+```
+
+---
+
+## <span>7. 활용 기술 스택</span>
+
+### <span>AI 및 개발 플랫폼</span>
+
+- <span><strong>Google AI Studio</strong></span>
+    - <span>웹앱 프로토타입 생성</span>
+    - <span>Gemini 모델 호출</span>
+    - <span>입력 분석 및 논문 평가</span>
+    - <span>구조화된 결과 생성</span>
+- <span><strong>Gemini API</strong></span>
+    - <span>Markdown 문서 구조 분석</span>
+    - <span>논문·데이터셋·도구 분류</span>
+    - <span>논문 비교 및 평가</span>
+    - <span>추천 이유와 읽기 질문 생성</span>
+
+### <span>프론트엔드</span>
+
+- <span><strong>React</strong></span>
+    - <span>입력 화면과 결과 화면 구성</span>
+    - <span>논문 카드 및 사용자 선택 상태 관리</span>
+- <span><strong>TypeScript</strong></span>
+    - <span>논문 정보와 평가 결과의 데이터 타입 정의</span>
+    - <span>검색 결과와 미확인 상태의 안정적인 처리</span>
+- <span><strong>HTML / CSS</strong></span>
+    - <span>반응형 웹 UI 구성</span>
+    - <span>카드, 배지, 비교표 디자인</span>
+- <span><strong>Recharts 또는 Chart.js</strong></span>
+    - <span>6개 평가 기준의 육각형 레이더 차트 구현</span>
+
+### <span>데이터 처리</span>
+
+- <span><strong>Markdown Parsing</strong></span>
+    - <span>연구 브리핑의 제목과 섹션 구조 분석</span>
+    - <span>논문 후보와 링크 추출</span>
+- <span><strong>JSON Structured Output</strong></span>
+    - <span>논문별 평가 결과를 동일한 데이터 구조로 저장</span>
+    - <span>육각형 그래프와 비교표에서 동일한 평가 데이터 사용</span>
+
+### <span>외부 학술 정보</span>
+
+- <span>논문 원문 및 공식 학회·저널 페이지</span>
+- <span>arXiv</span>
+- <span>bioRxiv</span>
+- <span>Semantic Scholar</span>
+- <span>OpenAlex</span>
+- <span>공식 GitHub repository</span>
+- <span>저자 및 연구실 공식 페이지</span>
+
+### <span>출력 및 기록</span>
+
+- <span><strong>Markdown</strong></span>
+    - <span>최종 분석 결과 저장</span>
+    - <span>Notion 연구 노트로 복사</span>
+    - <span>주간 논문 읽기 계획 기록</span>
+
+---
+
+## <span>8. 주요 데이터 구조</span>
+
+<span>논문별 결과는 다음과 같은 구조로 관리한다.</span>
+
+```json
+{
+  "title": "논문 제목",
+  "authors": ["저자"],
+  "year": 2026,
+  "identifier": {
+    "doi": null,
+    "arxivId": "0000.00000"
+  },
+  "publication": {
+    "type": "preprint",
+    "venue": "arXiv",
+    "peerReviewed": false,
+    "impactFactor": null,
+    "jcrQuartile": null
+  },
+  "resources": {
+    "paperUrl": "",
+    "codeUrl": "",
+    "dataUrl": ""
+  },
+  "scores": {
+    "performance": 3,
+    "novelty": 5,
+    "trendImportance": 4,
+    "academicSignificance": 4,
+    "applicationValue": 4,
+    "reproducibility": 3
+  },
+  "publicationReliability": 2,
+  "recency": 5,
+  "evidence": {
+    "paper": [],
+    "external": [],
+    "aiInterpretation": []
+  },
+  "needsVerification": [],
+  "recommendationReason": ""
+}
+```
+
+<span>확인되지 않은 점수는 임의의 숫자를 입력하지 않고 </span><span><code>null</code></span><span> 또는 </span><span><code>needsVerification</code></span><span> 상태로 관리한다.</span>
+
+---
+
+## <span>9. 핵심 UI 구성</span>
+
+### <span>시작 화면</span>
+
+- <span>서비스 이름 및 설명</span>
+- <span>Markdown 입력창</span>
+- <span>예시 Markdown 입력 버튼</span>
+- <span>최대 5편 분석 안내</span>
+- <span>분석 시작 버튼</span>
+
+### <span>분석 현황 화면</span>
+
+- <span>논문 후보 추출</span>
+- <span>논문 정보 확인</span>
+- <span>최근 연구 탐색</span>
+- <span>학회·저널 검증</span>
+- <span>평가 근거 생성</span>
+
+### <span>논문 카드</span>
+
+- <span>논문 제목</span>
+- <span>저자와 연도</span>
+- <span>학회·저널·preprint 상태</span>
+- <span>코드 및 데이터 공개 여부</span>
+- <span>육각형 평가 그래프</span>
+- <span>출판 신뢰도와 최신성 배지</span>
+- <span>강점과 한계</span>
+- <span>근거 확인 버튼</span>
+
+### <span>후보 비교 화면</span>
+
+- <span>논문별 점수 비교표</span>
+- <span>최근 유사 연구와의 차이</span>
+- <span>추가 확인 필요 항목</span>
+- <span>AI 추천 논문</span>
+
+### <span>최종 선택 화면</span>
+
+- <span>AI 추천</span>
+- <span>사용자 최종 선택</span>
+- <span>읽기 질문</span>
+- <span>Markdown 결과 복사</span>
+
+---
+
+## <span>10. 차별점</span>
+
+<span>기존의 논문 추천 서비스는 사용자 관심 키워드나 인용 수를 기준으로 논문 목록을 제시하는 데 집중한다.</span>
+
+<span>Paper Quest는 다음과 같은 차이가 있다.</span>
+
+- <span>이미 생성된 연구 브리핑을 실제 의사결정 입력으로 사용한다.</span>
+- <span>논문뿐 아니라 데이터셋과 도구가 섞인 문서를 분류한다.</span>
+- <span>브리핑의 평가를 그대로 신뢰하지 않고 외부 자료를 검증한다.</span>
+- <span>최근 1~2년의 유사 연구와 직접 비교한다.</span>
+- <span>성능 외에 신규성, 유의미성, 적용 가치와 재현성을 평가한다.</span>
+- <span>출판 신뢰도와 연구 최신성을 분리한다.</span>
+- <span>근거를 논문 원문, 외부 출처, AI 해석으로 구분한다.</span>
+- <span>확인되지 않은 정보는 추가 확인 대상으로 남긴다.</span>
+- <span>AI 추천과 사용자 선택을 분리해 최종 판단을 사용자에게 남긴다.</span>
+- <span>최종 결과를 연구 노트로 재사용할 수 있다.</span>
+
+---
+
+## <span>11. 구현 범위</span>
+
+### <span>MVP에 포함</span>
+
+- <span>Markdown 입력</span>
+- <span>논문·데이터셋·도구 분류</span>
+- <span>논문 최대 5편 추출</span>
+- <span>외부 학술 정보 조사</span>
+- <span>최근 1~2년 유사 연구 비교</span>
+- <span>6개 기준 평가</span>
+- <span>육각형 레이더 차트</span>
+- <span>논문 후보 비교표</span>
+- <span>출판 신뢰도와 최신성 표시</span>
+- <span>AI 추천 논문 1편</span>
+- <span>사용자 최종 선택</span>
+- <span>Markdown 결과 복사</span>
+
+### <span>현재 제외</span>
+
+- <span>사용자 개인 프로젝트 기반 맞춤 추천</span>
+- <span>평가 가중치 커스텀</span>
+- <span>기존 논문 데이터베이스와 중복 검사</span>
+- <span>Notion API 자동 저장</span>
+- <span>논문 PDF 직접 업로드 및 전체 분석</span>
+- <span>5편을 초과하는 대량 논문 분석</span>
+- <span>장기 연구 로드맵 자동 생성</span>
+
+---
+
+## <span>12. 기대 효과</span>
+
+- <span>논문 선정에 필요한 반복적인 검색 시간을 줄일 수 있다.</span>
+- <span>매주 동일한 기준으로 논문을 평가할 수 있다.</span>
+- <span>브리핑 내용의 오류나 과장 가능성을 확인할 수 있다.</span>
+- <span>최신성과 학술적 신뢰도를 구분해 판단할 수 있다.</span>
+- <span>SOTA라는 표현을 성능, 신규성, 연구 흐름으로 세분화할 수 있다.</span>
+- <span>단순 추천이 아니라 논문을 선택한 이유를 기록할 수 있다.</span>
+- <span>논문을 읽기 전 핵심 질문을 정할 수 있다.</span>
+- <span>읽은 결과를 다음 연구 질문으로 연결하는 기반을 제공한다.</span>
+
+---
+
+## <span>13. 예상 한계</span>
+
+- <span>외부 검색 결과가 누락되거나 최신 정보와 일치하지 않을 수 있다.</span>
+- <span>동일한 benchmark가 없는 논문은 성능을 직접 비교하기 어렵다.</span>
+- <span>학회 위상은 분야마다 다르므로 절대적인 점수로 단순화하기 어렵다.</span>
+- <span>Impact Factor와 JCR Quartile만으로 논문의 질을 판단할 수 없다.</span>
+- <span>최신 preprint는 후속 검증 결과에 따라 평가가 달라질 수 있다.</span>
+- <span>코드가 공개되어 있어도 실제 재현 가능성까지 자동으로 확인하기 어렵다.</span>
+- <span>AI의 해석에는 오류가 포함될 수 있으므로 원문 확인이 필요하다.</span>
+
+<span>이러한 한계를 줄이기 위해 출처를 함께 제시하고, 확인되지 않은 항목은 </span><span><code>추가 확인 필요</code></span><span>로 표시하며, 최종 선택은 사용자가 수행하도록 설계한다.</span>
+
+---
+
+## <span>14. 향후 확장 방향</span>
+
+- <span>사용자의 연구 분야와 현재 프로젝트를 반영한 개인 맞춤형 평가</span>
+- <span>기존 Notion 논문 데이터베이스와의 중복 검사</span>
+- <span>DOI와 arXiv ID 기반 논문 이력 관리</span>
+- <span>Notion API 연동</span>
+- <span>논문 PDF 직접 분석</span>
+- <span>논문을 읽은 후 사용자 메모와 최초 평가 비교</span>
+- <span>사용자 선택 데이터를 활용한 추천 기준 개선</span>
+- <span>연구실 또는 스터디 단위의 공동 논문 선정</span>
+- <span>장기적인 연구 주제 변화와 논문 읽기 기록 시각화</span>
+
+---
+
+## <span>15. 최종 산출물</span>
+
+- <span>Google AI Studio 기반 AI 웹 서비스</span>
+- <span>연구 브리핑 Markdown 입력 화면</span>
+- <span>논문 후보 평가 카드</span>
+- <span>육각형 레이더 차트</span>
+- <span>논문 비교표</span>
+- <span>AI 추천 및 사용자 선택 화면</span>
+- <span>복사 가능한 논문 선정 Markdown 기록</span>
+- <span>서비스 기획 워크시트 및 실행 화면 캡처</span>
