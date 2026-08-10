@@ -1,0 +1,1418 @@
+---
+title: "Animal Behaviour Analysis Weekly Brief — 2026.08.10."
+slug: "animal-behaviour-analysis-weekly-brief-20260810"
+generated: true
+status: "completed"
+type: "weekly-brief"
+date: "2026-08-10"
+notion: "https://app.notion.com/p/Animal-Behaviour-Analysis-Weekly-Brief-2026-08-10-3b814b84a0f2800ba094c303bb80fbdf"
+---
+
+import NotionBookmark from '../../components/notion/NotionBookmark.astro';
+import NotionCallout from '../../components/notion/NotionCallout.astro';
+import NotionColumns from '../../components/notion/NotionColumns.astro';
+import NotionToggle from '../../components/notion/NotionToggle.astro';
+
+{/* This file is generated from Notion. Do not edit directly. */}
+
+# <span>Animal Behaviour Analysis Weekly Research Briefing</span>
+
+<span><strong>기준일:</strong></span><span> 2026년 8월 10일<br /></span><span><strong>우선 조사 기간:</strong></span><span> 2026년 7월 27일~8월 10일<br /></span><span><strong>분야:</strong></span><span> Animal Behaviour Analysis / Computational Ethology / Animal Pose Estimation / Animal Behavior Recognition</span>
+
+> <span><strong>이번 주 핵심:</strong></span><span> 이번 주에는 사용자의 관심사와 직접 맞닿는 논문이 하나 나왔습니다. </span><span><strong>Promptable Animal Pose Tracking Across Species</strong></span><span>는 동물마다 수백 장의 keypoint annotation을 다시 만드는 대신, </span><span><strong>한 reference frame에서 원하는 keypoint를 지정하고 나머지 영상으로 전파</strong></span><span>하는 방향을 제시합니다. supervised route와 training-free unsupervised route를 모두 제공하며, foundation-model feature를 이용해 cross-species pose tracking을 수행합니다. 2026년 8월 5일 arXiv에 공개됐고 ECCV 2026 CV4Ecology Workshop 발표 논문입니다. (</span><a href={"https://arxiv.org/html/2608.04995v1"}><span>arXiv</span></a><span>)</span>
+
+---
+
+## <span>1. 이번 주 한눈에 보기</span>
+
+<span>이번 주 가장 중요한 변화는 </span><span><strong>animal pose labeling 자체를 줄이는 방법이 foundation model 기반 promptable tracking 형태로 구체화되었다는 점</strong></span><span>입니다. Promptable Animal Pose Tracking은 영상 한 프레임에서 사용자가 관심 keypoint를 지정하면, DINOv3·BioCLIP·diffusion feature 같은 pretrained representation을 이용해 나머지 frame으로 keypoint를 전달합니다. 연구진은 supervised route와 별도로 </span><span><strong>task-specific training이 필요 없는 unsupervised correspondence route</strong></span><span>도 제안했습니다. (</span><a href={"https://arxiv.org/html/2608.04995v1"}><span>arXiv</span></a><span>)</span>
+
+<span>특히 이 연구는 사용자의 labeling 자동화 관심과 직접 연결됩니다. DeepLabCut/SLEAP처럼 여러 frame을 직접 annotation해 species-specific pose estimator를 학습하는 대신, </span><span><strong>“한 프레임을 prompt로 주고 tracking으로 annotation을 확장한다”</strong></span><span>는 방향입니다. 논문은 실제 연구자가 predefined skeleton 전체가 아니라 관심 있는 keypoint 몇 개만 지정하고 싶어 한다는 문제를 명시적으로 다룹니다. (</span><a href={"https://arxiv.org/html/2608.04995v1"}><span>arXiv</span></a><span>)</span>
+
+<span>또한 7월 28일에는 </span><span><strong>Comparison of multiple video tracking-based behavioral summary approaches for compound discrimination</strong></span><span>의 v2가 공개됐습니다. 이 연구의 중요한 메시지는 복잡한 unsupervised behavior representation이 항상 단순 tracking summary보다 압도적으로 낫지는 않다는 점입니다. 검색 가능한 논문 설명에서는 treatment/dosage discrimination 성능이 여러 behavioral summary model 사이에서 유사했다고 보고합니다. (</span><a href={"https://www.biorxiv.org/content/10.64898/2026.07.20.739643v2.full?utm_source=chatgpt.com"}><span>bioRxiv</span></a><span>)</span>
+
+<span>도구 측면에서는 SLEAP이 현재 PyTorch backend와 </span><span><code>sleap-io</code></span><span>, </span><span><code>sleap-nn</code></span><span>으로 모듈화되어 있고, GUI 수준에서 human-in-the-loop labeling workflow를 제공하고 있습니다. 최신 신작은 아니지만 이번 주 promptable tracking 흐름과 비교할 기준점으로 적절합니다. (</span><a href={"https://talmolab.github.io/sleap-website/"}><span>TALMO Lab</span></a><span>)</span>
+
+### <span>이번 주 labeling 자동화 관점의 핵심</span>
+
+<span>기존 흐름은 대체로 다음과 같습니다.</span>
+
+```plaintext
+많은 frame 수동 labeling
+        ↓
+Animal-specific pose model training
+        ↓
+전체 video inference
+        ↓
+오류 frame 수정
+```
+
+<span>이번 주 핵심 연구가 제안하는 흐름은 더 가볍습니다.</span>
+
+```plaintext
+Reference frame 1장
+        ↓
+사용자가 원하는 keypoint prompt
+        ↓
+Foundation-model dense feature
+        ↓
+Cross-frame correspondence
+        ↓
+전체 video keypoint trajectory
+```
+
+<span>즉, </span><span><strong>pose estimation 문제 일부를 “supervised keypoint detection”에서 “visual correspondence tracking” 문제로 재정의</strong></span><span>합니다. (</span><a href={"https://arxiv.org/html/2608.04995v1"}><span>arXiv</span></a><span>)</span>
+
+### <span>이번 주 반드시 볼 자료</span>
+
+<span><strong>Promptable Animal Pose Tracking Across Species</strong></span>
+
+<span>이 논문은 지금까지 추적해온 주제 중에서도 다음 항목과 동시에 연결됩니다.</span>
+
+- <span>labeling 자동화</span>
+- <span>scarce annotation</span>
+- <span>cross-species generalization</span>
+- <span>keypoint sequence</span>
+- <span>animal pose tracking</span>
+- <span>vision foundation model</span>
+- <span>wildlife video</span>
+- <span>downstream behavior recognition</span>
+
+<span>따라서 이번 주에는 두 논문을 동일한 비중으로 읽기보다 </span><span><strong>Promptable Animal Pose Tracking을 주 논문으로 깊게 읽고</strong></span><span>, behavioral-summary comparison은 결과와 Discussion 위주로 보는 것이 적절합니다.</span>
+
+---
+
+# <span>2. 이번 주 핵심 트렌드</span>
+
+## <span>2.1 “Few-label pose estimation”에서 “Promptable pose tracking”으로</span>
+
+### <span>무엇이 바뀌었는가</span>
+
+<span>기존 scarce-label 방법은 적은 annotation으로 pose estimator를 잘 fine-tuning하는 문제로 접근했습니다.</span>
+
+<span>Promptable Animal Pose Tracking은 다른 문제 설정을 사용합니다.</span>
+
+```plaintext
+Video
++
+Reference frame의 K개 keypoint
+        ↓
+Foundation model
+        ↓
+Reference ↔ target feature correspondence
+        ↓
+K개 keypoint를 모든 frame으로 propagate
+```
+
+<span>즉, </span><span><strong>새 species마다 pose detector를 처음부터 학습해야 한다는 가정을 완화</strong></span><span>합니다. 논문은 단 하나의 annotated reference frame을 입력으로 사용해 나머지 video frame의 keypoint trajectory를 추정합니다. (</span><a href={"https://arxiv.org/html/2608.04995v1"}><span>arXiv</span></a><span>)</span>
+
+### <span>왜 중요한가</span>
+
+<span>animal pose에서 가장 큰 병목 중 하나는 morphology가 species마다 달라 standard skeleton을 만들기 어렵다는 점입니다. 논문 역시 cross-species appearance와 morphology 차이, annotation 비용을 핵심 문제로 지적합니다. (</span><a href={"https://arxiv.org/html/2608.04995v1"}><span>arXiv</span></a><span>)</span>
+
+### <span>Animal Behaviour Analysis 연결</span>
+
+<span>행동 분석 전체 pipeline을 다음처럼 만들 수 있습니다.</span>
+
+```plaintext
+1 frame manual keypoint
+        ↓
+Promptable tracking
+        ↓
+Full-video keypoint sequence
+        ↓
+movement / trajectory feature
+        ↓
+behavior segmentation
+        ↓
+behavior classifier / forecasting
+```
+
+<span>사용자의 장기 연구 흐름과 상당히 잘 맞습니다.</span>
+
+### <span>내가 지금 신경 써야 하는가</span>
+
+<span><strong>High</strong></span>
+
+---
+
+# <span>2.2 Supervised와 unsupervised를 경쟁 관계가 아니라 역할 분담으로 사용</span>
+
+<span>Promptable APT에는 두 route가 있습니다.</span>
+
+### <span>Supervised route</span>
+
+```plaintext
+Reference image + target image
+        ↓
+Frozen foundation-model features
+        ↓
+Keypoint prompt encoder
+        ↓
+Feature projection
+        ↓
+Correspondence matcher
+        ↓
+Target-frame keypoint
+```
+
+<span>foundation backbone 전체를 학습하는 것이 아니라 keypoint prompt encoder와 feature projection, matcher 정도를 학습합니다. 논문에서는 foundation backbone을 frozen 상태로 두고 이 구성요소들을 50 epoch 학습했다고 설명합니다. (</span><a href={"https://arxiv.org/html/2608.04995v1"}><span>arXiv</span></a><span>)</span>
+
+<span>장점은 </span><span><strong>occlusion, ambiguity, 큰 appearance 변화에서 정확도가 좋다는 것</strong></span><span>입니다. (</span><a href={"https://arxiv.org/html/2608.04995v1"}><span>arXiv</span></a><span>)</span>
+
+### <span>Unsupervised route</span>
+
+```plaintext
+Reference image + target image
+        ↓
+Frozen foundation-model dense feature
+        ↓
+Pixel-level correspondence
+        ↓
+Bounding-box constraint
+        ↓
+Drift correction
+        ↓
+Target keypoint
+```
+
+<span>task-specific pose training이 필요 없습니다.</span>
+
+<span>장점은 </span><span><strong>unseen species와 category shift에 상대적으로 강한 cross-species generalization</strong></span><span>입니다. 논문의 leave-one-family-out 실험에서는 supervised model이 가까운 category가 없는 경우 negative transfer를 보이는 반면 unsupervised route가 더 안정적인 경우도 관찰됐습니다. (</span><a href={"https://arxiv.org/html/2608.04995v1"}><span>arXiv</span></a><span>)</span>
+
+### <span>중요한 연구적 포인트</span>
+
+<span>이는 흥미로운 trade-off입니다.</span>
+
+> <span><strong>Supervised = accuracy 중심Unsupervised = generalization 중심</strong></span>
+
+<span>완전히 한쪽이 다른 쪽을 대체하는 구조가 아닙니다. (</span><a href={"https://arxiv.org/html/2608.04995v1"}><span>arXiv</span></a><span>)</span>
+
+### <span>내가 지금 신경 써야 하는가</span>
+
+<span><strong>High</strong></span>
+
+<span>특히 향후 연구에서 다음 비교가 가능합니다.</span>
+
+```plaintext
+DLC/SLEAP supervised
+vs
+Promptable supervised
+vs
+Promptable unsupervised
+```
+
+<span>그리고 비교 지표를 annotation frame 수와 tracking accuracy로 잡을 수 있습니다.</span>
+
+---
+
+# <span>2.3 Vision Foundation Model이 animal pose의 feature extractor로 들어오기 시작</span>
+
+<span>논문은 dense per-pixel feature extractor 후보로 다음 계열을 다룹니다.</span>
+
+- <span>DINOv3</span>
+- <span>BioCLIP</span>
+- <span>CleanDIFT</span>
+- <span>Diffusion Hyperfeatures</span>
+
+<span>즉 foundation model을 단순 image classifier encoder로 사용하는 것이 아니라 </span><span><strong>keypoint correspondence를 위한 dense representation</strong></span><span>으로 활용합니다. (</span><a href={"https://arxiv.org/html/2608.04995v1"}><span>arXiv</span></a><span>)</span>
+
+<span>이는 중요한 변화입니다.</span>
+
+<span>기존에는:</span>
+
+```plaintext
+Foundation model
+→ image/video embedding
+→ behavior classification
+```
+
+<span>을 많이 생각했다면, 이제는:</span>
+
+```plaintext
+Foundation model
+→ spatial correspondence
+→ keypoint tracking
+→ behavior sequence
+```
+
+<span>로도 연결할 수 있습니다.</span>
+
+### <span>Animal Behaviour Analysis 연결</span>
+
+<span>사용자 연구에서는 CLIP 평균 embedding을 바로 behavior classifier에 넣는 것뿐 아니라 foundation feature를 </span><span><strong>tracking과 annotation automation 단계</strong></span><span>에서 먼저 활용하는 방향도 고려할 수 있습니다.</span>
+
+### <span>내가 지금 신경 써야 하는가</span>
+
+<span><strong>High</strong></span>
+
+---
+
+# <span>2.4 단순한 behavior summary를 무시하면 안 됨</span>
+
+<span>7월 28일 v2가 공개된 behavioral summary 비교 연구는 video tracking에서 얻은 정보를 여러 방식으로 요약하여 compound/treatment discrimination에 활용합니다. bioRxiv 검색 결과에서 저자들은 여러 behavioral summary model 사이의 discrimination 성능이 유사한 경우를 보고했습니다. (</span><a href={"https://www.biorxiv.org/content/10.64898/2026.07.20.739643v2.full?utm_source=chatgpt.com"}><span>bioRxiv</span></a><span>)</span>
+
+<span>따라서 다음과 같은 가정은 피하는 것이 좋습니다.</span>
+
+```plaintext
+Keypoint-MoSeq
+>
+trajectory statistics
+```
+
+<span>또는</span>
+
+```plaintext
+Transformer
+>
+handcrafted feature
+```
+
+<span>복잡도가 높다는 이유만으로 자동으로 더 좋은 representation이 되는 것은 아닙니다.</span>
+
+### <span>Animal Behaviour Analysis 연결</span>
+
+<span>BMOD/Duck에서 다음 순서가 더 논리적입니다.</span>
+
+```plaintext
+Baseline 1
+centroid trajectory statistics
+
+Baseline 2
+pose statistics
+
+Baseline 3
+unsupervised pose state
+
+Baseline 4
+learned video embedding
+```
+
+<span>이후 성능을 비교해야 합니다.</span>
+
+### <span>내가 지금 신경 써야 하는가</span>
+
+<span><strong>High</strong></span>
+
+---
+
+# <span>3. 추천 논문 1~2편</span>
+
+# <span>3.1 Promptable Animal Pose Tracking Across Species</span>
+
+<span><strong>Title:</strong></span><span> Promptable Animal Pose Tracking Across Species<br /></span><span><strong>Authors:</strong></span><span> Le Li, Daniela Ivanova, Nicolas Pugeault<br /></span><span><strong>Affiliation:</strong></span><span> University of Glasgow<br /></span><span><strong>공개:</strong></span><span> 2026년 8월 5일<br /></span><span><strong>Venue 상태:</strong></span><span> ECCV 2026 Workshop on CV4Ecology 발표 예정<br /></span><span><strong>논문:</strong></span><span> </span><a href={"https://arxiv.org/abs/2608.04995"}><span>arXiv:2608.04995</span></a><span> (</span><a href={"https://arxiv.org/html/2608.04995v1"}><span>arXiv</span></a><span>)</span>
+
+## <span>분야</span>
+
+- <span>Animal Pose Tracking</span>
+- <span>Vision Foundation Model</span>
+- <span>Few-shot / Low-label Learning</span>
+- <span>Unsupervised Correspondence</span>
+- <span>Cross-species Generalization</span>
+
+## <span>핵심 문제</span>
+
+<span>동물 pose tracking은 human pose에 비해 다음 문제가 큽니다.</span>
+
+```plaintext
+종별 morphology 차이
++
+행동 차이
++
+annotation 부족
++
+standard skeleton 부족
+```
+
+<span>기존 animal pose model은 많은 annotation을 요구하거나, 특정 species에 지나치게 특화될 수 있습니다. 반대로 general point tracker는 임의의 point를 tracking할 수 있지만 animal anatomy prior가 부족할 수 있습니다. 논문은 이 간극을 해결하는 것을 목표로 합니다. (</span><a href={"https://arxiv.org/html/2608.04995v1"}><span>arXiv</span></a><span>)</span>
+
+---
+
+## <span>핵심 아이디어</span>
+
+<span>사용자가 video의 </span><span><strong>한 reference frame만 annotation</strong></span><span>합니다.</span>
+
+<span>예:</span>
+
+```plaintext
+Duck frame 1
+
+● beak
+● head
+● neck
+● left wing
+● right wing
+● tail
+```
+
+<span>그다음 foundation-model dense feature를 이용해 동일한 anatomical point를 다른 frame에서 찾습니다.</span>
+
+```plaintext
+Reference keypoint
+        ↓
+Reference feature vector
+        ↓
+Target-frame dense feature map
+        ↓
+Correspondence matching
+        ↓
+Target keypoint
+```
+
+<span>이 과정을 전체 video로 반복합니다. (</span><a href={"https://arxiv.org/html/2608.04995v1"}><span>arXiv</span></a><span>)</span>
+
+---
+
+## <span>모델 구조</span>
+
+### <span>입력</span>
+
+```plaintext
+RGB video
++
+Reference frame 1개
++
+Reference keypoints K개
+```
+
+### <span>공통 처리</span>
+
+```plaintext
+Reference frame
+Target frame
+       ↓
+Foundation-model feature extractor
+       ↓
+Dense feature map
+```
+
+<span>논문은 DINOv3, BioCLIP, CleanDIFT, Diffusion Hyperfeatures 같은 pretrained representation을 검토합니다. (</span><a href={"https://arxiv.org/html/2608.04995v1"}><span>arXiv</span></a><span>)</span>
+
+### <span>Supervised route</span>
+
+```plaintext
+Reference feature
++
+keypoint prompt
+        ↓
+Keypoint Prompt Encoder
+        ↓
+Projected feature
+        ↓
+Matcher
+        ↓
+Target keypoint
+```
+
+### <span>Unsupervised route</span>
+
+```plaintext
+Reference feature
+        ↓
+Dense correspondence
+        ↓
+Bounding-box restriction
+        ↓
+Drift correction
+        ↓
+Target keypoint
+```
+
+### <span>출력</span>
+
+```plaintext
+T frames × K keypoints × (x,y)
+```
+
+<span>즉 downstream에서 바로 keypoint sequence로 사용할 수 있습니다. (</span><a href={"https://arxiv.org/html/2608.04995v1"}><span>arXiv</span></a><span>)</span>
+
+---
+
+## <span>실험 데이터셋</span>
+
+### <span>APTv2</span>
+
+<span>APTv2에는 30종, 15 family에 걸친 animal video가 포함됩니다. 각 clip은 15 frame이며, 논문에서는 첫 번째 frame의 keypoint를 reference annotation으로 사용해 나머지 14 frame으로 전파합니다. (</span><a href={"https://arxiv.org/html/2608.04995v1"}><span>arXiv</span></a><span>)</span>
+
+### <span>TigDog</span>
+
+<span>동물 pose generalization 평가에 사용하는 기존 benchmark입니다. Promptable APT는 APTv2와 TigDog 모두에서 평가됩니다. (</span><a href={"https://arxiv.org/abs/2608.04995?utm_source=chatgpt.com"}><span>arXiv</span></a><span>)</span>
+
+---
+
+## <span>성능 또는 주요 결과</span>
+
+<span>수치 하나만 떼어 SOTA라고 판단하는 것보다는 이 논문의 </span><span><strong>trade-off 결과</strong></span><span>가 더 중요합니다.</span>
+
+### <span>Supervised</span>
+
+- <span>tracking accuracy가 더 높음</span>
+- <span>occlusion에 강함</span>
+- <span>appearance 변화에 더 안정적</span>
+
+### <span>Unsupervised</span>
+
+- <span>task-specific training 불필요</span>
+- <span>unseen species에 상대적으로 안정적</span>
+- <span>category shift에 강함</span>
+
+<span>연구진은 foundation backbone을 frozen 상태로 유지하고 supervised route의 일부 모듈만 학습했음에도 강한 tracking 성능을 보고합니다. (</span><a href={"https://arxiv.org/html/2608.04995v1"}><span>arXiv</span></a><span>)</span>
+
+---
+
+## <span>기존 방법과의 차이</span>
+
+<span>논문의 appendix는 대표적인 animal tracking 방법과 다음처럼 비교합니다.</span>
+
+```plaintext
+DeepLabCut
+→ supervised
+
+ScarceNet
+→ pseudo-label-based supervised
+
+3D-MuPPET
+→ supervised multi-view
+
+Promptable APT
+→ supervised / unsupervised
+→ foundation model
+→ 30 species
+```
+
+<span>특히 fixed predefined skeleton보다 </span><span><strong>user-selected keypoint</strong></span><span>라는 것이 중요한 차이입니다. (</span><a href={"https://arxiv.org/html/2608.04995v1"}><span>arXiv</span></a><span>)</span>
+
+---
+
+## <span>한계점</span>
+
+<span>첫째, APTv2 clip이 15 frame으로 상당히 짧습니다. 논문에서도 APTv2 frame은 일정 FPS로 연속 sampling된 것이 아니라 동작 변화가 보이도록 수동 선택되었다고 설명합니다. 따라서 </span><span><strong>몇 시간짜리 continuous video에서 long-term drift가 어떻게 누적되는지는 별도 검증이 필요</strong></span><span>합니다. (</span><a href={"https://arxiv.org/html/2608.04995v1"}><span>arXiv</span></a><span>)</span>
+
+<span>둘째, bounding box가 필요합니다.</span>
+
+<span>셋째, supervised route는 cross-species generalization에서 training distribution에 따라 negative transfer가 발생할 수 있습니다. (</span><a href={"https://arxiv.org/html/2608.04995v1"}><span>arXiv</span></a><span>)</span>
+
+<span>넷째, 현재 논문에서는 pose tracking이 목표이며 행동 분류까지 end-to-end로 연결하지는 않습니다.</span>
+
+---
+
+## <span>내 관심사와의 연결</span>
+
+<span><strong>매우 높음</strong></span>
+
+<span>특히 다음 연구 질문으로 연결할 수 있습니다.</span>
+
+> <span><strong>“한 frame keypoint prompt만으로 장시간 single-animal video의 pose sequence를 생성하고, 이를 behavior embedding/classification에 사용할 수 있는가?”</strong></span>
+
+<span>이 주제는 충분히 narrow하면서도 다음을 묶습니다.</span>
+
+- <span>automated annotation</span>
+- <span>foundation model</span>
+- <span>animal pose</span>
+- <span>long video</span>
+- <span>behavior recognition</span>
+
+---
+
+## <span>읽기 우선순위</span>
+
+<span><strong>High — 이번 주 1순위</strong></span>
+
+---
+
+## <span>읽을 때 집중할 부분</span>
+
+1. <span>Reference frame 선택이 성능에 미치는 영향</span>
+2. <span>Foundation feature별 성능</span>
+3. <span>supervised vs unsupervised 차이</span>
+4. <span>drift correction</span>
+5. <span>leave-one-family-out experiment</span>
+6. <span>bounding-box dependence</span>
+7. <span>temporal robustness</span>
+8. <span>annotation 절감량을 어떤 방식으로 평가했는지</span>
+
+<span>특히 appendix의 </span><span><strong>Temporal Robustness</strong></span><span>와 </span><span><strong>Leave-one-out analysis</strong></span><span>를 놓치지 않는 것이 좋습니다.</span>
+
+---
+
+## <span>구현 난이도</span>
+
+### <span>전체 재현</span>
+
+<span><strong>어려움</strong></span>
+
+<span>Foundation-model feature extraction과 dense correspondence 구현이 필요합니다.</span>
+
+### <span>축소 구현</span>
+
+<span><strong>보통</strong></span>
+
+<span>이미 존재하는 point tracker 또는 DINO feature correspondence를 사용하면 핵심 아이디어만 실험할 수 있습니다.</span>
+
+---
+
+## <span>현재 수준에서 필요한 선행 학습</span>
+
+- <span>PyTorch tensor indexing</span>
+- <span>ViT feature map</span>
+- <span>cosine similarity</span>
+- <span>feature correspondence</span>
+- <span>bounding box coordinate</span>
+- <span>bilinear interpolation</span>
+- <span>nearest-neighbor matching</span>
+- <span>video frame extraction</span>
+
+<span>Transformer를 처음부터 구현할 필요는 없습니다.</span>
+
+---
+
+## <span>포트폴리오 포인트</span>
+
+> <span>Vision foundation model의 dense representation을 이용해 한 reference frame의 animal keypoint annotation을 전체 video로 전파하고, manual labeling 비용과 tracking drift의 trade-off를 분석했습니다.</span>
+
+---
+
+# <span>3.2 Comparison of Multiple Video Tracking-Based Behavioral Summary Approaches for Compound Discrimination</span>
+
+<span><strong>공개:</strong></span><span> v2, 2026년 7월 28일<br /></span><span><strong>상태:</strong></span><span> bioRxiv preprint<br /></span><span><strong>논문:</strong></span><span> </span><a href={"https://www.biorxiv.org/content/10.64898/2026.07.20.739643v2"}><span>bioRxiv 2026.07.20.739643v2</span></a><span> (</span><a href={"https://www.biorxiv.org/content/10.64898/2026.07.20.739643v2.full?utm_source=chatgpt.com"}><span>bioRxiv</span></a><span>)</span>
+
+## <span>분야</span>
+
+- <span>behavior representation</span>
+- <span>animal tracking</span>
+- <span>trajectory analysis</span>
+- <span>unsupervised behavior segmentation</span>
+
+---
+
+## <span>핵심 문제</span>
+
+<span>동물 tracking을 완료했다고 해서 행동 분석이 끝나는 것은 아닙니다.</span>
+
+<span>예를 들어 tracking sequence가 있을 때 다음 중 무엇을 사용할 수 있습니다.</span>
+
+```plaintext
+speed mean
+distance traveled
+zone occupancy
+turning
+
+vs
+
+unsupervised state
+
+vs
+
+behavioral syllable
+```
+
+<span>어느 representation이 실험 조건의 차이를 가장 잘 나타내는가가 핵심 문제입니다.</span>
+
+---
+
+## <span>핵심 아이디어</span>
+
+<span>여러 behavioral summary method를 동일 downstream discrimination 문제에 적용해 비교합니다.</span>
+
+<span>검색 가능한 논문 설명에서는 treatment/dosage discrimination 성능이 여러 모델 사이에서 비슷한 경향을 보였다고 보고합니다. 즉 더 복잡한 representation이 항상 압도적 이득을 주지는 않았습니다. (</span><a href={"https://www.biorxiv.org/content/biorxiv/early/2026/07/28/2026.07.20.739643.full.pdf?utm_source=chatgpt.com"}><span>bioRxiv</span></a><span>)</span>
+
+---
+
+## <span>내 관심사와의 연결</span>
+
+<span><strong>High</strong></span>
+
+<span>현재 Duck 연구에서도 반드시 고려해야 하는 문제입니다.</span>
+
+<span>다음 순서로 baseline을 만들 수 있습니다.</span>
+
+```plaintext
+1. Trajectory statistics
+2. Pose statistics
+3. Keypoint-MoSeq
+4. CLIP/video embedding
+5. Fusion
+```
+
+<span>이렇게 해야 모델 성능 향상의 원인을 설명할 수 있습니다.</span>
+
+---
+
+## <span>읽기 우선순위</span>
+
+<span><strong>Medium~High</strong></span>
+
+<span>이번 주에는 Methods 전체보다 다음을 먼저 보는 것이 좋습니다.</span>
+
+- <span>비교한 representation 종류</span>
+- <span>downstream evaluation 방법</span>
+- <span>complexity 대비 성능</span>
+- <span>Discussion</span>
+
+---
+
+## <span>구현 난이도</span>
+
+- <span>trajectory feature: </span><span><strong>쉬움</strong></span>
+- <span>Keypoint-MoSeq: </span><span><strong>보통</strong></span>
+- <span>전체 paper reproduction: </span><span><strong>어려움</strong></span>
+
+---
+
+# <span>4. 추천 GitHub repo / tool</span>
+
+<span>이번 주에는 억지로 최신 repo 3개를 채우지 않고 </span><span><strong>실제로 지금 쓸 가치가 있는 2개만</strong></span><span> 권합니다.</span>
+
+## <span>4.1 SLEAP 1.5+</span>
+
+<span><strong>공식 사이트:</strong></span><span> </span><a href={"https://sleap.ai/"}><span>SLEAP</span></a>
+
+<span>SLEAP은 현재 GUI의 human-in-the-loop annotation과 single/multi-animal pose estimation을 지원하며, backend가 PyTorch 중심으로 전환되었습니다. </span><span><code>sleap-io</code></span><span>와 </span><span><code>sleap-nn</code></span><span>으로 데이터 처리와 neural-network workflow도 분리되어 있습니다. (</span><a href={"https://talmolab.github.io/sleap-website/"}><span>TALMO Lab</span></a><span>)</span>
+
+### <span>무엇을 하는가</span>
+
+```plaintext
+Video
+ ↓
+manual label
+ ↓
+model training
+ ↓
+prediction
+ ↓
+human correction
+ ↓
+retraining
+```
+
+### <span>연구적으로 중요한 이유</span>
+
+<span>Promptable APT와 비교할 좋은 baseline입니다.</span>
+
+<span>연구 질문을 다음처럼 잡을 수 있습니다.</span>
+
+```plaintext
+SLEAP
+N manually annotated frames
+
+vs
+
+Promptable tracking
+1 manually annotated frame
+```
+
+### <span>설치/실행 난이도</span>
+
+<span><strong>보통 이하</strong></span>
+
+<span>공식 설치법은 현재 </span><span><code>uv</code></span><span>와 pip를 모두 지원합니다. (</span><a href={"https://talmolab.github.io/sleap-website/"}><span>TALMO Lab</span></a><span>)</span>
+
+### <span>당장 실험해볼 수 있는 부분</span>
+
+<span>Duck 영상 30초 정도로:</span>
+
+- <span>5~10 frame labeling</span>
+- <span>작은 pose model 학습</span>
+- <span>전체 영상 inference</span>
+- <span>오류 frame 수 측정</span>
+
+<span>이후 Promptable 방식과 비교할 baseline으로 보관하면 됩니다.</span>
+
+---
+
+# <span>4.2 APTv2</span>
+
+<span><strong>논문/데이터:</strong></span><span> </span><a href={"https://arxiv.org/abs/2312.15612"}><span>APTv2</span></a>
+
+<span>최신 dataset은 아니지만 이번 주 신작 논문의 핵심 benchmark이므로 다시 볼 가치가 있습니다.</span>
+
+<span>APTv2는 30 animal species, 2,749 video clip, 총 41,235 frame과 84,611 animal instance의 pose/tracking annotation을 제공합니다. (</span><a href={"https://arxiv.org/abs/2312.15612?utm_source=chatgpt.com"}><span>arXiv</span></a><span>)</span>
+
+### <span>연구적으로 중요한 이유</span>
+
+<span>다음 두 가지를 직접 평가할 수 있습니다.</span>
+
+```plaintext
+In-species performance
+vs
+Cross-species generalization
+```
+
+<span>특히 labeling automation 연구라면 단일 species accuracy만 보고 끝내기보다 </span><span><strong>unseen species에 keypoint propagation이 가능한가</strong></span><span>를 볼 필요가 있습니다.</span>
+
+### <span>설치/실행 난이도</span>
+
+<span>전체 benchmark: </span><span><strong>어려움</strong></span>
+
+<span>일부 clip visualization: </span><span><strong>쉬움</strong></span>
+
+### <span>당장 실험할 수 있는 부분</span>
+
+<span>전체 모델을 학습하지 말고 APTv2에서 서로 다른 species 5개를 골라 다음만 확인하는 것이 좋습니다.</span>
+
+```plaintext
+reference frame
+↓
+keypoint
+↓
+다른 frame visual correspondence
+```
+
+---
+
+# <span>5. 이번 주 미니프로젝트 제안</span>
+
+## <span>프로젝트 제목</span>
+
+<span><strong>One-Frame Animal Pose Propagation Baseline</strong></span>
+
+---
+
+## <span>목표</span>
+
+<span>동물 영상에서 </span><span><strong>한 frame만 keypoint annotation</strong></span><span>하고, foundation-model visual feature 또는 point tracker를 사용해 나머지 frame으로 keypoint를 자동 propagation합니다.</span>
+
+<span>그리고 자동 생성 label과 수동 ground truth 사이의 error를 측정합니다.</span>
+
+---
+
+## <span>배경</span>
+
+<span>이번 주 Promptable Animal Pose Tracking의 핵심 연구 질문을 그대로 축소합니다.</span>
+
+<span>하지만 논문 전체의 supervised model을 구현하지 않습니다.</span>
+
+<span>대신 다음 질문 하나만 검증합니다.</span>
+
+> <span><strong>한 장의 annotation만으로 짧은 single-animal video의 pose label을 어느 정도까지 확장할 수 있는가?</strong></span>
+
+---
+
+## <span>사용할 데이터</span>
+
+### <span>1순위</span>
+
+<span>단일 Duck 영상</span>
+
+<span>30~60초 정도면 충분합니다.</span>
+
+<span>우선 keypoint는 3~5개만 사용합니다.</span>
+
+<span>예:</span>
+
+```plaintext
+beak
+head
+body_center
+tail
+foot
+```
+
+### <span>대체 데이터</span>
+
+<span>APTv2의 single-animal clip.</span>
+
+---
+
+## <span>사용할 모델/tool</span>
+
+<span>난이도 순으로 선택합니다.</span>
+
+### <span>Option A — 쉬움</span>
+
+<span>기존 point tracker</span>
+
+```plaintext
+CoTracker
+또는
+TAPIR
+```
+
+### <span>Option B — 보통</span>
+
+<span>DINO 계열 feature matching</span>
+
+```plaintext
+Reference patch feature
+      ↓
+Target feature map
+      ↓
+cosine similarity
+      ↓
+argmax
+```
+
+### <span>Option C — 어려움</span>
+
+<span>Promptable APT 논문의 unsupervised route 일부 재현</span>
+
+<span>현재는 A 또는 B를 권합니다.</span>
+
+---
+
+## <span>최소 구현 범위</span>
+
+### <span>Step 1</span>
+
+<span>30초 동물 영상 준비.</span>
+
+### <span>Step 2</span>
+
+<span>첫 frame에서 3개 keypoint 수동 지정.</span>
+
+```plaintext
+head
+body
+tail
+```
+
+### <span>Step 3</span>
+
+<span>10 frame마다 ground-truth를 직접 labeling.</span>
+
+<span>예:</span>
+
+```plaintext
+frame 0
+frame 10
+frame 20
+...
+```
+
+<span>evaluation 용으로만 사용합니다.</span>
+
+### <span>Step 4</span>
+
+<span>첫 frame annotation을 자동 propagation.</span>
+
+### <span>Step 5</span>
+
+<span>각 frame에서 Euclidean distance error 계산.</span>
+
+### <span>Step 6</span>
+
+<span>frame index에 따른 error plot 생성.</span>
+
+<span>예상되는 형태:</span>
+
+```plaintext
+Error
+  |
+  |           /
+  |        /
+  |     /
+  |__/
+  +-------------- Time
+```
+
+<span>drift가 보이는지를 확인합니다.</span>
+
+### <span>Step 7</span>
+
+<span>다음 조건 비교.</span>
+
+```plaintext
+A. 첫 frame만 reference
+
+B. 영상 중간 frame reference
+
+C. 5초마다 reference reset
+```
+
+---
+
+## <span>핵심 평가 지표</span>
+
+### <span>Pixel Error</span>
+
+```plaintext
+|| prediction - GT ||
+```
+
+### <span>Normalized Error</span>
+
+<span>animal bounding-box 크기로 normalization.</span>
+
+### <span>Label Saving Ratio</span>
+
+<span>예를 들어:</span>
+
+```plaintext
+기존: 100 frames labeling
+제안: 5 frames labeling
+
+→ manual annotation 95% 감소
+```
+
+<span>단, annotation 감소율과 tracking error를 반드시 함께 보고해야 합니다.</span>
+
+---
+
+## <span>확장 구현 범위</span>
+
+### <span>확장 1 — Confidence-based re-annotation</span>
+
+<span>confidence가 낮은 frame만 사람이 다시 labeling합니다.</span>
+
+```plaintext
+자동 tracking
+     ↓
+low confidence
+     ↓
+human correction
+     ↓
+새 reference
+     ↓
+tracking 재시작
+```
+
+<span>이 단계부터 </span><span><strong>active labeling</strong></span><span>과 직접 연결됩니다.</span>
+
+### <span>확장 2 — Behavior-aware sampling</span>
+
+<span>행동 전환이 큰 구간만 추가 annotation합니다.</span>
+
+<span>예:</span>
+
+```plaintext
+Resting
+   ↓
+Exploring
+```
+
+<span>전환점에서 tracking error가 커지는지 확인합니다.</span>
+
+### <span>확장 3 — Downstream behavior classifier</span>
+
+<span>자동 생성된 pose와 수동 pose를 각각 behavior classifier에 넣습니다.</span>
+
+<span>최종적으로:</span>
+
+```plaintext
+Pose error
+        ↓
+Behavior classification error
+```
+
+<span>관계를 볼 수 있습니다.</span>
+
+<span>이것이 연구적으로 가장 재미있는 확장입니다.</span>
+
+---
+
+## <span>예상 산출물</span>
+
+- <span>Notion 논문 정리</span>
+- <span>Jupyter notebook</span>
+- <span>keypoint propagation demo</span>
+- <span>drift plot</span>
+- <span>annotation saving vs error graph</span>
+- <span>GitHub README</span>
+- <span>Velog 글</span>
+- <span>GIF/video visualization</span>
+
+---
+
+## <span>포트폴리오 한 줄</span>
+
+> <span>한 프레임의 animal keypoint annotation을 foundation-model 기반 visual tracking으로 전체 영상에 전파하고, annotation 절감률과 temporal tracking drift 간 trade-off를 정량적으로 분석했습니다.</span>
+
+---
+
+## <span>예상 소요 시간</span>
+
+<span><strong>6~10시간</strong></span>
+
+<span>전체 Promptable APT reproduction보다 훨씬 현실적입니다.</span>
+
+---
+
+## <span>실패 가능성이 높은 부분</span>
+
+<span>가장 가능성이 높은 실패는 </span><span><strong>occlusion 이후 drift</strong></span><span>입니다.</span>
+
+<span>예:</span>
+
+```plaintext
+head
+ ↓
+wing에 가림
+ ↓
+tracker가 wing을 head로 추적
+ ↓
+이후 모든 frame에서 drift
+```
+
+<span>두 번째 문제는 deformation입니다.</span>
+
+<span>동물 몸은 rigid object가 아니기 때문에 point appearance가 크게 변할 수 있습니다.</span>
+
+---
+
+## <span>실패했을 때 대체 목표</span>
+
+<span>tracking 성능을 높이는 데 집착하지 말고 다음 실험으로 바꿉니다.</span>
+
+> <span><strong>“Manual reset 간격이 pose tracking error에 미치는 영향”</strong></span>
+
+<span>예:</span>
+
+```plaintext
+Reference every 1 sec
+Reference every 3 sec
+Reference every 5 sec
+Reference only once
+```
+
+<span>이것만으로도 annotation 비용과 정확도의 trade-off를 분석하는 좋은 결과가 됩니다.</span>
+
+---
+
+# <span>6. 이번 주 읽기 루틴</span>
+
+## <span>1회독 — 30~40분</span>
+
+<span>Promptable Animal Pose Tracking에서 다음만 봅니다.</span>
+
+1. <span>Abstract</span>
+2. <span>Figure 1</span>
+3. <span>Introduction</span>
+4. <span>supervised / unsupervised route 차이</span>
+5. <span>전체 result table</span>
+6. <span>Conclusion</span>
+
+<span>목표는 다음 문장을 설명할 수 있게 되는 것입니다.</span>
+
+> <span>“왜 animal pose estimation을 correspondence problem으로 바꾸려 했는가?”</span>
+
+---
+
+# <span>2회독 — 1~1.5시간</span>
+
+<span>이번에는 모델 구조를 봅니다.</span>
+
+<span>특히 다음 pipeline을 직접 그려보십시오.</span>
+
+```plaintext
+Reference frame
++
+Reference keypoints
+        ↓
+Foundation model
+        ↓
+Dense reference feature
+───────────────────────
+
+Target frame
+        ↓
+Foundation model
+        ↓
+Dense target feature
+
+        ↓
+
+Correspondence matching
+
+        ↓
+
+Target keypoint
+```
+
+<span>그리고 다음 네 가지를 확인합니다.</span>
+
+- <span>DINOv3</span>
+- <span>BioCLIP</span>
+- <span>CleanDIFT</span>
+- <span>Diffusion Hyperfeatures</span>
+
+<span>각각 어떤 feature를 사용하는지 비교하십시오. (</span><a href={"https://arxiv.org/html/2608.04995v1"}><span>arXiv</span></a><span>)</span>
+
+---
+
+# <span>3회독 — 내 연구 연결</span>
+
+<span>이번에는 논문을 보는 것이 아니라 다음 pipeline을 설계합니다.</span>
+
+```plaintext
+Camera
+ ↓
+Motion event
+ ↓
+Animal detection
+ ↓
+1-frame pose prompt
+ ↓
+Pose propagation
+ ↓
+Pose sequence
+ ↓
+Behavior embedding
+ ↓
+Behavior classification
+```
+
+<span>여기서 자신의 연구 질문을 하나 선택하십시오.</span>
+
+<span>가장 권하는 것은:</span>
+
+> <span><strong>Promptable pose tracking으로 만든 pseudo-keypoint가 downstream behavior recognition에 충분한가?</strong></span>
+
+<span>이 질문은 꽤 narrow하면서도 연구로 확장할 여지가 있습니다.</span>
+
+---
+
+## <span>정리할 질문 3개</span>
+
+### <span>Q1.</span>
+
+<span><strong>왜 supervised route는 unseen family에서 unsupervised route보다 오히려 나빠질 수 있는가?</strong></span>
+
+<span>→ negative transfer와 learned category prior 관점에서 생각해보면 좋습니다. 논문의 leave-one-out 분석에서도 이 현상이 관찰됩니다. (</span><a href={"https://arxiv.org/html/2608.04995v1"}><span>arXiv</span></a><span>)</span>
+
+### <span>Q2.</span>
+
+<span><strong>Pose tracking의 error가 몇 pixel 정도까지 커져도 downstream behavior recognition에는 문제가 없을까?</strong></span>
+
+<span>이 질문은 논문이 직접 답하지 않습니다.</span>
+
+<span>사용자 연구로 이어질 수 있는 좋은 open question입니다.</span>
+
+### <span>Q3.</span>
+
+<span><strong>Reference frame을 자동으로 선택할 수 있을까?</strong></span>
+
+<span>예:</span>
+
+```plaintext
+highest confidence
++
+minimal occlusion
++
+representative pose
+```
+
+<span>가 되는 frame을 자동으로 선택하면 annotation automation을 한 단계 더 진행할 수 있습니다.</span>
+
+---
+
+# <span>7. 다음 주 Watchlist</span>
+
+## <span>추적 키워드 5개</span>
+
+1. <span><code>promptable animal pose tracking</code></span>
+2. <span><code>foundation model animal keypoint tracking</code></span>
+3. <span><code>active learning animal pose annotation</code></span>
+4. <span><code>pseudo-label animal keypoint video</code></span>
+5. <span><code>pose tracking downstream behavior recognition</code></span>
+
+---
+
+## <span>추적할 repo/tool 3개</span>
+
+### <span>1. SLEAP</span>
+
+<span>특히 PyTorch-based </span><span><code>sleap-nn</code></span><span>과 human-in-the-loop workflow 변화를 추적합니다. (</span><a href={"https://talmolab.github.io/sleap-website/"}><span>TALMO Lab</span></a><span>)</span>
+
+### <span>2. APTv2</span>
+
+<span>Promptable APT 관련 code/checkpoint가 공개되면 benchmark reproduction에 활용합니다.</span>
+
+### <span>3. Promptable Animal Pose Tracking</span>
+
+<span>현재 arXiv 본문에서는 공식 GitHub code repository가 명확히 연결되어 있지 않습니다. 따라서 </span><span><strong>공식 code 공개 여부를 다음 주에도 확인할 가치가 큽니다.</strong></span><span> (</span><a href={"https://arxiv.org/html/2608.04995v1"}><span>arXiv</span></a><span>)</span>
+
+---
+
+## <span>다음 주 open question 3개</span>
+
+1. <span>Promptable Animal Pose Tracking의 공식 code와 pretrained weight가 공개되는가?</span>
+2. <span>15-frame APTv2가 아니라 수백~수천 frame의 continuous animal video에서도 drift가 안정적인가?</span>
+3. <span>promptable pose label을 그대로 pseudo-label로 사용해 SLEAP/DeepLabCut을 재학습하면 annotation 효율을 더 높일 수 있는가?</span>
+
+---
+
+# <span>Notion / Velog / 포트폴리오 게시용 자료</span>
+
+## <span>제목</span>
+
+<span><strong>동물 Pose Labeling을 한 프레임으로 줄일 수 있을까? — Promptable Animal Pose Tracking Across Species</strong></span>
+
+---
+
+## <span>요약문</span>
+
+<span>2026년 8월 공개된 </span><span><em>Promptable Animal Pose Tracking Across Species</em></span><span>는 animal pose estimation의 annotation 문제를 다른 방식으로 접근한다. 여러 frame에 keypoint를 직접 labeling해 pose model을 학습하는 대신, 하나의 reference frame에서 사용자가 원하는 keypoint를 지정하고 vision foundation model의 dense representation을 이용해 이를 나머지 video frame으로 전파한다.</span>
+
+<span>연구진은 supervised route와 unsupervised route를 모두 제안한다. supervised 방식은 keypoint prompt encoder와 correspondence matcher를 학습해 높은 tracking accuracy를 얻는 데 초점을 두는 반면, unsupervised 방식은 task-specific training 없이 foundation-model feature correspondence를 사용해 unseen species에 대한 generalization을 확보한다.</span>
+
+<span>이 구조는 animal behavior analysis의 labeling pipeline을 </span><span><code>manual labeling → model training → inference</code></span><span>에서 </span><span><code>single-frame prompt → automatic propagation → human correction</code></span><span>으로 바꿀 가능성이 있다.</span>
+
+<span>이번 주 실험에서는 전체 모델을 재현하지 않고, 짧은 동물 영상에서 첫 frame의 3~5개 keypoint를 point tracker 또는 DINO feature matching으로 propagation한다. 이후 수동 ground truth와 비교해 tracking error가 시간에 따라 얼마나 누적되는지 분석한다.</span>
+
+---
+
+## <span>태그</span>
+
+<span><code>#AnimalBehaviourAnalysis#ComputationalEthology#AnimalPoseEstimation#AnimalPoseTracking#AutomatedAnnotation#PseudoLabeling#FoundationModel#DINO#SLEAP#ComputerVision</code></span>
+
+---
+
+# <span>GitHub README 초안</span>
+
+```markdown
+# One-Frame Animal Pose Propagation
+
+## Overview
+
+This project explores whether animal pose annotations can be propagated across a video from a single manually annotated reference frame.
+
+The project is inspired by *Promptable Animal Pose Tracking Across Species*, which uses dense visual representations from vision foundation models for animal keypoint correspondence.
+
+## Research Question
+
+How much manual animal pose annotation can be reduced through prompt-based keypoint tracking before temporal drift becomes too large?
+
+## Pipeline
+
+1.Load a short animal video.
+2.Manually annotate several keypoints in one reference frame.
+3.Extract visual features or initialize a point tracker.
+4.Propagate each keypoint across subsequent frames.
+5.Manually annotate sparse evaluation frames.
+6.Measure keypoint tracking error.
+7.Analyze error growth over time.
+
+## Keypoints
+
+Example:
+
+-head
+-beak
+-body center
+-tail
+
+## Baselines
+
+-point tracker
+-DINO feature correspondence
+-periodic manual reference reset
+
+## Evaluation
+
+-pixel error
+-normalized keypoint error
+-temporal drift
+-tracking failure rate
+-manual annotation reduction
+
+## Experiments
+
+### Experiment 1
+
+Single reference frame.
+
+### Experiment 2
+
+Reference reset every 5 seconds.
+
+### Experiment 3
+
+Reference reset every 2 seconds.
+
+## Extension
+
+Use low-confidence frames as candidates for human correction.
+
+The corrected frame becomes a new reference frame, creating a human-in-the-loop annotation pipeline.
+
+## Long-Term Goal
+
+Video
+→ promptable pose tracking
+→ pose sequence
+→ behavior recognition
+→ behavior forecasting
+
+## Portfolio Statement
+
+Implemented a one-frame animal pose propagation pipeline and quantified the trade-off between manual annotation reduction and temporal tracking drift.
+```
+
+---
+
+# <span>간결한 블로그 초안</span>
+
+## <span>동물 Pose Labeling을 한 프레임으로 줄일 수 있을까?</span>
+
+<span>Animal pose estimation을 사용하려면 일반적으로 여러 영상 frame에 keypoint를 직접 annotation해야 한다. 새로운 동물 종이나 촬영 환경으로 바뀔 때마다 이 과정을 반복해야 하기 때문에 pose estimation은 동물 행동 분석 pipeline에서 큰 labeling 병목이 된다.</span>
+
+<span>2026년 8월 공개된 </span><span><em>Promptable Animal Pose Tracking Across Species</em></span><span>는 이 문제를 pose detection이 아니라 </span><span><strong>visual correspondence</strong></span><span> 문제로 접근한다.</span>
+
+<span>사용자는 video의 한 reference frame에서 원하는 keypoint만 지정한다.</span>
+
+<span>예를 들어 오리 영상이라면 head, beak, body, tail 네 점을 지정할 수 있다.</span>
+
+<span>이후 vision foundation model로 reference frame과 target frame의 dense visual feature를 추출한다. reference keypoint에 대응하는 feature와 가장 유사한 target-frame 위치를 찾으면 해당 keypoint를 나머지 영상으로 전파할 수 있다.</span>
+
+<span>논문은 supervised 방식과 unsupervised 방식을 모두 제안한다.</span>
+
+<span>Supervised 방식에서는 keypoint prompt encoder와 correspondence matcher를 학습한다. 이 방식은 occlusion이나 큰 appearance 변화에서 높은 정확도를 목표로 한다.</span>
+
+<span>반면 unsupervised 방식에서는 별도의 animal pose training 없이 pretrained foundation-model representation 자체를 사용한다. 정확도에서는 supervised 방식에 뒤질 수 있지만 새로운 species에 대한 generalization이 더 안정적인 경우가 관찰되었다.</span>
+
+<span>이 결과에서 중요한 점은 두 방법이 완전히 경쟁하는 것이 아니라 서로 다른 목적을 가진다는 것이다.</span>
+
+```plaintext
+Supervised
+→ Accuracy
+
+Unsupervised
+→ Cross-species generalization
+```
+
+<span>이 연구는 labeling automation이라는 관점에서도 흥미롭다.</span>
+
+<span>기존 workflow가</span>
+
+```plaintext
+많은 frame 수동 labeling
+→ pose model training
+→ video inference
+```
+
+<span>였다면, promptable tracking은</span>
+
+```plaintext
+한 frame labeling
+→ automatic propagation
+→ 필요한 frame만 human correction
+```
+
+<span>이라는 구조를 만들 수 있기 때문이다.</span>
+
+<span>이번 주에는 논문 전체 모델을 재현하기보다 이 핵심 아이디어만 실험한다.</span>
+
+<span>짧은 animal video에서 첫 frame의 3~5개 keypoint를 지정하고 point tracker 또는 foundation-model feature matching으로 나머지 frame에 전파한다. 이후 일정 간격으로 만든 수동 ground truth와 비교해 tracking error가 시간에 따라 얼마나 증가하는지를 측정한다.</span>
+
+<span>다음 단계에서는 error가 커지거나 confidence가 낮은 frame만 사람이 수정하도록 만들 수 있다.</span>
+
+<span>이렇게 되면 단순 pose tracking experiment가 아니라,</span>
+
+```plaintext
+automatic pose labeling
+→ uncertainty detection
+→ human review
+→ pseudo-label generation
+```
+
+<span>으로 이어지는 human-in-the-loop animal annotation pipeline이 된다.</span>
+
+---
+
+## <span>이번 주 최종 우선순위</span>
+
+<span><strong>지금 바로 할 것:</strong></span><span> Promptable Animal Pose Tracking 논문의 Figure 1 → Method → unsupervised route → cross-species/temporal robustness 순서로 읽고, one-frame propagation baseline을 설계하는 것을 권합니다. 이 주제는 지난주의 behavior forecasting보다 현재의 labeling 자동화 관심과 더 직접적으로 맞닿아 있습니다. (</span><a href={"https://arxiv.org/html/2608.04995v1"}><span>arXiv</span></a><span>)</span>
+
+<span><strong>나중에 봐도 되는 것:</strong></span><span> behavioral-summary comparison은 중요한 논문이지만, 이번 주에는 tracking representation에 대한 비교 결과와 Discussion만 확인해도 충분합니다. (</span><a href={"https://www.biorxiv.org/content/10.64898/2026.07.20.739643v2.full?utm_source=chatgpt.com"}><span>bioRxiv</span></a><span>)</span>
+
+<span><strong>이번 주 신뢰도 구분:</strong></span><span> Promptable APT는 ECCV 2026 workshop 발표 예정이지만 현재 공개본은 arXiv v1이고, behavioral-summary comparison은 bioRxiv preprint입니다. 따라서 둘 다 최종적으로 확정된 범용 SOTA로 받아들이기보다는 </span><span><strong>새 연구 방향과 실험 설계 근거</strong></span><span>로 사용하는 것이 적절합니다. (</span><a href={"https://arxiv.org/html/2608.04995v1"}><span>arXiv</span></a><span>)</span>
