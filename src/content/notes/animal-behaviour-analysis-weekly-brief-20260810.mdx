@@ -1416,3 +1416,191 @@ automatic pose labeling
 <span><strong>나중에 봐도 되는 것:</strong></span><span> behavioral-summary comparison은 중요한 논문이지만, 이번 주에는 tracking representation에 대한 비교 결과와 Discussion만 확인해도 충분합니다. (</span><a href={"https://www.biorxiv.org/content/10.64898/2026.07.20.739643v2.full?utm_source=chatgpt.com"}><span>bioRxiv</span></a><span>)</span>
 
 <span><strong>이번 주 신뢰도 구분:</strong></span><span> Promptable APT는 ECCV 2026 workshop 발표 예정이지만 현재 공개본은 arXiv v1이고, behavioral-summary comparison은 bioRxiv preprint입니다. 따라서 둘 다 최종적으로 확정된 범용 SOTA로 받아들이기보다는 </span><span><strong>새 연구 방향과 실험 설계 근거</strong></span><span>로 사용하는 것이 적절합니다. (</span><a href={"https://arxiv.org/html/2608.04995v1"}><span>arXiv</span></a><span>)</span>
+
+# <span>[Paper Quest] 주간 논문 분석 및 최종 선택 리포트</span>
+
+> <span><strong>분석 기준일</strong></span><span>: 2026년 8월 12일</span>
+> 
+> <span><strong>연구 브리핑 제목</strong></span><span>: Animal Behaviour Analysis Weekly Research Briefing</span>
+> 
+> <span><strong>서비스</strong></span><span>: Paper Quest (학술 검증 및 의사결정 지원 시스템)</span>
+
+---
+
+## <span>1. 종합 선택 요약</span>
+
+| <span>구분</span> | <span>논문 제목</span> | <span>출판 / 버전</span> | <span>교차검증 상태</span> | <span>주요 특징 및 연구 위치</span> |
+| --- | --- | --- | --- | --- |
+| <span><strong>AI 최우선 추천</strong></span> | <span>Promptable Animal Pose Tracking Across Species</span> | <span>ECCV 2026 CV4Ecology Workshop (accepted)</span> | <span><code>VERIFIED</code></span> | <span>The recommended paper aligns strongly with recent trends combining prompt engineering and animal pose estimation in ecology-related computer vision research, reflecting an emerging area that leverages cross-species generalization and promptability for improved tracking and behavior analysis.</span> |
+| <span><strong>사용자 최종 선택</strong></span> | <span><strong>Promptable Animal Pose Tracking Across Species</strong></span> | <span>ECCV 2026 CV4Ecology Workshop (accepted)</span> | <span><code>VERIFIED</code></span> | <span>이번 주 읽기 지정 논문</span> |
+
+---
+
+## <span>2. 브리핑 추출 및 검증 분류 현황</span>
+
+- <span><strong>추출된 논문 후보</strong></span><span>: 총 2편 (검증 완료: 2편, 평가 제외: 0편)</span>
+- <span><strong>데이터셋</strong></span><span>: 2개 (APTv2, TigDog)</span>
+- <span><strong>GitHub 도구/레포</strong></span><span>: 2개 (SLEAP 1.5+, APTv2)</span>
+- <span><strong>평가 제외 항목</strong></span><span>: Official GitHub code and pretrained weights for Promptable Animal Pose Tracking are currently unavailable and pending confirmation., Long-term drift stability on continuous multi-hundred-frame videos remains untested and requires future validation., Effectiveness of using promptable pose labels directly as pseudo labels for re-training SLEAP/DeepLabCut has not been demonstrated yet.</span>
+- <span><strong>불확실성 현황</strong></span><span>:</span>
+    - <span>사실 검증 필요 (Fact Verification): 4건</span>
+    - <span>평가 근거 부족 (Insufficient Evidence): 4건</span>
+    - <span>연구 Open Question: 5건</span>
+
+---
+
+## <span>3. 후보 논문 종합 평가 비교표</span>
+
+| <span>논문명</span> | <span>교차검증</span> | <span>성능 경쟁력</span> | <span>방법론 신규성</span> | <span>연구 흐름</span> | <span>학술 유의미성</span> | <span>실무·연구 적용</span> | <span>재현 가능성</span> | <span>출판 신뢰도</span> | <span>최신성</span> |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| <span><strong>Promptable Animal Pose Tracking Across Species</strong></span><span> 🌟[AI&amp;최종선택]</span> | <span><code>VERIFIED</code></span> | <span>추가확인</span> | <span>4점</span> | <span>4점</span> | <span>3점</span> | <span>추가확인</span> | <span>추가확인</span> | <span>5점</span> | <span>5점</span> |
+| <span><strong>Comparison of Multiple Video Tracking-Based Behavioral Summary Approaches for Compound Discrimination</strong></span> | <span><code>VERIFIED</code></span> | <span>추가확인</span> | <span>3점</span> | <span>3점</span> | <span>3점</span> | <span>추가확인</span> | <span>추가확인</span> | <span>3점</span> | <span>5점</span> |
+
+---
+
+## <span>4. AI 추천 근거 및 위치 분석</span>
+
+### <span>🤖 AI 추천 논문: Promptable Animal Pose Tracking Across Species</span>
+
+- <span><strong>추천 이유</strong></span><span>: The paper arXiv:2608.04995 is both the overall academic leader and the weekly topic leader specifically addressing promptable animal pose tracking across species, which aligns directly with the core topic of this week's briefing. Despite its reproducibility status marked as NOT_VERIFIED and absence of available code and data, it holds academic acceptance in a relevant workshop (ECCV 2026 CV4Ecology Workshop), indicating peer recognition in the ecological and computer vision communities. The alternative candidate, bioRxiv 2026.07.20.739643v2, while related to behavioral summary approaches, is a preprint with reproducibility notes limited to PAPER_ONLY and does not directly cover the promptable tracking aspect across species. Therefore, arXiv:2608.04995 is recommended to prioritize relevance and academic standing for the user's research focus.</span>
+- <span><strong>최근 연구 흐름상 위치</strong></span><span>: The recommended paper aligns strongly with recent trends combining prompt engineering and animal pose estimation in ecology-related computer vision research, reflecting an emerging area that leverages cross-species generalization and promptability for improved tracking and behavior analysis.</span>
+
+#### <span>주요 강점</span>
+
+- <span>Direct alignment with promptable animal pose tracking across species</span>
+- <span>Peer-reviewed acceptance at ECCV 2026 CV4Ecology Workshop</span>
+- <span>Focus on cross-species generalization relevant to ecological and behavioral research</span>
+
+#### <span>주요 한계 및 위험요소</span>
+
+- <span>Lack of publicly available code and data limits reproducibility</span>
+- <span>Reproducibility not verified, potentially hindering immediate adoption</span>
+- <span>Uncertainty about empirical performance due to unavailable supporting resources</span>
+
+#### <span>검증 필요 사항</span>
+
+- <span>⚠️ Confirm reported results through independent replication once resources are available</span>
+- <span>⚠️ Monitor for code and data release to enable reproducibility assessment</span>
+- <span>⚠️ Evaluate generalizability to species or behaviors not covered in the original study</span>
+
+---
+
+## <span>5. 선택 논문 상세 읽기 가이드 (Reading Checklist)</span>
+
+### <span>📖 최종 선택 논문: Promptable Animal Pose Tracking Across Species</span>
+
+- <span><strong>저자</strong></span><span>: Le Li, Daniela Ivanova, Nicolas Pugeault (2026)</span>
+- <span><strong>출판/Preprint</strong></span><span>: ECCV 2026 CV4Ecology Workshop (accepted) (accepted)</span>
+- <span><strong>식별자/주소</strong></span><span>: arXiv: 2608.04995</span>
+- <span><strong>코드 상태</strong></span><span>: </span><span><code>NOT_FOUND_AFTER_RETRIES</code></span><span> (URL 미제공)</span>
+- <span><strong>데이터 상태</strong></span><span>: </span><span><code>NOT_FOUND_AFTER_RETRIES</code></span><span> (URL 미제공)</span>
+- <span><strong>재현 가능성</strong></span><span>: </span><span><code>NOT_VERIFIED</code></span>
+
+#### <span>🎯 읽을 때 집중해서 검토할 핵심 질문 (Key Questions)</span>
+
+1. <span><strong>How does the method implement promptability across different animal species?</strong></span>
+2. <span><strong>What datasets and evaluation metrics were used for validation?</strong></span>
+3. <span><strong>Are there plans to release code or data to facilitate reproducibility?</strong></span>
+4. <span><strong>What are the limitations or failure cases noted by the authors?</strong></span>
+
+#### <span>🔬 후속 연구 및 아이디어 확장 질문 (Follow-up Research)</span>
+
+- <span>How can reproducibility be improved by providing code and data?</span>
+- <span>Can the approach be extended to more animal species or behaviors?</span>
+- <span>What comparative performance does the model achieve against other pose tracking methods?</span>
+- <span>Can integration with behavioral summary frameworks enhance ecological insights?</span>
+
+---
+
+## <span>6. 각 후보 논문별 평가 근거 (Grounded Evidence) &amp; 불확실성 분해</span>
+
+### <span>1. Promptable Animal Pose Tracking Across Species</span>
+
+- <span><strong>출판 정보</strong></span><span>: ECCV 2026 CV4Ecology Workshop (accepted) (교차검증 상태: </span><span><code>VERIFIED</code></span><span>)</span>
+- <span><strong>6개 평가 축 점수 요약</strong></span><span>:</span>
+    - <span>성능 경쟁력: 추가확인필요점 [상태: NEEDS_VERIFICATION] (No direct quantitative performance data, benchmark comparisons, or baseline results were found in the provided information or summary. Performance claims cannot be verified without access to detailed experimental results or official tables in the paper.)</span>
+    - <span>방법론적 신규성: 4점 [상태: SCORED] (The paper proposes a novel approach by using foundation-model dense features for user-prompted keypoint tracking in animal pose estimation, leveraging both supervised and unsupervised correspondence methods to achieve cross-species generalization. This method appears innovative in methodology compared to prior art which mostly dealt with species-specific pose estimation or tracking without foundation models.)</span>
+    - <span>연구 흐름 중요도: 4점 [상태: SCORED] (Foundation models and promptable approaches represent a cutting-edge trend in computer vision, particularly for tasks like pose tracking that require generalization beyond predefined classes or species. The paper aligns well with current trends towards foundation-model based generalist vision systems.)</span>
+    - <span>학술적 유의미성: 3점 [상태: SCORED] (The paper contributes a peer-reviewed workshop publication presenting a new methodological direction and extending foundation-model usage to ecological animal tracking. While impactful for academic interest, the significance is limited by lack of verified comparative evaluation or extensive community adoption yet.)</span>
+    - <span>실무/연구 적용 가치: 추가확인필요점 [상태: NEEDS_VERIFICATION] (Code and datasets are not found or publicly available currently, limiting immediate practical applicability or adoption by others in real experiments or applications.)</span>
+    - <span>재현 가능성: 추가확인필요점 [상태: NEEDS_VERIFICATION] (No code, datasets, or checkpoints have been found or verified available, and no reported reproduction attempts exist. Reproducibility is currently unverified and presumably low.)</span>
+
+#### <span>📊 비교 연구 모듈</span>
+
+- <span><strong>SOTA 및 상대적 위치</strong></span><span>: No identified direct comparisons available with exact matching task, dataset, and metrics. The existing candidate is related but addresses a different task and evaluation context, placing the target paper as a novel contribution in foundation-model-based animal pose tracking across species.</span>
+- <span><strong>1) 직접 비교 연구 (Direct Comparison)</strong></span><span>:</span>
+    - <span>해당 동일 조건 직접 비교 연구 없음</span>
+- <span><strong>2) 유사 과업 연구 (Near Task Comparison / 정량 직접 비교 유예)</strong></span><span>:</span>
+    - <span><strong>Comparison of Multiple Video Tracking-Based Behavioral Summary Approaches for Compound Discrimination</strong></span><span> (2026): 과업 [Video tracking-based behavioral summary for compound discrimination] | 데이터셋 [상이한 벤치마크] | 지표 [상이한 평가 지표] | 유예 사유: The task focuses on behavioral summary using video tracking in compound discrimination, which is related but not the same as pose tracking across species. Datasets and metrics differ or are unspecified, disallowing direct performance comparison.</span>
+- <span><strong>3) 맥락상 관련 연구 (Contextual Related)</strong></span><span>:</span>
+    - <span>해당 맥락 관련 연구 없음</span>
+- <span><strong>4) 대표 선행 연구 (Representative Prior)</strong></span><span>:</span>
+    - <span>해당 대표 선행 연구 없음</span>
+
+#### <span>📌 불확실성 3분할 (Uncertainty Breakdown)</span>
+
+- <span><strong>1) 사실 검증 필요 (Fact Verification)</strong></span><span>:</span>
+    - <span>🔍 Performance claims lack direct quantitative benchmark comparison evidence.</span>
+    - <span>🔍 Code and dataset for reproduction are not found and unverified.</span>
+- <span><strong>2) 평가 근거 부족 (Insufficient Evidence)</strong></span><span>:</span>
+    - <span>⚠️ No detailed experimental results or tables extracted to verify accuracy or SOTA claims.</span>
+    - <span>⚠️ No external benchmark or third-party reproduction evidence found.</span>
+- <span><strong>3) 연구적 Open Question</strong></span><span>:</span>
+    - <span>❓ How does the method quantitatively compare to existing animal pose estimation or tracking approaches on standardized datasets?</span>
+    - <span>❓ What is the robustness and generality performance across diverse species beyond reported cases?</span>
+    - <span>❓ Will released code and data be provided to enable reproduction and practical application?</span>
+
+#### <span>📌 근거 삼분할 (Grounded Evidence)</span>
+
+- <span><strong>논문 원문 근거</strong></span><span>:</span>
+    - <span>원문 스니펫에서 직접 추출되지 않음 (원문 수동 검증 필요)</span>
+- <span><strong>외부 출처 근거</strong></span><span>:</span>
+    - <span>외부 기록 확인</span>
+- <span><strong>AI 종합 해석</strong></span><span>:</span>
+    - <span>AI 종합 분석</span>
+
+### <span>2. Comparison of Multiple Video Tracking-Based Behavioral Summary Approaches for Compound Discrimination</span>
+
+- <span><strong>출판 정보</strong></span><span>: bioRxiv preprint (교차검증 상태: </span><span><code>VERIFIED</code></span><span>)</span>
+- <span><strong>6개 평가 축 점수 요약</strong></span><span>:</span>
+    - <span>성능 경쟁력: 추가확인필요점 [상태: NEEDS_VERIFICATION] (Paper compares multiple video tracking-based behavioral summary approaches but lacks direct quantitative benchmark comparisons against established state-of-the-art methods or official baselines; no verified performance table or external benchmark evidence available.)</span>
+    - <span>방법론적 신규성: 3점 [상태: SCORED] (The paper proposes a comparative study of multiple behavioral summary approaches for compound discrimination, including complex unsupervised representations and simpler tracking summaries, which represents a methodological contribution by analyzing these approaches in a novel comparative context.)</span>
+    - <span>연구 흐름 중요도: 3점 [상태: SCORED] (Video tracking and behavioral analysis for compound discrimination is relevant to ongoing trends in computational ethology and behavioral phenotyping, albeit not at the forefront of hot topics like deep learning pose estimation; it contributes to a meaningful emerging research area.)</span>
+    - <span>학술적 유의미성: 3점 [상태: SCORED] (Provides a comparative analysis in behavioral tracking for compound discrimination, which adds to academic knowledge and methodology in behavioral neuroscience and bioinformatics despite being a preprint and not peer-reviewed.)</span>
+    - <span>실무/연구 적용 가치: 추가확인필요점 [상태: NEEDS_VERIFICATION] (No code or data found after retries; practical applicability and usability depend on resource availability, which is currently missing or unverified.)</span>
+    - <span>재현 가능성: 추가확인필요점 [상태: NEEDS_VERIFICATION] (Code and data are not available; no evidence of third-party reproduction or detailed documentation to support reproducibility; reproducibility level is PAPER_ONLY.)</span>
+
+#### <span>📊 비교 연구 모듈</span>
+
+- <span><strong>SOTA 및 상대적 위치</strong></span><span>: No direct state-of-the-art comparison studies found. Existing candidate paper addresses related but distinct tasks (animal pose tracking vs. behavioral summary for compound discrimination).</span>
+- <span><strong>1) 직접 비교 연구 (Direct Comparison)</strong></span><span>:</span>
+    - <span>해당 동일 조건 직접 비교 연구 없음</span>
+- <span><strong>2) 유사 과업 연구 (Near Task Comparison / 정량 직접 비교 유예)</strong></span><span>:</span>
+    - <span><strong>Promptable Animal Pose Tracking Across Species</strong></span><span> (2026): 과업 [Animal pose tracking across species] | 데이터셋 [상이한 벤치마크] | 지표 [상이한 평가 지표] | 유예 사유: Focuses on animal pose tracking rather than behavioral summary approaches for treatment discrimination; different task and metrics so direct comparison is not possible.</span>
+- <span><strong>3) 맥락상 관련 연구 (Contextual Related)</strong></span><span>:</span>
+    - <span>해당 맥락 관련 연구 없음</span>
+- <span><strong>4) 대표 선행 연구 (Representative Prior)</strong></span><span>:</span>
+    - <span>해당 대표 선행 연구 없음</span>
+
+#### <span>📌 불확실성 3분할 (Uncertainty Breakdown)</span>
+
+- <span><strong>1) 사실 검증 필요 (Fact Verification)</strong></span><span>:</span>
+    - <span>🔍 Performance claims not directly verified with benchmark tables or official baselines.</span>
+    - <span>🔍 Code and data for reproducibility not found after retries.</span>
+- <span><strong>2) 평가 근거 부족 (Insufficient Evidence)</strong></span><span>:</span>
+    - <span>⚠️ Quantitative performance details and benchmarks are insufficient or absent.</span>
+    - <span>⚠️ No third-party reproduction or comprehensive documentation available.</span>
+- <span><strong>3) 연구적 Open Question</strong></span><span>:</span>
+    - <span>❓ How do the compared behavioral summary approaches rank quantitatively on standardized benchmarks?</span>
+    - <span>❓ Could releasing code and data improve practical adoption and reproducibility?</span>
+
+#### <span>📌 근거 삼분할 (Grounded Evidence)</span>
+
+- <span><strong>논문 원문 근거</strong></span><span>:</span>
+    - <span>[Document Analysis] Comparison of multiple video tracking-based behavioral summary approaches, but quantitative results and direct benchmark comparisons are not detailed in snippet or summary.</span>
+- <span><strong>외부 출처 근거</strong></span><span>:</span>
+    - <span>외부 기록 확인</span>
+- <span><strong>AI 종합 해석</strong></span><span>:</span>
+    - <span>AI 종합 분석</span>
+
+<span><em>Generated by Paper Quest - Evidence-based AI Academic Research Support System</em></span>
