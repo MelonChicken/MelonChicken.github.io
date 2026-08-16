@@ -1,0 +1,917 @@
+---
+title: "[Reading Note] Is Space-Time Attention All You Need for Video Understanding?"
+slug: "reading-note-is-space-time-attention-all-you-need-for-video-understanding"
+generated: true
+status: "completed"
+domain: 
+  - "Video Action Recognition"
+  - "Video Understanding"
+  - "Vision Transformer"
+summary: "TimeSformer는 ViT를 video domain으로 확장하여 spatial·temporal attention을 분리한 Divided Space-Time Attention으로 효율적인 convolution-free video recognition을 구현하고, 긴 temporal context까지 확장 가능함을 보인 모델이다."
+type: "paper-review"
+methods: 
+  - "AutoML"
+  - "Algorithms"
+  - "Long-Term Video Modeling"
+  - "Space-Time Attention"
+  - "Vision Transformer"
+date: "2026-08-08"
+notion: "https://app.notion.com/p/Reading-Note-Is-Space-Time-Attention-All-You-Need-for-Video-Understanding-3b614b84a0f280ae9206ddfb991238d0"
+---
+
+import NotionBookmark from '../../components/notion/NotionBookmark.astro';
+import NotionCallout from '../../components/notion/NotionCallout.astro';
+import NotionColumns from '../../components/notion/NotionColumns.astro';
+import NotionToggle from '../../components/notion/NotionToggle.astro';
+
+{/* This file is generated from Notion. Do not edit directly. */}
+
+| <span>속성</span> | <span>역할</span> | <span>권장 개수</span> |
+| --- | --- | --- |
+| <span>Research Theme</span> | <span>최상위 연구 축</span> | <span>노트당 1개</span> |
+| <span>Domain</span> | <span>구체적인 연구 분야</span> | <span>노트당 1~3개</span> |
+| <span>Methods</span> | <span>사용하거나 다룬 기술</span> | <span>제한 없음</span> |
+| <span>Type</span> | <span>문서 형식</span> | <span>1개</span> |
+| <span>Status</span> | <span>작성 상태</span> | <span>1개</span> |
+| <span>Related Project</span> | <span>연결된 프로젝트</span> | <span>0~2개</span> |
+
+## <span>Paper Information</span>
+
+> <span><strong>Title:</strong></span><span> Is Space-Time Attention All You Need for Video Understanding?</span>
+> 
+> <span><strong>Authors:</strong></span><span> Gedas Bertasius, Heng Wang, Lorenzo Torresani</span>
+> 
+> <span><strong>Affiliation:</strong></span><span> Facebook AI; Dartmouth College</span>
+> 
+> <span><strong>arXiv ID:</strong></span><span> arXiv:2102.05095</span>
+> 
+> <span><strong>Topic:</strong></span><span> Video Action Recognition, Video Understanding, TimeSformer, Vision Transformer, Space-Time Attention, Divided Space-Time Attention, Long-Term Video Modeling</span>
+> 
+> <span><strong>Venue:</strong></span><span> Proceedings of the 38th International Conference on Machine Learning (</span><span><strong>ICML 2021</strong></span><span>), Proceedings of Machine Learning Research (PMLR), Vol. 139</span>
+> 
+> <span><strong>Pages:</strong></span><span> 813–824</span>
+
+## <span>1. One-line Summary</span>
+
+<span>TimeSformer는 ViT를 video domain으로 확장하여 spatial·temporal attention을 분리한 Divided Space-Time Attention으로 효율적인 convolution-free video recognition을 구현하고, 긴 temporal context까지 확장 가능함을 보인 모델이다.</span>
+
+---
+
+## <span>2. Problem</span>
+
+<span>Video understanding과 NLP는 고수준의 유사성을 가지고 있다</span>
+
+1. <span>영상과 문장은 모두 sequential하다</span>
+2. <span>단어의 뜻은 문장 내의 다른 단어들과의 관계성에 의해 이해되듯이 shorterm segment 속 원자적인 움직임은 완전히 명확하게 되기 위해서는 그 영상의 나머지부분과의 맥락을 알아야 한다.</span>
+
+<span>→ NLP의 긴 범위의 self attention 모델은 영상 모델링에서 또한 매우 효율적일것이다라고 예상할 수 있음</span>
+
+> <span>BUT 영상 도메인에서 2D, 3D 합성곱은 서로 다른 영상 과제 속에서 공간적(spatial) 정보와 시간적(temporal) 정보를 함께 담은 특징을 위한 핵심 연산자로 여겨진다.</span>
+
+- <span>self-attention을 CNN의 convolutional feature 위에 추가해서 쓰는 방식은 이미 효과가 있었다</span>
+    <span>Video → CNN/3D CNN → feature map → self-attention → prediction</span>
+- <span>하지만 video recognition 모델을 </span><span class="notion-color-blue"><strong>convolution 없이 self-attention만으로 구성한 사례는 보고되지 않았다</strong></span>
+    > <span>그러므로 저자들이 합성곱 대신 self-attention을 활용해서 효율적으로 잘 작동하는 convolution free한 영상 아키텍쳐를 만들겠다라고 주장함</span>
+
+<NotionCallout icon={"💡"} color={"green_background"}>
+
+<span>그럼 CNN은 어떤 한계점이 있다고 저자들은 본 것인가</span>
+
+1. <span>충분한 대규모 데이터가 있어 필요한 패턴을 데이터로부터 직접 학습할 수 있는 환경에서는 강한 귀납적인 편향 (Local connectivity, translation equivariance)가 오히려 </span><span class="notion-color-blue"><strong>모델의 표현력을 지나치게 제한</strong></span><span>할 수 있다.</span>
+    <span>→ 반면 Transformer가 CNN보다 inductive bias가 약하기 때문에, </span><span class="notion-color-blue"><strong>더 다양한 함수 관계를 학습</strong></span><span>할 수 있고, (This broadens the family of functions they can represent) 데이터가 충분히 많은 환경에서는 그 점이 오히려 장점이 된다</span>
+2. <span>합성곱 커널은 짧은 시공간적 정보를 포착하는데 특화된 디자인이지만 receptive field를 넘어서는 dependency에 대해서는 모델링할 수 없다.</span>
+    - <span>CNN도 층을 깊게 쌓으면 receptive field를 넓힐 수는 있지만, 먼 거리의 관계를 직접 보는 게 아니라 여러 번의 국소 정보 결합을 거쳐 간접적으로 본다</span>
+    - <span>dependency: </span><span><strong>“한 시공간 위치의 의미가 다른 시공간 위치의 정보와 맺는 관계”</strong></span>
+    
+    <span>→ 반면 self-attention은 </span><span class="notion-color-blue"><strong>모든 시공간 위치의 feature activation을 직접 비교</strong></span><span>할 수 있기 때문에, </span><span><strong>local dependency뿐 아니라 global long-range dependency도 직접 모델링할 수 있다.</strong></span>
+    
+    <span>CNN: local → local → local → long-range</span>
+    
+    <span>Self-Attention: distant token ↔  distant token</span>
+3. <span>GPU의 발전에도 불구하고 deep CNN은 비싸고 특히 고해상도의 긴 영상을 다룰때는 더 비싸다. </span>
+    <span>→ 이미지 분야의 선행 연구에서는 Transformer가 CNN보다 빠른 학습과 추론을 보였으며, </span><span class="notion-color-blue"><strong>동일한 computational budget</strong></span><span>에서 </span><span class="notion-color-blue"><strong>더 큰 learning capacity</strong></span><span>를 가진 모델을 구축할 가능성을 제공한다.</span>
+
+</NotionCallout>
+
+<span>현재 Transformer의 self-attention의 한가지 단점은 토큰의 모든ㄴ 쌍에 대하여 유사도 측정을 진행해야한다는 점인데 TimeSFormer에서는 큰 규모의 패치를 다루나보니 비싸다</span>
+
+<span>→ 그래서 저자들은 이러한 문제를 해결하기 위해 </span><span class="notion-color-blue"><strong>시공간 볼륨(space-time volume)에 적용할 수 있는 여러 scalable self-attention 설계</strong></span><span>를 제안하고, 이를 </span><span class="notion-color-blue"><strong>대규모 action classification 데이터셋</strong></span><span>에서 실험적으로 평가한다.</span>
+
+<span>→ 최고는 Divided attention 구조인데 이건 temporal attention과 spatial attention을 각각 신경망 블록에 적용한것.</span>
+
+### <span>2.1. Related Works</span>
+
+#### <span>2.1.1. CNN + Self-Attention</span>
+
+<span>기존 이미지·비디오 연구에서는 self-attention을 convolution과 함께 사용하는 방식이 이미 존재했다.</span>
+
+- <span><strong>Non-Local Networks</strong></span>
+    - <span>convolutional feature 위에 non-local operation을 적용</span>
+    - <span>Transformer의 self-attention과 유사한 전역적 관계 모델링을 수행</span>
+- <span><strong>Bello et al.</strong></span>
+    - <span>2D self-attention을 2D convolution의 대체재로도 사용 가능</span>
+    - <span>하지만 convolutional feature에 self-attention feature를 추가했을 때 더 좋은 성능을 보임</span>
+- <span><strong>Relation Networks / DETR</strong></span>
+    - <span>object detection에서 convolutional feature map 위에 self-attention을 적용</span>
+
+> <span>즉 이 계열에서는 self-attention이 완전히 독립적인 feature extractor라기보다, </span><span><strong>CNN이 추출한 feature를 보완하는 역할</strong></span><span>에 가까웠다.</span>
+
+---
+
+#### <span>2.1.2 Self-Attention as a Substitute for Convolution</span>
+
+<span>TimeSformer는 위의 CNN + Attention 계열보다는, </span><span class="notion-color-blue"><strong>self-attention을 convolution의 대체재로 사용하는 이미지 네트워크</strong></span><span>와 더 밀접하다.</span>
+
+<span>하지만 기존 연구들은 </span><span class="notion-color-blue"><strong>개별 pixel을 query로 사용</strong></span><span>했기 때문에 계산량과 메모리 사용량이 매우 컸다.</span>
+
+<span>이를 해결하기 위해 다음과 같은 방법들이 사용되었다.</span>
+
+- <span><strong>Local Attention</strong></span>
+    - <span>self-attention의 범위를 주변 neighborhood로 제한</span>
+- <span><strong>Downsampled Global Attention</strong></span>
+    - <span>이미지를 크게 축소한 뒤 global self-attention 수행</span>
+- <span><strong>Sparse Key-Value Sampling</strong></span>
+    - <span>모든 key/value를 사용하지 않고 일부만 선택</span>
+- <span><strong>Axial Attention</strong></span>
+    - <span>전체 2D 공간에서 attention을 한 번에 수행하지 않고</span>
+    - <span>width, height 등의 축별로 분리하여 계산</span>
+
+<span>TimeSformer의 일부 attention scheme도 이러한 s</span><span class="notion-color-blue">parse / axial computation을<br />비디오의 </span><span class="notion-color-blue"><strong>spatiotemporal volume</strong></span><span class="notion-color-blue">으로 확장</span><span>한다.</span>
+
+---
+
+#### <span>2.1.3 ViT와의 직접적인 연결</span>
+
+<span>TimeSformer의 효율성은 sparse/axial attention 자체보다 </span><span class="notion-color-blue"><strong>ViT의 patchification 방식</strong></span><span>에서 더 직접적으로 나온다.</span>
+
+<span>ViT는 개별 pixel 대신 image patch를 token으로 사용한다.</span>
+
+<span><code>Image → Patches → Linear Embeddings → Transformer</code></span>
+
+<span>TimeSformer는 이 아이디어를 video로 확장한다.</span>
+
+<span><code>Video → Frame-level Patches → Linear Embeddings → Space-Time Self-Attention</code></span>
+
+<span>즉 각 frame을 patch로 분할하고, 각 </span><span class="notion-color-blue"><strong>patch를 linear embedding</strong></span><span>으로 변환한 뒤 Transformer의 </span><span class="notion-color-blue"><strong>input token</strong></span><span>으로 사용한다.</span>
+
+<span>→ </span><span><strong>TimeSformer는 ViT의 patch-based Transformer 구조를 video로 확장한 모델</strong></span>
+
+<NotionCallout icon={"💡"} color={"green_background"}>
+
+<span><strong>Pixel-level 방식과 ViT의 Patch 방식의 가장 큰 차이점</strong></span>
+
+<span><strong>Pixel-level 방식</strong></span>
+
+- <span>입력의 원천은 RGB pixel 값입니다.</span>
+- <span>pixel 하나가 token 하나가 됩니다.</span>
+- <span>각 pixel token을 embedding한 뒤, </span><span><strong>pixel token끼리 attention</strong></span><span>을 계산합니다.</span>
+- <span>따라서</span><span class="notion-color-blue"><strong> token 수가 H×W</strong></span><span>로 매우 많습니다.</span>
+
+<span><strong>ViT patch 방식</strong></span>
+
+- <span>역시 입력의 원천은 동일한 RGB pixel 값입니다.</span>
+- <span>하지만 P×P개의 pixel을 묶어 </span><span><strong>하나의 patch token</strong></span><span>으로 만듭니다.</span>
+- <span>따라서 token 수가 </span>$HW→{HW}/{P^2}$<span> 로 크게 감소합니다.</span>
+- <span>이후 attention은 pixel끼리가 아니라 </span><span><strong>patch token끼리</strong></span><span> 계산합니다</span>
+    > <span>평균을 내는 것이 아니라, patch에 포함된 모든 pixel 값의 weighted combination을 학습하는 것</span>
+
+> <span>Pixel-level self-attention과 ViT 모두 근본적으로는 </span><span class="notion-color-blue"><strong>pixel 값을 입력으로 사용</strong></span><span>하지만, pixel-level 방식은 </span><span class="notion-color-blue"><strong>각 pixel을 하나의 token으로 만들어 pixel token들 사이의 attention을 계산</strong></span><span>하는 반면, </span>
+> 
+> <span>ViT는 여러 pixel을 하나의 patch로 묶고 </span><span class="notion-color-blue"><strong>patch 내부의 pixel 값들을 flatten한 뒤 학습 가능한 linear projection을 통해 하나의 embedding vector로 변환</strong></span><span>한다. 따라서 </span><span class="notion-color-blue"><strong>attention에 들어가는 token의 수가 크게 감소</strong></span><span>하며, patch 내부 정보를 단순 평균하는 것이 아니라 학습된 가중치에 의해 하나의 representation으로 변환한다.</span>
+
+</NotionCallout>
+
+---
+
+#### <span>2.1.4 기존 Video Transformer 연구</span>
+
+<span>TimeSformer 이전에도 Transformer는 video 분야에서 사용되고 있었다.</span>
+
+- <span>Video generation</span>
+- <span>Action localization / recognition</span>
+- <span>Video classification</span>
+- <span>Group activity recognition</span>
+- <span>Video captioning</span>
+- <span>Video question answering</span>
+- <span>Video-grounded dialogue</span>
+- <span>Multimodal video-text pretraining</span>
+
+<span>하지만 대부분의 경우 구조는 다음과 같았다.</span>
+
+<span><code>Video → CNN → </code></span><span class="notion-color-blue"><code>Convolutional Feature Map</code></span><span><code> → Transformer</code></span>
+
+<span>즉 Transformer를 사용하더라도 </span><span><strong>CNN이 여전히 video feature extractor 역할을 수행했다.</strong></span>
+
+---
+
+#### <span>2.1.5 TimeSformer의 Positioning</span>
+
+<span>저자들이 강조하는 차별점은 당시까지 </span><span class="notion-color-blue"><strong>self-attention을 video recognition의 exclusive building block으로 사용하는 구조가 없었다</strong></span><span>는</span><span class="notion-color-blue"> </span><span>점이다.</span>
+
+<span>기존:</span>
+
+<span><code>Video → CNN → Feature → Transformer → Prediction</code></span>
+
+<span>TimeSformer:</span>
+
+<span><code>Video → Frame-level Patches → Self-Attention → Prediction</code></span>
+
+<span>따라서 TimeSformer는</span>
+
+- <span>convolution 없이 frame-level patch를 token으로 사용하고</span>
+- <span>space-time self-attention으로 video recognition을 수행하는</span>
+
+<span><strong>convolution-free video architecture</strong></span><span>를 제안한다.</span>
+
+---
+
+> <span>기존 연구가 CNN에 attention을 추가하거나 이미지에서 convolution을 self-attention으로 대체하는 단계였다면,</span>
+
+> <span><strong>TimeSformer는 ViT의 patch 기반 구조를 video로 확장하여 CNN 없이 space-time self-attention만으로 video recognition을 수행하려는 접근이다.</strong></span>
+
+---
+
+## <span>3. Method</span>
+
+### <span>3.1. Model</span>
+
+#### <span><strong>Input</strong></span>
+
+<span>The TimeSformer takes as input a clip </span>$X \in \R ^{H×W×3×F}$
+
+- $F$<span> RGB frames </span>
+- <span>size </span>$H\times W$<span> sampled from the original video</span>
+
+#### <span><strong>Decomposition into patches</strong></span>
+
+<span>각 프레임을 N개의 겹침 없는 P × P 패치들로 쪼갠다. (non-overlapping patches)</span>
+
+> $N = HW/P^2 <-> P = \sqrt{\frac{HW}{N}}$
+
+#### <span>Linear Embedding</span>
+
+<span>각각의 패치들을 학습 가능한 행렬, </span>$\bold E∈R^{D×3P^2}$<span>를 이용하여 </span>$\bold z_{(p,t)}^{(0)}∈\R^D$<span>라는 임베딩 벡터로 </span><span class="notion-color-blue"><strong>선형 변환(linearly map)</strong></span><span>한다</span>
+
+<figure class="notion-figure">
+  <img src={"/notion-assets/reading-note-is-space-time-attention-all-you-need-for-video-understanding/3ba14b84a0f2805f8e89c5902074b163.png"} alt={"Source: author's Notion note"} />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+$\bold z^{(0)}_{(p, t)} = E\bold x_{(p,t)}+e^{\text{pos}}_{(p,t)}$
+
+- $e^{\text{pos}}_{(p,t)}$<span> : 그 patch가 비디오에서 </span><span><strong>어디에 있고 언제 등장하는지(position in space and time)</strong></span><span> 를 알려주는 embedding</span>
+- $E\bold x_{(p,t)}$<span>: patch의 </span><span><strong>내용(content)</strong></span><span>을 표현하는 embedding</span>
+- $p = 1, . . . , N , \;\;and\;\; t = 1, . . . , F$
+
+<NotionCallout icon={"💡"} color={"green_background"}>
+
+#### <span>Positional Embedding을 왜 더하는가?</span>
+
+$\mathbf z^{(0)}_{(p,t)}E\mathbf x_{(p,t)}+\mathbf e^{pos}_{(p,t)}$
+
+<span>Positional embedding을 더하는 목적은 </span><span><strong>나중에 위치 벡터를 다시 분리해서 복원하기 위함이 아니다. </strong></span><span>같은 시각적 내용을 가진 patch라도 위치가 다르면</span>
+
+$x+p_1 \neq x+p_2$<span>가 되므로 </span><span class="notion-color-blue"><strong>Transformer가 서로 다른 token</strong></span><span>으로 처리할 수 있게 한다.</span>
+
+<span> </span>$\boxed{\text{What}}+\boxed{\text{Where / When}}\rightarrow\boxed{\text{Context-aware Token}}$
+
+> <span><strong>왜 단순히 더해도 되는가?</strong></span>
+
+<span>이후 Transformer에서</span>$Q=zW_Q,\quad K=zW_K,\quad V=zW_V$<span>를 계산하는데,</span>$z=x+p$<span>이므로 </span>$Q=(x+p)W_Q=xW_Q+pW_Q$<span>가 된다.</span>
+
+<span>따라서 attention 계산에는 자연스럽게 </span><span class="notion-color-blue"><strong>내용 정보와 위치 정보가 함께 반영</strong></span><span>된다.</span>
+
+#### <span>주의할 점</span>
+
+- <span>Positional embedding을 더한 뒤 원래 </span><span><strong>x</strong></span><span>와 </span><span><strong>p</strong></span><span>를 다시 분리하려는 구조가 아니다.</span>
+- <span>위치는 벡터의 </span><span><strong>원점으로부터 거리</strong></span><span>로 표현되는 것이 아니다.</span>
+- <span>각 위치마다 서로 다른 D차원 벡터 패턴이 학습된다.</span>
+- <span>더하기를 사용하면 embedding dimension을 </span><span><strong>D</strong></span><span>로 유지하면서 content와 position 정보를 결합할 수 있다.</span>
+
+#### <span>한 줄 요약</span>
+
+> <span><strong>Positional embedding을 더한다는 것은 위치 정보를 따로 저장하는 것이 아니라, patch representation 자체를 위치에 따라 다르게 만들어 이후 attention이 위치와 시간을 함께 고려하도록 하는 것이다.</strong></span>
+
+</NotionCallout>
+
+#### <span>Query-Key-Value computation</span>
+
+<figure class="notion-figure">
+  <img src={"/notion-assets/reading-note-is-space-time-attention-all-you-need-for-video-understanding/3bd14b84a0f2801eaef0e8a6c7baaf85.png"} alt={"Source: author's Notion note"} />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+> <span><strong>Denotation 정보</strong></span>
+> 
+> - $A$<span> : attention head의 총 개수</span>
+> - $1\le a \le A$<span> : 여러개의 attention head의 인덱스</span>
+> - $D_h = D /A$<span> : 각각의 attention head의 latent dimensionality</span>
+>     > <span><strong>multi-head attention에서 여러 head의 출력을 다시 합쳤을 때 전체 embedding 차원 D를 그대로 유지하려고 </strong></span><span>보통 각 head 차원을 </span>$D_h=D/A$
+
+<NotionCallout icon={"💡"} color={"green_background"}>
+
+<span>Multi head attention의 계산 흐름</span>
+
+<span>예를 들어 A=12개의 head가 있으면, 같은 입력 token representation </span>$\bold z$<span>에 대해 각 head가 자기만의 projection matrix를 사용해서 동시에 </span>$Q, K, V$<span>등을 계산한다.</span>
+
+$Q^{(a)} =W_Q^{(a)}\bold z,\;\;\;\; K^{(a)}=W_K^{(a)}\bold z,\;\;\;\;V^{(a)}=W_V^{(a)}\bold z$
+
+```plaintext
+같은 입력 z
+   ├─ Head 1 → Q1, K1, V1 → Attention 1
+   ├─ Head 2 → Q2, K2, V2 → Attention 2
+   ├─ Head 3 → Q3, K3, V3 → Attention 3
+   ...
+   └─ Head A → QA, KA, VA → Attention A
+```
+
+<span>이 head들은 </span><span><strong>서로 독립적인 파라미터를 사용해 병렬로 서로 다른 관계를 학습한다.</strong></span>
+
+<span>그리고 각 head의 결과 </span>$s_{(1)},s_{(2)},…,s_{(A)}$<span> 를 마지막에 concatenate해서 </span>$[s_{(1)};s_{(2)};…;s_{(A)}]$<span>로 합친다.</span>
+
+</NotionCallout>
+
+<NotionCallout icon={"💡"} color={"green_background"}>
+
+<span>Multi head attention의 head 별 차이 발생의 원인</span>
+
+<span>각 attention head </span>$a$<span>는 서로 다른 학습 가능한 projection matrix를 가진다.</span>
+
+$W_Q^{(a)},\quad W_K^{(a)},\quad W_V^{(a)}$
+
+<span>따라서 같은 입력 </span>$z$<span>를 사용하더라도 각 head는 서로 다른 Q, K, V를 생성한다.</span>
+
+$Q^{(a)} = W_Q^{(a)}z$
+
+$K^{(a)} = W_K^{(a)}z$
+
+$V^{(a)} = W_V^{(a)}z$
+
+#### <span>왜 서로 다른 관계를 학습할 수 있는가?</span>
+
+- <span>각 head의</span>$(W_Q, W_K, W_V)$<span>는 </span><span><strong>서로 독립적인 parameter</strong></span>
+- <span>학습 시작 시 일반적으로 </span><span><strong>서로 다른 random initialization</strong></span><span>을 가짐</span>
+- <span>따라서 같은 입력이라도 head마다 처음부터 다른 Q/K/V representation이 생성됨</span>
+- <span>이후 각 head가 만든 attention 결과가 다르므로 loss에 대한 gradient도 서로 다르게 전달될 수 있음</span>
+- <span>결과적으로 각 head의 parameter가 서로 다른 방향으로 학습될 수 있음</span>
+
+<span>흐름으로 보면:</span>
+
+$\text{Different Initialization}\\\downarrow\\\text{Different } Q/K/V\\\downarrow\\\text{Different Attention Patterns}\\\downarrow\\\text{Different Gradients}\\\downarrow\\\text{Different Learned Representations}$
+
+> <span><strong>하지만 각 head가 반드시 서로 다른 의미나 기능을 학습하는 것은 아니다.</strong></span>
+
+<span>Multi-head attention은</span>
+
+- <span>Head 1 = motion</span>
+- <span>Head 2 = object</span>
+- <span>Head 3 = background</span>
+
+<span>처럼 역할을 미리 지정하지 않는다.</span>
+
+<span>대신 각 head에 </span><span class="notion-color-blue"><strong>독립적인 parameter와 서로 다른 학습 경로를 제공</strong></span><span><strong>하여 다양한 관계를 학습할 수 있는 가능성</strong></span><span>을 만든다.</span>
+
+<span>따라서 서로 다른 head가 비슷한 attention pattern을 학습하는 경우도 가능하다.</span>
+
+</NotionCallout>
+
+1. $z_{(p,t)}^{(ℓ−1)}$<span> :이전 Transformer block이 만든 patch representation</span>
+    <span>e.g. first block : patch pixel→</span><span class="notion-color-blue"><strong>patch embedding + position</strong></span>
+    
+    $\boxed{\bold z_{(p,t)}^{(0)}​=E\bold x_{(p,t)}​+\bold e_{(p,t)}^{pos​}}$
+2. $LN(z_{(p,t)}^{(ℓ−1)})$<span> : 먼저 Layer Norm을 적용한다. </span><span><strong>(Pre-LN 구조)</strong></span>
+    <span>이전 block의 patch representation<br />↓<br />LayerNorm<br />↓<br />정규화된 representation</span>
+3. <span>같은 patch representation에서 Q, K, V를 각각 만든다 </span><span><em>(2, 3, 4)</em></span>
+    - <span><strong>Query</strong></span><span>: 나는 어떤 정보를 찾고 있는가?</span>
+    - <span><strong>Key</strong></span><span>: 나는 어떤 특징을 가지고 있는가?</span>
+    - <span><strong>Value</strong></span><span>: 실제로 전달할 정보는 무엇인가?</span>
+
+#### <span>Self-attention Computation</span>
+
+<span>Source: Original Document</span>
+
+> <span>Joint Attention 기반 설명</span>
+
+$\boxed{\alpha_{(p, t)}^{(l, a)}=SM(\frac{q_{(p, t)}^{(l, a)}}{\sqrt{D_h}}^T\; \dot\;[\bold k_{(o, 0)}^{(l, a)}\{k_{(p', t')}^{(l, a)}\}_{p'=1,\dots,N, \; t'=1,\dots, F}])}$
+
+$\alpha_{(p, t)}^{(l, a)} \in \R^{NF+1}$<span>로 query patch </span>$(p, t)$<span>에 대한 self-attention weight </span>$\alpha$<span>를 설정한다고 가정할 아래와 같이 점곱을 활용해서 구할 수 있다. </span>$SM$<span>은 softmax 활성화 함수를 의미한다</span>
+
+> <span>주의깊게 볼 점은 attention 계산을 한번에 한 차원(e.g. Spatial Only or Temporal Only)으로 하면 계산량이 줄어든다고 한다. (</span>$N+1$<span>의 query-key comparison 생성)</span>
+> 
+> - <span>한번에 모든 차원에 대해 계산을 하는 경우 → e.g. Joint Space-Time Attention, …,</span>
+> - <span>각각의 차원에 대해 계산을 하는 경우 → e.g. Divided Space-Time Attention,… </span>
+
+> <span>기존의 attention 수식</span>
+> 
+> $\text{Attention}(Q,K,V)=\text{softmax}(\frac{QK^T}{\sqrt{d_k}})V = \alpha V$
+> 
+> | <span>기존 Transformer</span> | <span>TimeSformer</span> |
+> | --- | --- |
+> | <span>token (i)</span> | <span>patch token ((p,t))</span> |
+> | <span>token (j)</span> | <span>patch token ((p',t'))</span> |
+> | <span>(</span>$d_k$<span>)</span> | <span>(</span>$D_h=D/A$<span>)</span> |
+> | <span>(</span>$QK^T$<span>)</span> | <span>(</span>$q_{(p,t)}^Tk_{(p',t')}$<span>)</span> |
+> | <span>softmax 결과</span> | <span>(</span>$\alpha_{(p,t)}$<span>)</span> |
+> | $\text{softmax}(\cdot)V$ | <span>다음 식에서 </span>$V$<span>의 weighted sum</span> |
+
+#### <span>Encoding</span>
+
+> <span>self-attention weight를 구한 뒤, 실제로 각 head의 정보를 어떻게 모아서 다음 block의 representation </span>$z_{(p,t)}^{(ℓ)}$<span>를 만드는가?</span>
+
+1. <span>특정 query patch </span>$(p,t)$<span>에 대해 </span><span><strong>모든 value vector의 weighted sum</strong></span>
+
+$[s^{(\ell,a)}_{(p,t)}\alpha^{(\ell,a)}{(p,t),(0,0)}v^{(\ell,a)}{(0,0)}+\sum_{p'=1}^{N}\sum_{t'=1}^{F}\alpha^{(\ell,a)}{(p,t),(p',t')}v^{(\ell,a)}{(p',t')}]$
+
+> $\text{output of head }a\sum\text{attention weight}\times\text{value}$
+
+> <span>이때 weight 값이 앞서 앞에서 구한 </span>$\bold\alpha$<span>이다.</span>
+
+- <span>즉 </span>$s^{(\ell,a)}_{(p,t)}$<span>는 </span><span><strong>head </strong></span>$a$<span><strong>가 여러 patch에서 필요한 정보를 골라 모은 결과</strong></span>
+- <span>여기서 첫 항</span>$\alpha_{(p,t),(0,0)}v_{(0,0)}$<span>는 </span><span class="notion-color-blue"><strong>classification token의 value를 따로 포함</strong></span><span>한 것입니다.</span>
+
+2. <span>multi-head attention 결과를 합친다.</span>
+
+<span>각 head에서</span>$s^{(\ell,1)}{(p,t)},\quad s^{(\ell,2)}{(p,t)},\quad\dots,\quad s^{(\ell,A)}_{(p,t)}$<span>가 나왔으니, 이걸 concatenate한다.</span>
+
+$\begin{bmatrix}s^{(\ell,1)}{(p,t)};\dots\ ;s^{(\ell,A)}{(p,t)}\end{bmatrix}$
+
+<span>각 head가 </span>$D_h$<span>차원이고 </span>$D_h=D/A$<span>이므로 concatenate 후 전체 차원은 다시 </span>$D$<span>가 된다.</span>
+
+3. <span>output projection </span>$W_O$<span>를 적용하고, 원래 입력 </span>$z^{(\ell-1)}_{(p,t)}$<span>를 residual connection으로 더한다.</span>
+    $z'^{(\ell)}_{(p,t)} = W_O\begin{bmatrix}s^{(\ell,1)}{(p,t)}\\ \vdots \\s^{(\ell,A)}{(p,t)}\end{bmatrix}+z^{(\ell-1)}_{(p,t)}$
+4. <span>Attention Computation 이후 </span><span><strong>MLP를 한 번 더 통과 (Transformer의 일반적인 구조)</strong></span>
+    $z^{(\ell)}_{(p,t)} = MLP\left(LN\left(z'^{(\ell)}{(p,t)}\right)\right)+z'^{(\ell)}{(p,t)}$
+
+<span>그리고 이 </span>$z^{(\ell)}_{(p,t)}$<span>가 </span><span><strong>다음 Transformer block의 입력</strong></span><span>이 된다</span>
+
+#### <span>Classification Embedding</span>
+
+> <span>마지막 clip embedding은 마지막 블록의 classification token으로부터 진행된다.</span>
+> 
+> <span>→이 임베딩이 끝난뒤 video class에 대한 예측에 사용되는 1개의 얇은 hidden layer MLP을 더 얹는다.</span>
+
+$\bold y = LN(\bold z_{(0, 0)}^{(L)}) \in \R^D$
+
+$\text{predicted class} = MLP(\bold y)$
+
+> $z_{CLS}^{(L)}$<span>→LN→y→MLP→class prediction</span>
+
+---
+
+## <span>4. Key Idea</span>
+
+<figure class="notion-figure">
+  <img src={"/notion-assets/reading-note-is-space-time-attention-all-you-need-for-video-understanding/3bd14b84a0f280aca055f01d8281c017.png"} alt={"Source: author's Notion note"} />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+> <span>Divided Attention, where temporal attention and spatial attention are separately applied within each block, leads to the best video classification accuracy among the design choices considered.</span>
+
+<span>ViT에서 영감을 받아 </span><span class="notion-color-blue"><strong>image space에서 space-time 3D volume으로 self-attention mechanism을 확장</strong></span><span>하여 적용한다.</span>
+
+## <span>4.1. Divided Attention Strategy</span>
+
+<figure class="notion-figure">
+  <img src={"/notion-assets/reading-note-is-space-time-attention-all-you-need-for-video-understanding/3ba14b84a0f28029a865de73c3a13737.png"} alt={"Source: author's Notion note"} />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+<span>Source: Original Document</span>
+
+> <span>기존의 Attention에 어떻게 Temporal Information과 Spatial Information을 동시에 담을 수 있는가?</span>
+> 
+> <span>→ 원론적으로는 동시에 계산하는게 가장 성능이 잘 나올 것 같지만 temporal 따로, Space 따로 계산하는게 비용적으로도 효율적이고 성능적으로도 잘 나온다.</span>
+> 
+> - <span>Joint의 경우 patch 하나가 </span>$NF+1$<span> 개 정도를 비교</span>
+> - <span>Divided Attention은 Temporal 단계: </span>$F+1$<span>, Spatial 단계: </span>$N+1$<span> 그래서 합쳐서 대략 </span>$N+F+2$
+> 
+> <span class="notion-color-blue"><strong>→ Divided Space-Time Attention (T+S) 제시</strong></span>
+
+<span>저자는 Space only attention, Joint Space-Time attention, Divided Space-Time Attention 등 5개의 attention 전략을 classification accuracy를 통해 평가했다.</span>
+
+<figure class="notion-figure">
+  <img src={"/notion-assets/reading-note-is-space-time-attention-all-you-need-for-video-understanding/3bd14b84a0f2806e87bdd9181ad16b16.png"} alt={"Source: author's Notion note"} />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+<figure class="notion-figure">
+  <img src={"/notion-assets/reading-note-is-space-time-attention-all-you-need-for-video-understanding/3bd14b84a0f2801781c4c6fa6812cd8c.png"} alt={"Source: author's Notion note"} />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+<span>Source: Original Document</span>
+
+- <span><strong>Sparse Local Global Attention (L+G)</strong></span><span>은 먼저 주변의 local patch를 attention하고, 이후 전체 clip에서 stride 2로 일부 patch만 골라 </span><span><strong>sparse global attention</strong></span><span>을 합니다. 즉 full attention을 근사하는 방식</span>
+- <span><strong>Axial Attention (T+W+H)</strong></span><span>은 attention을 Time→Width→Height의 세 축으로 더 잘게 분해</span>
+    <span>→ 어떤 방식으로 관계를 탐색할지를 구조적으로 제한하는 </span><span class="notion-color-blue"><strong>inductive bias. </strong></span><span><strong>이 경우는 효과가 없었다.</strong></span>
+
+> <span><strong>Joint → Divided → Axial로 갈수록 attention의 자유도가 줄고 구조적 bias가 강해진다</strong></span>
+
+> <span>Full space-time attention으로 모든 patch를 한꺼번에 비교하는 대신, </span><span class="notion-color-blue"><strong>시간축과 공간축 attention을 순차적으로 factorize</strong></span><span>하여 계산량을 크게 줄이면서도 효과적인 spatiotemporal representation을 학습할 수 있음을 보였다.</span>
+
+> <span><strong>K400:</strong></span><span> </span><span class="notion-color-blue"><strong>spatial/appearance cue</strong></span><span>의 영향이 상대적으로 큰 action recognition benchmark</span>
+> 
+> <span><strong>SSv2:</strong></span><span> </span><span class="notion-color-blue"><strong>temporal ordering, motion, object interaction 변화</strong></span><span>가 중요한 temporally-heavy benchmark</span>
+> 
+> <span>→ 따라서 두 데이터셋을 함께 비교하면 attention 구조가 단순 spatial appearance에 의존하는지, 실제 temporal dependency까지 잘 모델링하는지를 확인할 수 있다.</span>
+
+---
+
+## <span>5. Result</span>
+
+> <span>TimeSformer는 temporal attention을 통해 시간 정보를 분명히 학습하지만, </span><span class="notion-color-blue"><strong>모든 temporally-heavy task에서 최고의 temporal modeling을 보인 것은 아니다.</strong></span><span> 특히 SSv2에서는 </span><span class="notion-color-blue"><strong>explicit/inductive motion modeling을 가진 기존 video architecture보다 성능이 낮았다.</strong></span>
+
+> <span>Kinetics-400, Kinetics-600, Somthing-SomethingV2, Diving-48 Dataset에 대해 학습 및 평가를 진행했다.</span>
+
+### <span>5.0. Default Experimental Setup</span>
+
+- <span><strong>Input clip size:</strong></span><span> </span>$8 \times 224 \times 224$
+    - <span>8 frames</span>
+    - <span>각 frame 크기: </span>$224 \times 224$
+- <span><strong>Frame sampling rate:</strong></span><span> </span>$1/32$
+    - <span>원본 영상에서 32 frame 간격으로 1 frame씩 샘플링</span>
+- <span><strong>Patch size:</strong></span><span> </span>$16 \times 16$
+    - <span>한 frame당 </span>$224/16 = 14$<span>이므로 </span>$14 \times 14 = 196$<span> patches 8 frames 기준 총 patch token 수: </span>$196 \times 8 = 1568$
+
+> <span><strong>Inference</strong></span>
+
+- <span>별도 언급이 없으면 영상의 </span><span><strong>중앙 temporal clip 1개</strong></span><span>를 사용</span>
+- <span>해당 clip에서 3개의 spatial crop 사용</span>
+    - <span>top-left</span>
+    - <span>center</span>
+    - <span>bottom-right</span>
+    
+    > <span>예를 들어 한 temporal clip의 각 frame이 더 큰 해상도라고 하면, 그중에서 모델 입력 크기인 224×224 영역을</span>
+    > 
+    > - <span>왼쪽 위(top-left)</span>
+    > - <span>중앙(center)</span>
+    > - <span>오른쪽 아래(bottom-right)</span>
+    > 
+    > <span>이렇게 3곳에서 잘라낸 뒤, 각 crop은 같은 시간 구간의 8개 frame에 대해 동일한 위치를 사용한다</span>
+- <span>각 crop의 prediction score를 평균하여 최종 예측</span>
+    $\text{Final Score}=\frac{S_{\text{top-left}}+S_{\text{center}}+S_{\text{bottom-right}}}{3}$
+
+---
+
+### <span>5.1. Analysis of Self-Attention Schemes</span>
+
+<figure class="notion-figure">
+  <img src={"/notion-assets/reading-note-is-space-time-attention-all-you-need-for-video-understanding/3bd14b84a0f2804aa832e2766e5dcb9b.png"} alt={"Source: author's Notion note"} />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+<span>Source: Original Document</span>
+
+> <span><code>Out of memory</code></span><span> 표시는 </span><span><strong>Joint Space-Time Attention이 해당 설정에서는 GPU 메모리에 올라가지 못해 실제 연산을 수행할 수 없었다</strong></span>
+> 
+> <span>→ 입력 해상도나 영상 길이가 커지면 Joint Space-Time Attention은 아예 실행 자체가 불가능해질 수 있지만, Divided Attention은 계속 계산 가능하다</span>
+
+---
+
+### <span>5.2. Comparison to 3D CNNs</span>
+
+#### <span>비교 모델</span>
+
+1. <span>SlowFast :  영상 분류에서 SOTA</span>
+    > <span>CNN 기반 explicit temporal design vs Transformer 기반 space-time attention</span>
+    
+    <figure class="notion-figure">
+      <img src={"/notion-assets/reading-note-is-space-time-attention-all-you-need-for-video-understanding/3be14b84a0f280108ee4e984beceb285.png"} alt={"Source: author's Notion note"} />
+      <figcaption>Source: author's Notion note</figcaption>
+    </figure>
+    
+    <span>Source: Feichtenhofer et al., "SlowFast Networks for Video Recognition," ICCV 2019, Fig. 1.</span>
+    
+    - <span><strong>Slow pathway</strong></span>
+        - <span>frame을 드문드문 샘플링</span>
+        - <span>비교적 낮은 temporal resolution</span>
+        - <span>대신 channel 수가 많아서 </span><span><strong>appearance, semantic information</strong></span><span>을 잘 학습</span>
+    - <span><strong>Fast pathway</strong></span>
+        - <span>frame을 더 촘촘하게 샘플링</span>
+        - <span>높은 temporal resolution</span>
+        - <span>channel 수는 적게 두어 계산량을 줄이면서 </span><span><strong>motion, 빠른 시간적 변화</strong></span><span>를 학습</span>
+2. <span>I3D : 이미지 기반 사전학습을 잘 활용하는 CNN 모델</span>
+    <figure class="notion-figure">
+      <img src={"/notion-assets/reading-note-is-space-time-attention-all-you-need-for-video-understanding/3be14b84a0f28000a296c5577af99f80.png"} alt={"Source: author's Notion note"} />
+      <figcaption>Source: author's Notion note</figcaption>
+    </figure>
+    
+    <span>Source: Carreira &amp; Zisserman, "Quo Vadis, Action Recognition? A New Model and the Kinetics Dataset," CVPR 2017.</span>
+    
+    > <span>기존의 2D CNN filter를 </span><span><strong>시간축까지 확장해서 3D convolution으로 만든 것</strong></span>
+    > 
+    > - <span><strong>ImageNet에서 학습한 2D CNN weight를 3D convolution으로 확장해서 초기화할 수 있다</strong></span>
+    
+    <span><strong>SlowFast:</strong></span><span> 느린 pathway에서 </span><span class="notion-color-blue"><strong>appearance/semantic 정보</strong></span><span>를, 빠른 pathway에서 </span><span class="notion-color-blue"><strong>motion 정보</strong></span><span>를 학습하는 two-pathway 3D CNN. 당시 강력한 video classification baseline.</span>
+    
+    <span><strong>I3D:</strong></span><span> 2D convolution을 시간축까지 확장한 3D ConvNet. I</span><span class="notion-color-blue"><strong>mageNet pretrained 2D weight를 활용</strong></span><span>할 수 있어 TimeSformer와 같이 image-based pretraining의 이점을 받는 비교군.</span>
+    
+    <span>→ 두 모델은 각각 </span><span><strong>강력한 CNN-based temporal modeling</strong></span><span>과 </span><span><strong>image-pretrained 3D CNN</strong></span><span>을 대표하는 baseline이다.</span>
+
+#### <span>5.2.1. Model Capacity</span>
+
+<figure class="notion-figure">
+  <img src={"/notion-assets/reading-note-is-space-time-attention-all-you-need-for-video-understanding/3be14b84a0f28004951cc291f4a315da.png"} alt={"Source: author's Notion note"} />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+<span>Source: Original Document</span>
+
+> <span>다른 모델과 비교한 결과, TimeSformer가 learning capacity, 파라미터의 수가 121.4M개로 가장 많은 모습을 보여줌에도 불구하고 추론하는데 있어 드는 비용 (</span><span><strong>0.59 </strong></span><span>TFLOPs)은 가장 적었다.</span>
+
+<NotionCallout icon={"💡"} color={"green_background"}>
+
+<span>TFLOPs 란 무엇인가?</span>
+
+> <span><strong>Tera Floating Point Operations</strong></span><span>, 1</span><span><strong>조 번의 부동소수점 연산량</strong></span>
+
+- <span>1 TFLOP=1012 floating point operations</span>
+- <span><strong>한 번의 추론을 수행하는 데 대략 얼마나 많은 계산이 필요한지</strong></span><span>를 나타내는 지표</span>
+
+</NotionCallout>
+
+- <span>반대로 SlowFast 8x8 R50의 경우 가장 작은 capacity (34.6M)를 가지고 있음에도 추론 비용은 가장 컸다. (1.97 TFLOPs)</span>
+
+<span>⇒ TimeSformer가 대규모의 학습에 있어 더 적합하다.</span>
+
+#### <span>5.2.2. Video Training Time</span>
+
+<span>ImageNet으로 사전학습을 할때의 장점 중 하나는 TimeSformer가 영상 데이터에 대해 효율적으로 학습하게 한다는 점이다. 이에 반면 SOTA인 3 CNN의 경우 이미지 데이터셋에 사전학습을 했음에도 더 비싸다는 점이 눈에 띈다.</span>
+
+<figure class="notion-figure">
+  <img src={"/notion-assets/reading-note-is-space-time-attention-all-you-need-for-video-understanding/3be14b84a0f280749c6fcd66c5b5b20d.png"} alt={"Source: author's Notion note"} />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+<span>실제로 방금의 표에서 K400 Training Time (hours)를 보면 SlowFast 8 × 8 R50의 경우 K400에 대해 75.6%의 정확도에 도달하기 위해서는 3,840 Tesla V100 GPU 시간이 필요했다. 마찬가지로 I3D의 경우 1,440 Tesla V100 GPU 시간을 들여 73.4%의 정확도에 도달했다. </span>
+
+<NotionCallout icon={"💡"} color={"green_background"}>
+
+<span>Tesla V100 GPU hours가 무슨 말인가</span>
+
+> <span>NVIDIA Tesla V100 GPU를 기준으로 측정한 총 학습 계산 시간.</span>
+
+$GPU hours=GPU 수×학습 시간$
+
+<span>예: 416 GPU hours = V100 1장으로 416시간, 또는 8장으로 약 52시간에 해당.</span>
+
+<span>→ 모델 간 총 training compute를 비교하는 지표로 사용.</span>
+
+</NotionCallout>
+
+<span>반면 TimeSformer의 경우 오직 416 Tesla V100 GPU 시간 만제 가장 높은 정확도인 75.8%에 다다랐을 뿐더러 비슷한 GPU 시간으로 SlowFast와 I3D를 학습시키면 각각 70.0%, 71,0%의 정확도로 성능이 떨어짐을 확인할 수 있다. </span>
+
+<span>⇒ SOTA인 3D CNN 모델들의 경우 ImageNet을 통해 사전학습을 한다고 해도 좋은 성능을 내기 위해서는 매우 긴 최적화 시간이 필요하다.</span>
+
+<span>⇒ 반면 TimeSformer의 경우 더 효율적이다.</span>
+
+#### <span>5.2.3. The Importance of Pretraining</span>
+
+> <span>TimeSformer의 경우 learning capacity (parameters)가 큰 만큼 모델을 순수하게 맨땅에서부터 만들기란 어렵다. 그렇기에 영상 데이터에 대해 바로 모델을 학습시키기 보다는 가중치들을 ImageNet으로부터 사전학습하여 초기화를 한다.</span>
+
+- <span>반면 CNN인 SlowFast의 경우 영상 데이터로부터 직접적으로 배울 수 있지만 높은 학습 비용을 요구한다.</span>
+- <span>저자들은 사전 학습 없이 바로 TimeSformer를 K400에 학습시켰는데, 긴 학습 시간과 추가적인 데이터 증강을 통해 학습이 가능하긴 하지만 정확도가 64.8%로 성능이 그다지 좋지는 않았다. </span>
+
+<span>저자들은 TimeSformer의 세 가지 입력 configuration에 대해 </span><span><strong>ImageNet-1K와 ImageNet-21K pretraining의 효과를 비교</strong></span><span>하였다. 이를 통해 더 큰 image pretraining dataset이 video classification 성능에 어떤 영향을 주는지 확인하였다.</span>
+
+> <span>실험 조건 정리</span>
+> 
+> - <span><strong>Pretraining dataset 규모</strong></span>
+>     - <span>ImageNet-1K</span>
+>     - <span>ImageNet-21K</span>
+> - <span><strong>TimeSformer 입력 구성</strong></span>
+>     - <span>기본형</span>
+>     - <span>고해상도형</span>
+>     - <span>장시간 범위형</span>
+
+> <span>(# of frames) x (Width pixel of video) x (Height pixel of video)</span>
+
+1. <span>TimeSformer : </span><span><code>8x224x224</code></span><span> 영상 클립에 작동하는 저자들의 모델의 기본 버전</span>
+2. <span>TimeSformer-HR : </span><span><code>16x448x448</code></span><span> 영상 클립이라는 고해상도에서 작동하는 버전 (기본 모델보다 frame 수도 늘리고 spatial resolution도 크게 높인 버전)</span>
+3. <span>TimeSformer-L : </span><span><code>96x224x224</code></span><span> 영상 클립으로 해상도는 기본과 동일하지만 원본 비디오에서 4 frame 간격으로 1 frame씩 샘플링하여 긴 범위에서 작동하는 버전 (더 많은 frame과 더 긴 시간 구간을 처리하도록 설계)</span>
+
+<figure class="notion-figure">
+  <img src={"/notion-assets/reading-note-is-space-time-attention-all-you-need-for-video-understanding/3be14b84a0f2802f9206d8bb1ac606c1.png"} alt={"Source: author's Notion note"} />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+<span>Source: Original Document</span>
+
+<span>결과를 봤을때 동일 Method의 경우 더 큰 규모의 데이터인 ImageNet21K로 진행하는게 K400 (주로 appearance)에서는 유의미하게 좋은 성능을 보이고 있지만 SSv2 (주로 Temporal, motion)의 경우 효과가 미미하거나 오히려 떨어지는 모습을 보여준다.</span>
+
+> <span>This makes sense as SSv2 requires complex spatiotemporal reasoning, whereas K400 is biased more towards spatial scene information</span>
+
+<span>⇒ 사전학습은 K400과 같이 spatial scene information 에 의존하는 데이터셋에서 더 좋은 성능을 보인다.</span>
+
+#### <span>5.2.4. The Impact of Video-Data Scale</span>
+
+> <span>영상 데이터의 규모가 성능에 미치는 영향을 알기 위해 저자들은 서로 다른 K400과 SSv2의 부분 데이터셋을 활용해 실험을 설계했다. (전체 영상의 25%, 50%, 75%, 100%) </span>
+> 
+> - <span>모델은 3D CNN으로 비교된 SlowFast와 I3D를 활용하였다.</span>
+> - <span>사전학습의 경우 세모델 모두 ImageNet-1K에 사전학습을 진행했다. </span>
+>     > <span>정확하게는 사전학습 된 모델을 가져와서 학습을 진행한 것 같다. </span>
+
+<figure class="notion-figure">
+  <img src={"/notion-assets/reading-note-is-space-time-attention-all-you-need-for-video-understanding/3be14b84a0f280d2a638ec0bd7e9b875.png"} alt={"Source: author's Notion note"} />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+<span>Source: Original Document</span>
+
+- <span>K400의 경우 TimeSformer가 CNN 모델들에 비해 항상 더 좋은 성능을 보여준다.</span>
+- <span>SSv2d의 경우 데이터셋의 규모가 작을 때 (42K, 85K)에는 CNN이 좋은 모습을 보여주지만 그 이상으로 커지면 K400과 마찬가지로 TimeSformer가 가장 좋은 성능을 보여준다</span>
+    - <span>⇒ 이는 SSv2의 경우 더 복잡한 temporal patterns를 학습해야하기 때문에 TimeSformer가 이 패턴을 효과적으로 학습하기 위해서는 더 많은 예시들이 필요하기 때문이다.</span>
+
+---
+
+### <span>5.3. Varying the Number of Tokens</span>
+
+> <span>TimeSformer의 scalability는 SOTA인 3D CNN과 비교해서 고해상도이고 긴 영상에 대해서도 작동할 수 있게 해주는데, 저자들은 이 두가지 조건 (고해상도 &amp; 영상의 긴 길이)이 Transformer에 주어지는 token sequence의 길이에 영향을 미친다고 생각했다.</span>
+
+- <span>공간 해상도를 높이면 프레임 당 patch의 수 역시 커진다.</span>
+    > $N = HW/P^2 <-> P = \sqrt{\frac{HW}{N}}$
+- <span>더 많은 프레임을 사용할 수록 (영상의 길이를 늘릴수록) input token의 수 역시 늘어난다.</span>
+
+<span>⇒ 따라서 이로 인한 효과를 보기 위해 공간축과 시간축 각각에서 token 수를 따로 증가시켜 실험적으로 확인했다</span>
+
+<figure class="notion-figure">
+  <img src={"/notion-assets/reading-note-is-space-time-attention-all-you-need-for-video-understanding/3be14b84a0f28089ace8dfe2c584b0e4.png"} alt={"Source: author's Notion note"} />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+> <span>프레임의 수같은 경우 거의 선형적으로 정확도가 오르는 반면, 해상도의 경우 elbow point가 존재했다. </span>
+> 
+> - <span><strong>Spatial axis:</strong></span><span> 해상도 증가 → frame당 patch 수 N 증가</span>
+> - <span><strong>Temporal axis:</strong></span><span> 입력 frame 수 증가 → 시간 방향 token 수 F 증가</span>
+
+- <span>GPU 제한으로 인해 96 프레임 이상은 실험해보지 않았다고 했다 (따라서 96프레임 이상에서의 성능은 증가를 보장할 수 없다)</span>
+- <span><strong>96-frame clip을 사용</strong></span><span>하는 것은 일반적으로 8~32 frame 입력 처리에 제한되어 있던 당시 convolutional model들과 비교하면 상당히 큰 변화라는 점을 강조한다.</span>
+
+---
+
+### <span>5.4. The Importance of Positional Embeddings</span>
+
+> <span>spatiotemporal positional embedding에 대해 중요성을 확인하기 위해 저자는 또 다른 실험을 설계했다</span>
+> 
+> 1. <span>no positional embedding</span>
+> 2. <span>space-only positional embedding</span>
+> 3. <span>space-time positional embedding</span>
+> 
+> <figure class="notion-figure">
+>   <img src={"/notion-assets/reading-note-is-space-time-attention-all-you-need-for-video-understanding/3be14b84a0f280c8bf36c950bbc2cc39.png"} alt={"Source: author's Notion note"} />
+>   <figcaption>Source: author's Notion note</figcaption>
+> </figure>
+> 
+> <span>Source: Original Document</span>
+
+<span>결과는 예상되게도 space-time이 가장 좋은 성능을 보여주었다.</span>
+
+---
+
+### <span>5.5. Comparison to the State-of-the-Art</span>
+
+- <span><strong>K400</strong></span>
+    <figure class="notion-figure">
+      <img src={"/notion-assets/reading-note-is-space-time-attention-all-you-need-for-video-understanding/3be14b84a0f280ddba70da5d3caa3aad.png"} alt={"Source: author's Notion note"} />
+      <figcaption>Source: author's Notion note</figcaption>
+    </figure>
+    
+    <span>Source: Original Document</span>
+    
+    - <span>적은 inference views로도 높은 accuracy</span>
+    - <span>기본 TimeSformer는 매우 낮은 inference TFLOPs</span>
+    - <span>TimeSformer-L은 높은 Top-1 accuracy 달성</span>
+- <span><strong>Actual Runtime</strong></span>
+    - <span>TFLOPs뿐 아니라 실제 inference 시간에서도 SlowFast보다 훨씬 빠름</span>
+- <span><strong>K600</strong></span>
+    <figure class="notion-figure">
+      <img src={"/notion-assets/reading-note-is-space-time-attention-all-you-need-for-video-understanding/3be14b84a0f28056bb72e4aead5a275e.png"} alt={"Source: author's Notion note"} />
+      <figcaption>Source: author's Notion note</figcaption>
+    </figure>
+    
+    <span>Source: Original Document</span>
+    
+    - <span>K400과 유사하게 기존 방법들을 능가</span>
+    - <span>성능 향상이 다른 dataset에서도 유지됨</span>
+- <span><strong>Effect of Temporal Clips</strong></span>
+    <figure class="notion-figure">
+      <img src={"/notion-assets/reading-note-is-space-time-attention-all-you-need-for-video-understanding/3be14b84a0f2806c849ee3048e34f57e.png"} alt={"Source: author's Notion note"} />
+      <figcaption>Source: author's Notion note</figcaption>
+    </figure>
+    
+    <span>Source: Original Document</span>
+    
+    - <span>기존 CNN 모델은 여러 temporal clip이 필요</span>
+    - <span>TimeSformer-L은 긴 temporal coverage 덕분에 </span><span class="notion-color-blue"><strong>적은 clip으로도 높은 accuracy</strong></span>
+    
+    <figure class="notion-figure">
+      <img src={"/notion-assets/reading-note-is-space-time-attention-all-you-need-for-video-understanding/3be14b84a0f28032a076def12ac98ccc.png"} alt={"Source: author's Notion note"} />
+      <figcaption>Source: author's Notion note</figcaption>
+    </figure>
+    
+    <span>Source: Original Document (“temporally-heavy” datasets)</span>
+- <span><strong>SSv2</strong></span>
+    - <span>temporally-heavy dataset에서는 최고 성능에는 못 미침 (최고 성능은 bLVNet이 차지했다.) 하지만 그래도 convolution-free 구조로 경쟁력 있는 성능</span>
+        <NotionCallout icon={"💡"} color={"green_background"}>
+        
+        <span>bLVNet은 어떤 모델인가?</span>
+        
+        - <span><strong>bLVNet은 Big-Little-Video-Net</strong></span><span>의 약자</span>
+        
+        <figure class="notion-figure">
+          <img src={"/notion-assets/reading-note-is-space-time-attention-all-you-need-for-video-understanding/3be14b84a0f280d0a3e6e300ba3af86f.png"} alt={"Source: author's Notion note"} />
+          <figcaption>Source: author's Notion note</figcaption>
+        </figure>
+        
+        - <span><strong>Big subnet</strong></span><span>: 더 깊고 큰 네트워크로 </span><span><strong>저해상도 frame</strong></span><span>을 처리</span>
+        - <span><strong>Little subnet</strong></span><span>: 더 작고 가벼운 네트워크로 </span><span><strong>고해상도 frame</strong></span><span>을 처리</span>
+        
+        <span>그런데 bLVNet 자체만으로는 frame 간 </span><span><strong>temporal relation</strong></span><span>을 충분히 모델링해야 하므로, 논문에서는 </span><span><strong>TAM(Temporal Aggregation Module)</strong></span><span>도 같이 제안된다. (</span><span><strong>bLVNet-TAM</strong></span><span>) </span>
+        
+        - <span>TAM은 큰 3D convolution을 쓰는 대신 가벼운 temporal operation을 이용해서 시간축 정보를 결합 </span>
+        
+        </NotionCallout>
+- <span><strong>Diving-48</strong></span>
+    - <span>TimeSformer-L이 SlowFast보다 높은 성능</span>
+    - <span>long-range temporal modeling의 가능성 확인</span>
+
+> <span>TimeSformer의 장점은 단순히 정확도가 높은 것뿐 아니라, </span><span class="notion-color-blue"><strong>적은 temporal/spatial views와 낮은 실제 inference cost로 경쟁력 있는 성능을 달성</strong></span><span>하며, 특히 </span><span class="notion-color-blue"><strong>TimeSformer-L은 긴 temporal context를 한 번에 처리</strong></span><span>함으로써 multi-clip inference의 필요성을 줄인다는 점이다.</span>
+
+---
+
+### <span>5.6. Long-Term Video Modeling</span>
+
+> <span>마지막으로 TimSformer를 long-term video modeling에 HowTo100M를 활용해서 적용해보았다.</span>
+
+<NotionCallout icon={"💡"} color={"green_background"}>
+
+<span>HowTo100M이란 어떤 데이터셋인가?</span>
+
+<span>: HowTo100M은 23K개의 서로 다른 과업에 대해서 사람들이 수행하는 것을 담은 1M의 교육 웹 영상을 포함하는 데이터셋이다</span>
+
+<span>평균 영상 길이 : 7분</span>
+
+<span>각 영상은 영상에서 제시도니 과업을 라벨로 가지고 있다.</span>
+
+</NotionCallout>
+
+- <span>실험을 위해 최소 100개의 예시를 가지고 있는 카테고리만 실험에 활용하였다.</span>
+    - <span>1059개의 카테고리고 구성되었으며 약 120천개의 영상이 실험에 활용됨</span>
+    - <span>팔만오천개는 학습에, 나머지 삼만오천개는 평가에 활용 </span>
+
+<figure class="notion-figure">
+  <img src={"/notion-assets/reading-note-is-space-time-attention-all-you-need-for-video-understanding/3be14b84a0f280fc930ec856c1357aa8.png"} alt={"Source: author's Notion note"} />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+<span>Source: Original Document</span>
+
+- <span>네 가지의 입력 프레임 변수를 두고 SlowFast와 TimeSformer를 비교하였다.</span>
+- <span>추론에 활용되는 영상의 경우 중복구간이 없게 설계했으며, 영상 수즌의 분류는 clip prediction의 평균을 계산해서 진행되었다.</span>
+
+<p class="notion-empty" aria-hidden="true"></p>
+
+- <span>결과적으로 같은 Single Clip coveragae에 대해서 TimneSformer가 항상 SlowFast보다 좋은 성능을 보여주었다.</span>
+- <span>또한 영상의 길이가 길어질 수록 TimeSformer의 성능이 올랐다 (Elbow point가 존재한 SlowFast와는 다른 양상)</span>
+- 
+
+<figure class="notion-figure">
+  <img src={"/notion-assets/reading-note-is-space-time-attention-all-you-need-for-video-understanding/3be14b84a0f280188168cdc421636f37.png"} alt={"Source: author's Notion note"} />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+<span>Source: Original Document</span>
+
+<span>spatiotemporal attention을 실제로 시각화할 경우 SSv2에서 의미 있는 객체에 어텐션이 집중됨을 볼 수 있다.</span>
+
+<figure class="notion-figure">
+  <img src={"/notion-assets/reading-note-is-space-time-attention-all-you-need-for-video-understanding/3be14b84a0f28079847ed2c3a2707bf8.png"} alt={"Source: author's Notion note"} />
+  <figcaption>Source: author's Notion note</figcaption>
+</figure>
+
+<span>Source: Original Document</span>
+
+<span>또한 SSv2에 바로 fine tuning을 진행한뒤의 feature에 대해 tSNE를 활용해서 시각화한 결과 ViT 나 Space only 보다 space time attention이 훨씬 더 비슷한 색상의 카테고리를 잘 묶어놓는 것을 알 수 있다.</span>
+
+---
+
+## <span>6. Limitation By GPT</span>
+
+> <span>In the future, we plan to extend our method to other video analysis tasks such as action localization, video captioning and question-answering</span>
+
+1. <span><strong>Large-scale pretraining/data dependency</strong></span>
+    <span>TimeSformer는 </span><span class="notion-color-blue"><strong>높은 model capacity</strong></span><span>를 가지기 때문에</span><span class="notion-color-blue"><strong> ImageNet pretraining의 영향이 크며</strong></span><span>, scratch training에서는 성능이 크게 하락하였다. 특히 SSv2에서는 </span><span class="notion-color-blue"><strong>충분한 양의 video data가 주어졌을 때에야 CNN baseline을 능가</strong></span><span>하여, complex temporal patterns를 학습하는 데 많은 training examples가 필요할 가능성을 보였다.</span>
+2. <span><strong>Not consistently superior on temporally-heavy tasks</strong></span>
+    <span>Temporal self-attention을 통해 motion과 temporal dependency를 학습할 수 있지만, SSv2에서는 당시 </span><span class="notion-color-blue"><strong>temporal-specialized architectures보다 낮은 성능을 기록</strong></span><span>하였다. 따라서 TimeSformer가 모든 종류의 temporal reasoning에서 우월하다고 보기는 어렵다.</span>
+3. <span><strong>Scalability still has computational limits</strong></span>
+    <span>Divided Space-Time Attention은 Joint Attention보다 훨씬 효율적이지만 </span><span class="notion-color-blue"><strong>input frame과 spatial resolution이 증가하면 계산량과 memory 사용량 역시 증가</strong></span><span>한다. 실제로 저자들은 GPU memory limitation으로 96 frames보다 긴 clip을 실험하지 못했다.</span>
+4. <span><strong>Evaluation is mainly limited to video classification</strong></span>
+    <span>논문의 실험은 주로 </span><span class="notion-color-blue"><strong>video-level action classification에 집중</strong></span><span>되어 있으며, action localization, captioning, video QA 등의 다른 video understanding task에 대해서는 검증하지 않았다. 저자 역시 이를 향후 연구 방향으로 제시한다.</span>
+5. <span><strong>Space-time factorization may sacrifice direct joint interactions</strong></span>
+    <span>Divided Attention은 temporal과 spatial attention을 순차적으로 factorize하여 효율성을 얻지만, Joint Attention처럼 임의의 (p,t)와 (p′,t′)를 한 단계에서 직접 비교하지는 않는다. 이것이 실제 temporal correspondence에 어떤 영향을 주는지는 논문에서 충분히 분석되지 않았다.</span>
+
+## <span>7. Connection to My Research</span>
+
+## <span>8. What I Can Apply</span>
+
+## <span>9. Next Step</span>
