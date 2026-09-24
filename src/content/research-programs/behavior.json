@@ -8,6 +8,6 @@
   "matters": "Behavior recognition connects low-level visual signals to interpretable animal behavior analysis.",
   "methods": ["video understanding", "action recognition", "temporal modeling", "sequence classification"],
   "relatedProjects": ["be-more-duck-vision-language-embodied-agent"],
-  "relatedNotes": ["animal-behaviour-analysis-weekly-brief-20260706"],
+  "relatedNotes": [],
   "featured": true
 }

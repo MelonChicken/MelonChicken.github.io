@@ -31,7 +31,7 @@ const trackMeta: Record<string, Omit<ResearchTrack, 'slug'>> = {
     matters: 'Behavior recognition connects low-level visual signals to interpretable animal behavior analysis.',
     methods: ['video understanding', 'action recognition', 'temporal modeling', 'sequence classification'],
     relatedProjects: ['be-more-duck-vision-language-embodied-agent'],
-    relatedNotes: ['animal-behaviour-analysis-weekly-brief-20260706'],
+    relatedNotes: [],
     featured: true,
   },
   'annotation-efficient-learning': {
@@ -42,7 +42,7 @@ const trackMeta: Record<string, Omit<ResearchTrack, 'slug'>> = {
     matters: 'Animal behavior datasets are expensive to label, so weak supervision, pseudo-labeling, semi-supervised learning, and active learning can make experiments more scalable.',
     methods: ['weak supervision', 'semi-supervised learning', 'pseudo-labeling', 'active learning', 'labeling automation'],
     relatedProjects: ['architag-ai', 'wildlife-metadata-fusion'],
-    relatedNotes: ['animal-behaviour-analysis-weekly-brief-2026-06-29'],
+    relatedNotes: [],
     featured: true,
   },
 };

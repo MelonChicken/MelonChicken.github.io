@@ -5,6 +5,10 @@ import rehypeKatex from 'rehype-katex';
 
 export default defineConfig({
   site: 'https://melonchicken.github.io',
+  markdown: {
+    remarkPlugins: [remarkMath],
+    rehypePlugins: [[rehypeKatex, { strict: false, throwOnError: false }]],
+  },
   integrations: [
     mdx({
       remarkPlugins: [remarkMath],

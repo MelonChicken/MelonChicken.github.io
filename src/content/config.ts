@@ -9,7 +9,7 @@ const status = z.enum(['idea', 'work-in-progress', 'completed', 'archived']);
 const url = z.string().url().or(z.literal('')).optional();
 
 const projects = defineCollection({
-  loader: glob({ pattern: '**/*.mdx', base: './src/content/projects' }),
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/projects' }),
   schema: z.object({
     title: z.string(),
     slug: z.string(),
@@ -38,18 +38,20 @@ const projects = defineCollection({
 });
 
 const notes = defineCollection({
-  loader: glob({ pattern: '**/*.mdx', base: './src/content/notes' }),
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/notes' }),
   schema: z.object({
     title: z.string(),
     slug: z.string(),
     generated: z.boolean().optional(),
+    featured: z.boolean().default(false),
     type: z.enum([
-      'weekly-brief', 'paper-review', 'experiment-log',
+      'paper-review', 'experiment-log',
       'implementation-note', 'learning-note', 'retrospective',
     ]),
     status,
     domain: z.array(z.string()).default([]),
     tags: z.array(z.string()).default([]),
+    researchFields: z.array(z.enum(['Computer Vision', 'Video Understanding', 'Self-supervised Learning', 'ML'])).default(['ML']),
     methods: z.array(z.string()).default([]),
     date: z.coerce.date(),
     readTime: z.number().optional(),
@@ -57,12 +59,10 @@ const notes = defineCollection({
     relatedNotes: z.array(z.string()).default([]),
     sourceNotes: z.array(z.string()).default([]),
     notion: url,
+    paperUrl: url,
+    datasetUrl: url,
+    otherSources: z.array(z.string().url()).default([]),
     summary: z.string().optional(),
-    // weekly-brief only:
-    trackedFields: z.array(z.string()).optional(),
-    outputs: z.array(z.string()).optional(),
-    selectedForReview: z.string().optional(),
-    next: z.string().optional(),
   }),
 });
 

@@ -1,13 +1,14 @@
 import { notion, type AnyNotionObject, type SyncTargetKey } from './notion-client';
-import { fetchNotionBlockAst, normalizeNotionBlocks } from './notion-ast';
-import { notionMdxImports, renderNotionBlocks } from './notion-mdx-renderer';
+import { notionPageToMarkdown } from './notion-markdown';
+import { getNotionBlacklistReason } from './notion-sync-blacklist';
 import { richTextToPlain } from './notion-rich-text';
+import { classifyResearchFields } from '../src/lib/research-fields';
 
 type Frontmatter = Record<string, unknown>;
 
 const statusValues = ['idea', 'work-in-progress', 'completed', 'archived'] as const;
 const projectGroups = ['research', 'ml', 'product', 'archived'] as const;
-const noteTypes = ['weekly-brief', 'paper-review', 'experiment-log', 'implementation-note', 'learning-note', 'retrospective'] as const;
+const noteTypes = ['paper-review', 'experiment-log', 'implementation-note', 'learning-note', 'retrospective'] as const;
 const trackSlugAliases: Record<string, string> = {
   'animal-pose-estimation': 'animal-pose-estimation',
   'animal-pose-estimation-keypoint-trajectories': 'animal-pose-estimation',
@@ -54,11 +55,19 @@ export function getPageSlug(page: AnyNotionObject, title = getTitle(page.propert
 }
 
 export function shouldSyncPage(page: AnyNotionObject, target: SyncTargetKey) {
-  if (target !== 'projects') return true;
-
   const properties = page.properties || {};
   const title = getTitle(properties);
-  const titleSlug = slugify(title, page.id);
+  const titleSlug = getPageSlug(page, title);
+  const noteType = slugify(getPropertyText(properties, ['Type']));
+  const blacklistReason = getNotionBlacklistReason({ target, title, slug: titleSlug, type: noteType });
+
+  if (blacklistReason) {
+    console.warn(`[notion] Skip blacklisted page: ${title} (${blacklistReason})`);
+    return false;
+  }
+
+  if (target !== 'projects') return true;
+
   const summary = getPropertyText(properties, ['Summary', 'Description', 'Problem', 'One-liner', '문제-해결 one-liner']);
   const stack = getPropertyList(properties, ['Stack', 'Stacks', 'Tech Stack', 'Technologies', '스택 stack']);
   const roles = getPropertyList(properties, ['Roles', 'Role', '역할 role']);
@@ -80,27 +89,24 @@ export function shouldSyncPage(page: AnyNotionObject, target: SyncTargetKey) {
 }
 
 export async function blocksToMdx(blockId: string, slug: string): Promise<string> {
-  const blocks = await fetchNotionBlockAst(blockId, slug);
-  return renderNotionBlocks(blocks);
-}
-
-export async function blocksToMdxFromBlocks(blocks: AnyNotionObject[], slug: string): Promise<string> {
-  const ast = await normalizeNotionBlocks(blocks, slug);
-  return renderNotionBlocks(ast);
+  return notionPageToMarkdown(blockId, slug);
 }
 
 async function buildFrontmatter(page: AnyNotionObject, target: SyncTargetKey, title: string, slug: string): Promise<Frontmatter> {
   const properties = page.properties || {};
   const relatedNotes = await getPropertyReferenceSlugs(properties, ['Related Notes', 'Related Note']);
+  const domain = getPropertyList(properties, ['Domain', 'Domains', 'Tags']);
+  const tags = getPropertyList(properties, ['Tags']);
+  const summary = getPropertyText(properties, ['Summary', 'Description', 'Problem', 'One-liner', '문제-해결 one-liner']);
   const common = {
     title,
     slug,
     generated: true,
     status: normalizeStatus(getPropertyText(properties, ['Status', 'State', '상태', '상태 status'])),
-    domain: getPropertyList(properties, ['Domain', 'Domains', 'Tags']),
-    tags: getPropertyList(properties, ['Tags']),
+    domain,
+    tags,
     relatedNotes,
-    summary: getPropertyText(properties, ['Summary', 'Description', 'Problem', 'One-liner', '문제-해결 one-liner']),
+    summary,
   };
 
   if (target === 'projects') {
@@ -132,6 +138,8 @@ async function buildFrontmatter(page: AnyNotionObject, target: SyncTargetKey, ti
     return {
       ...common,
       type: normalizeNoteType(getPropertyText(properties, ['Type'])),
+      researchFields: classifyResearchFields({ title, summary, domains: domain, tags }),
+      featured: getPropertyCheckbox(properties, ['Featured', '대표 글', '추천 글']) || false,
       methods: getPropertyList(properties, ['Methods', 'Method']),
       date: getPropertyDate(properties, ['Date']) || page.created_time?.slice(0, 10) || new Date().toISOString().slice(0, 10),
       readTime: getPropertyNumber(properties, ['Read Time', 'ReadTime']),
@@ -142,6 +150,9 @@ async function buildFrontmatter(page: AnyNotionObject, target: SyncTargetKey, ti
       outputs: getPropertyList(properties, ['Outputs']),
       selectedForReview: emptyToUndefined(getPropertyText(properties, ['Selected For Review'])),
       next: emptyToUndefined(getPropertyText(properties, ['Next'])),
+      paperUrl: emptyToUndefined(getPropertyUrl(properties, ['Paper URL', 'Paper Url', 'Paper', '논문 URL'])),
+      datasetUrl: emptyToUndefined(getPropertyUrl(properties, ['Dataset URL', 'Dataset Url', 'Dataset Link', '데이터셋 URL'])),
+      otherSources: getPropertyUrls(properties, ['Other Sources', 'Other Source', 'Sources', 'References', '기타 자료']),
       notion: page.url || '',
     };
   }
@@ -160,8 +171,8 @@ function renderMdx(frontmatter: Frontmatter, body: string) {
     .map(([key, value]) => `${key}: ${yamlValue(value)}`)
     .join('\n');
 
-  const content = body || '{/* TODO: Add Notion page content. */}';
-  return `---\n${yaml}\n---\n\n${notionMdxImports()}\n\n{/* This file is generated from Notion. Do not edit directly. */}\n\n${content.trim()}\n`;
+  const content = body || '> TODO: Add Notion page content.';
+  return `---\n${yaml}\n---\n\n<!-- This file is generated from Notion. Do not edit directly. -->\n\n${content.trim()}\n`;
 }
 
 function getProperty(properties: AnyNotionObject = {}, names: string[]) {
@@ -193,10 +204,10 @@ function getPropertyText(properties: AnyNotionObject, names: string[]) {
 function getPropertyList(properties: AnyNotionObject, names: string[]) {
   const property = getProperty(properties, names);
   if (!property) return [];
-  if (property.type === 'multi_select') return property.multi_select?.map((item: AnyNotionObject) => item.name) || [];
+  if (property.type === 'multi_select') return (property.multi_select?.map((item: AnyNotionObject) => item.name) || []).filter(Boolean);
   if (property.type === 'select') return property.select?.name ? [property.select.name] : [];
   if (property.type === 'status') return property.status?.name ? [property.status.name] : [];
-  if (property.type === 'relation') return property.relation?.map((item: AnyNotionObject) => item.id) || [];
+  if (property.type === 'relation') return (property.relation?.map((item: AnyNotionObject) => item.id) || []).filter(Boolean);
   return splitList(getPropertyText(properties, names));
 }
 
@@ -224,10 +235,29 @@ async function retrievePage(pageId: string) {
 }
 
 function getPropertyUrl(properties: AnyNotionObject, names: string[]) {
-  const value = getPropertyText(properties, names).trim();
-  return value.startsWith('http') ? value : '';
+  return getPropertyUrls(properties, names)[0] || '';
 }
 
+function getPropertyUrls(properties: AnyNotionObject, names: string[]) {
+  const property = getProperty(properties, names);
+  if (!property) return [];
+
+  const candidates = [
+    property.url,
+    ...(property.rich_text || []).flatMap((item: AnyNotionObject) => [item.href, item.text?.link?.url, item.plain_text]),
+    ...(property.files || []).flatMap((item: AnyNotionObject) => [item.external?.url, item.file?.url]),
+    getPropertyText(properties, names),
+  ].filter(Boolean).flatMap((value: string) => String(value).match(/https?:\/\/[^\s,]+/g) || []);
+
+  return unique(candidates.map((value: string) => value.replace(/[)\].,;]+$/, '')).filter((value: string) => {
+    try {
+      new URL(value);
+      return true;
+    } catch {
+      return false;
+    }
+  }));
+}
 function getPropertyDate(properties: AnyNotionObject, names: string[]) {
   const property = getProperty(properties, names);
   if (property?.type === 'date') return property.date?.start || '';

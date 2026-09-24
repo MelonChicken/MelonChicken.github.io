@@ -13,7 +13,9 @@
     "sync:notion:projects": "tsx scripts/sync-notion.ts --projects",
     "sync:notion:notes": "tsx scripts/sync-notion.ts --notes",
     "sync:notion:blog": "tsx scripts/sync-notion.ts --blog",
-    "notion:debug": "tsx scripts/notion-debug.ts"
+    "notion:debug": "tsx scripts/notion-debug.ts",
+    "validate:notion": "tsx scripts/validate-notion-content.ts",
+    "test:notion": "tsx scripts/notion-to-mdx.fixture-test.ts"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
@@ -21,6 +23,7 @@
     "@notionhq/client": "^2.3.0",
     "astro": "^5.11.0",
     "katex": "^0.17.0",
+    "notion-to-md": "^3.1.9",
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0",
     "tsx": "^4.20.6",

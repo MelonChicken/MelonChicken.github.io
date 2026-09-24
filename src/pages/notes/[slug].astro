@@ -18,34 +18,41 @@ const [project, relatedNotes] = await Promise.all([
   resolveProject(note.data.relatedProject),
   resolveNotes(note.data.relatedNotes),
 ]);
-const isWeeklyBrief = note.data.type === 'weekly-brief';
+const sourceLinks = [
+  note.data.paperUrl ? { label: 'Paper', href: note.data.paperUrl } : undefined,
+  note.data.datasetUrl ? { label: 'Dataset', href: note.data.datasetUrl } : undefined,
+  ...note.data.otherSources.map((href, index) => ({ label: `Source ${index + 1}`, href })),
+].filter((item): item is { label: string; href: string } => Boolean(item));
 ---
 
 <BaseLayout title={`${note.data.title} - Junu's Lab`}>
   <section class="block-head detail-head">
-    <Eyebrow text={isWeeklyBrief ? 'Weekly Lab Brief' : 'Lab Note'} />
+    <Eyebrow text="Lab Note" />
     <h2>{note.data.title}</h2>
     <p>{note.data.summary}</p>
   </section>
 
   <div class="home-row detail-layout">
-    <article class="panel">
+    <article class="panel reading-panel">
+      <div class="reading-column">
       <Badge status={note.data.status} />
       <Metabox items={[
         { label: 'Type', value: note.data.type },
         { label: 'Date', value: formatDate(note.data.date) },
         { label: 'Read time', value: note.data.readTime ? `${note.data.readTime} min` : undefined },
-        { label: 'Domain', value: note.data.domain },
+        { label: 'Research field', value: note.data.researchFields },
         { label: 'Methods', value: note.data.methods },
       ]} />
-      {isWeeklyBrief && (
-        <div class="selected-note">
-          <b>Research tracking routine</b><br />
-          <span class="muted">Selected for review: {note.data.selectedForReview}</span>
-        </div>
+      {sourceLinks.length > 0 && (
+        <nav class="note-source-links" aria-label="Research sources">
+          {sourceLinks.map((link) => (
+            <a href={link.href} target="_blank" rel="noreferrer">{link.label}<span aria-hidden="true">↗</span></a>
+          ))}
+        </nav>
       )}
       <div class="dblock notion-content">
         <Content />
+      </div>
       </div>
     </article>
     <aside class="panel detail-side">
@@ -67,13 +74,6 @@ const isWeeklyBrief = note.data.type === 'weekly-brief';
         title: related.data.title,
         kind: related.data.type,
       }))} />
-      {isWeeklyBrief && (
-        <Metabox items={[
-          { label: 'Tracked fields', value: note.data.trackedFields },
-          { label: 'Outputs', value: note.data.outputs },
-          { label: 'Next', value: note.data.next },
-        ]} />
-      )}
     </aside>
   </div>
   <script>
@@ -134,4 +134,14 @@ const isWeeklyBrief = note.data.type === 'weekly-brief';
       headings.forEach((heading) => observer.observe(heading));
     }
   </script>
+  <style>
+    .detail-head{max-width:980px;margin-left:auto;margin-right:auto}
+    .detail-head h2{max-width:34ch;font-size:clamp(1.55rem,2.7vw,2.35rem);line-height:1.16;letter-spacing:-.03em;text-wrap:balance}
+    .reading-panel{padding:clamp(22px,3vw,40px)}
+    .reading-column{width:min(100%,80ch);margin:0 auto}
+    .reading-column .dblock{max-width:none}
+    .note-source-links{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 20px}
+    .note-source-links a{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);color:var(--color-link);font-size:.78rem;font-weight:600}
+    .note-source-links a:hover{border-color:var(--color-accent);background:var(--color-accent-soft)}
+  </style>
 </BaseLayout>

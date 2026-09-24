@@ -1,0 +1,162 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Badge from './Badge.astro';
+import Eyebrow from './Eyebrow.astro';
+import Tag from './Tag.astro';
+import { researchFields } from '../lib/research-fields';
+
+const notes = (await getCollection('notes')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const featured = notes.find((note) => note.data.featured);
+const posts = featured ? notes.filter((note) => note.id !== featured.id) : notes;
+const fields = researchFields.map((name) => ({
+  name,
+  count: notes.filter((note) => note.data.researchFields.includes(name)).length,
+}));
+const shortDate = (date: Date) => new Intl.DateTimeFormat('en', { month: 'short', day: '2-digit', year: 'numeric' }).format(date);
+const typeLabel = (value: string) => value.replaceAll('-', ' ');
+const compact = (value = '', maxLength = 150) => {
+  const normalized = value.replace(/\s+/g, ' ').trim();
+  return normalized.length > maxLength ? `${normalized.slice(0, maxLength).trimEnd()}...` : normalized;
+};
+---
+
+<BaseLayout title="Lab Notes · Junu's Lab">
+  <section class="notes-heading">
+    <div>
+      <Eyebrow text="Lab Notes" />
+      <h1>Research notes,<br />clearly archived.</h1>
+    </div>
+    <p>Papers, experiments, and implementation notes synced from Notion. Browse the latest work or follow a research topic.</p>
+  </section>
+
+  <nav class="topic-strip" aria-label="Research topics">
+    <a class="active" href="/notes/" data-field="all">Latest</a>
+    {fields.map((field) => <a href={`?field=${encodeURIComponent(field.name)}`} data-field={field.name}>{field.name}</a>)}
+  </nav>
+
+  {featured && (
+    <section class="featured-story" aria-labelledby="featured-title" data-fields={featured.data.researchFields.join("|")}>
+      <div class="featured-copy">
+        <div class="story-meta">
+          <span class="eyebrow">Featured / {typeLabel(featured.data.type)}</span>
+          <span class="kv">{shortDate(featured.data.date)}</span>
+        </div>
+        <h2 id="featured-title">{featured.data.title}</h2>
+        <p>{compact(featured.data.summary, 220)}</p>
+        <footer class="featured-footer">
+          <div class="taglist">{featured.data.researchFields.map((domain) => <Tag label={domain} />)}</div>
+          <a class="featured-link" href={`/notes/${featured.data.slug}/`}>Read note <span aria-hidden="true">→</span></a>
+        </footer>
+      </div>
+    </section>
+  )}
+
+  <div class="archive-layout" id="latest">
+    <section class="latest-posts" aria-labelledby="latest-title">
+      <div class="section-title">
+        <div><Eyebrow text="Latest Posts" /><h2 id="latest-title">Recent research notes</h2></div>
+        <span class="kv">Newest first</span>
+      </div>
+
+      <div class="post-list">
+        {posts.map((note) => (
+          <article class="post-row" data-fields={note.data.researchFields.join("|")}>
+            <a class="post-copy" href={`/notes/${note.data.slug}/`}>
+              <div class="story-meta">
+                <span>{typeLabel(note.data.type)}</span>
+                <span>{shortDate(note.data.date)}</span>
+                <Badge status={note.data.status} />
+              </div>
+              <h3>{note.data.title}</h3>
+              {note.data.summary && <p>{compact(note.data.summary, 150)}</p>}
+              <div class="taglist">{note.data.researchFields.map((domain) => <Tag label={domain} />)}</div>
+            </a>
+            <a class="open-note" href={`/notes/${note.data.slug}/`} aria-label={`Open ${note.data.title}`}>→</a>
+          </article>
+        ))}
+      </div>
+
+      <div class="list-actions">
+        <span class="muted" id="archiveCount">Showing {posts.length} of {notes.length} notes</span>
+        <a class="btn" href="/notes/">View full archive</a>
+      </div>
+    </section>
+
+    <aside class="archive-sidebar" id="topics">
+      <section class="panel topic-panel">
+        <Eyebrow text="Browse by Topic" />
+        <h2>Research fields</h2>
+        <div class="topic-list">
+          {fields.map((field) => (
+            <a href={`?field=${encodeURIComponent(field.name)}`} data-field={field.name}><span>{field.name}</span><b>{field.count}</b></a>
+          ))}
+        </div>
+      </section>
+      <section class="panel archive-note">
+        <Eyebrow text="About the Archive" />
+        <p>Notes are published from the Lab Notes database after schema validation. Each post keeps its original research context and related project links.</p>
+        <a href="/projects/">Browse projects <span aria-hidden="true">→</span></a>
+      </section>
+    </aside>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const selectedField = params.get('field') || 'all';
+    const rows = Array.from(document.querySelectorAll<HTMLElement>('.post-row[data-fields]'));
+    const featured = document.querySelector<HTMLElement>('.featured-story[data-fields]');
+    const fieldLinks = Array.from(document.querySelectorAll<HTMLElement>('[data-field]'));
+    const count = document.querySelector('#archiveCount');
+
+    const includesField = (element: HTMLElement, field: string) =>
+      field === 'all' || String(element.dataset.fields || '').split('|').includes(field);
+
+    let visibleCount = 0;
+    for (const row of rows) {
+      const visible = includesField(row, selectedField);
+      row.hidden = !visible;
+      if (visible) visibleCount += 1;
+    }
+    if (featured) featured.hidden = !includesField(featured, selectedField);
+    for (const link of fieldLinks) {
+      link.classList.toggle('active', link.dataset.field === selectedField);
+    }
+    if (count) count.textContent = selectedField === 'all'
+      ? `Showing ${visibleCount} notes`
+      : `${visibleCount} notes in ${selectedField}`;
+  </script>
+  <style>
+    .notes-heading{display:flex;flex-direction:column;align-items:center;padding:34px 0 26px;text-align:center}
+    .notes-heading h1{margin:.45rem 0 .8rem;max-width:16ch;font-size:clamp(2rem,4vw,3.2rem);line-height:1.02;letter-spacing:-.05em;text-wrap:balance}
+    .notes-heading p{margin:0;max-width:57ch;color:var(--color-text-secondary);font-size:.94rem}
+    .topic-strip{display:flex;justify-content:center;gap:4px;padding:13px 0;overflow-x:auto;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)}
+    .topic-strip a{flex:0 0 auto;padding:7px 11px;border-radius:var(--radius-sm);color:var(--color-text-secondary);font-size:.82rem}
+    .topic-strip a:hover,.topic-strip a.active{color:var(--color-text-primary);background:var(--color-accent-soft)}
+    .featured-story{display:grid;grid-template-columns:minmax(0,1fr);margin:20px 0 30px;overflow:hidden;background:var(--color-surface);border:1px solid var(--color-border);border-left:3px solid var(--color-accent);border-radius:var(--radius-md);box-shadow:var(--shadow-sm)}
+    .featured-copy{display:flex;flex-direction:column;align-items:center;width:min(100%,960px);margin:0 auto;padding:clamp(30px,4vw,42px);text-align:center}
+    .featured-copy .story-meta{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;width:100%;gap:9px 14px;color:var(--color-text-secondary);font-size:.74rem;text-transform:capitalize}
+    .featured-copy h2{max-width:32ch;margin:1.3rem auto .75rem;font-size:clamp(1.45rem,2.5vw,2.2rem);line-height:1.13;letter-spacing:-.035em;text-wrap:balance}
+    .featured-copy>p{max-width:70ch;margin:0 auto 22px;color:var(--color-text-secondary);font-size:.92rem}
+    .featured-footer{display:flex;align-items:center;justify-content:space-between;width:100%;gap:20px;padding-top:16px;border-top:1px solid var(--color-divider);text-align:left}.featured-link{color:var(--color-link);font-size:.82rem;font-weight:700;white-space:nowrap}
+    .archive-layout{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:42px;align-items:start}
+    .section-title{display:flex;align-items:end;justify-content:space-between;gap:20px;padding-bottom:14px;border-bottom:1px solid var(--color-border)}
+    .section-title h2,.topic-panel h2{margin:.3rem 0 0;font-size:1.08rem}
+    .post-row{display:grid;grid-template-columns:minmax(0,1fr) 38px;gap:18px;padding:23px 0;border-bottom:1px solid var(--color-divider)}
+    .post-copy h3{margin:.55rem 0 .4rem;font-size:clamp(1.05rem,2vw,1.35rem);line-height:1.3;letter-spacing:-.015em}
+    .post-copy>p{max-width:68ch;margin:0 0 11px;color:var(--color-text-secondary);font-size:.9rem}
+    .post-row:hover h3,.post-row:hover .open-note{color:var(--color-accent)}
+    .open-note{display:grid;place-items:center;align-self:center;width:34px;height:34px;border:1px solid var(--color-border);border-radius:var(--radius-sm);color:var(--color-text-secondary)}
+    .post-row:hover .open-note{border-color:var(--color-accent)}
+    .list-actions{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:18px 0;font-size:.82rem}
+    .archive-sidebar{position:sticky;top:112px;display:flex;flex-direction:column;gap:14px}
+    .topic-panel{padding:18px}.topic-list{margin-top:13px}
+    .topic-list a{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid var(--color-divider);color:var(--color-text-secondary);font-size:.84rem}
+    .topic-list a:hover{color:var(--color-accent)}
+    .topic-list b{min-width:26px;padding:1px 7px;border-radius:999px;color:var(--color-badge-text);background:var(--color-badge-bg);font-size:.68rem;text-align:center}
+    .archive-note p{margin:.7rem 0 1rem;color:var(--color-text-secondary);font-size:.84rem}
+    .archive-note a{color:var(--color-link);font-size:.82rem;font-weight:600}
+    @media(max-width:820px){.archive-layout{grid-template-columns:1fr}.archive-sidebar{position:static;order:-1}}
+    @media(max-width:520px){.notes-heading{align-items:flex-start;padding-top:12px;text-align:left}.notes-heading br{display:none}.topic-strip{justify-content:flex-start}.notes-heading h1{font-size:2rem}.featured-copy{align-items:flex-start;padding:28px 22px;text-align:left}.featured-copy .story-meta,.featured-footer{align-items:flex-start}.featured-footer{flex-direction:column}.featured-copy h2{margin-left:0;font-size:1.45rem}.archive-layout{gap:24px}.post-row{grid-template-columns:1fr;gap:8px}.open-note{display:none}.list-actions{align-items:stretch;flex-direction:column}.list-actions .btn{text-align:center}}
+  </style>
+</BaseLayout>

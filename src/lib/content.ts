@@ -64,10 +64,6 @@ export async function getRecentNotes(limit = 4) {
   return notes.slice(0, limit);
 }
 
-export async function getLatestWeeklyBrief() {
-  const notes = await getAllNotes();
-  return notes.find((note) => note.data.type === 'weekly-brief');
-}
 
 export function getProjectsForTrack(projects: ProjectEntry[], trackSlug: string) {
   return projects.filter((project) => project.data.tracks.includes(trackSlug));

@@ -8,6 +8,6 @@
   "matters": "Animal behavior datasets are expensive to label, so weak supervision, pseudo-labeling, semi-supervised learning, and active learning can make experiments more scalable.",
   "methods": ["weak supervision", "semi-supervised learning", "pseudo-labeling", "active learning", "labeling automation"],
   "relatedProjects": ["architag-ai", "wildlife-metadata-fusion"],
-  "relatedNotes": ["animal-behaviour-analysis-weekly-brief-2026-06-29"],
+  "relatedNotes": [],
   "featured": true
 }

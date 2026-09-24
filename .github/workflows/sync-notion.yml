@@ -43,16 +43,16 @@ jobs:
       - name: Verify Notion access
         run: npm run notion:debug
 
-      - name: Sync Notion MDX and assets
+      - name: Sync Notion Markdown and assets
         run: npm run sync:notion
 
       - name: Debug after Notion sync
         run: |
           echo "=== generated notes ==="
-          find src/content/notes -maxdepth 1 -type f -name "*.mdx" -print || true
+          find src/content/notes -maxdepth 1 -type f \( -name "*.md" -o -name "*.mdx" \) -print || true
 
           echo "=== generated projects ==="
-          find src/content/projects -maxdepth 1 -type f -name "*.mdx" -print || true
+          find src/content/projects -maxdepth 1 -type f \( -name "*.md" -o -name "*.mdx" \) -print || true
 
           echo "=== git status after sync ==="
           git status --short
@@ -62,6 +62,12 @@ jobs:
 
           echo "=== diff name-only ==="
           git diff --name-only || true
+
+      - name: Test Notion conversion rules
+        run: npm run test:notion
+
+      - name: Validate generated Notion content
+        run: npm run validate:notion
 
       - name: Check content schema
         run: npm run check

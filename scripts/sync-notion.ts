@@ -42,8 +42,9 @@ async function syncTarget(target: SyncTarget) {
 
     const { slug, mdx } = await pageToMdx(page, target.key);
     syncedSlugs.add(slug);
-    const outputPath = path.join(process.cwd(), target.outputDir, `${slug}.mdx`);
+    const outputPath = path.join(process.cwd(), target.outputDir, `${slug}.md`);
     const result = await writeGeneratedFile(outputPath, mdx);
+    await removeLegacyGeneratedFile(path.join(process.cwd(), target.outputDir, `${slug}.mdx`));
 
     if (result === 'written') written += 1;
     if (result === 'skipped') skipped += 1;
@@ -106,6 +107,12 @@ function parsePageId(args: string[]) {
   return index >= 0 ? String(args[index + 1] || '').trim() : '';
 }
 
+async function removeLegacyGeneratedFile(filePath: string) {
+  const content = await readOptional(filePath);
+  if (!content || !isGenerated(content)) return;
+  await fs.unlink(filePath);
+  console.log(`Remove legacy generated MDX: ${relative(filePath)}`);
+}
 async function readOptional(filePath: string) {
   try {
     return await fs.readFile(filePath, 'utf8');
@@ -127,9 +134,9 @@ async function pruneGeneratedFiles(outputDir: string, syncedSlugs: Set<string>) 
 
   let pruned = 0;
   for (const entry of entries) {
-    if (!entry.isFile() || !entry.name.endsWith('.mdx')) continue;
+    if (!entry.isFile() || !/\.mdx?$/.test(entry.name)) continue;
 
-    const slug = entry.name.replace(/\.mdx$/, '');
+    const slug = entry.name.replace(/\.mdx?$/, '');
     if (syncedSlugs.has(slug)) continue;
 
     const filePath = path.join(directory, entry.name);

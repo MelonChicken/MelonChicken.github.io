@@ -1,0 +1,57 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const fields = ['Latest', 'Computer Vision', 'Video Understanding', 'Self-supervised Learning', 'ML'];
+const description = 'Papers, experiments, and implementation notes synced from Notion. Browse the latest work or follow a research topic.';
+---
+
+<BaseLayout title="Lab Notes header studies · Junu's Lab">
+  <header class="lab-intro">
+    <span>Design study</span>
+    <h1>Lab Notes header</h1>
+    <p>Same content, three quieter layouts. Compare hierarchy, reading flow, and how quickly the archive begins.</p>
+  </header>
+
+  <div class="studies">
+    <section class="study">
+      <div class="study-label"><b>A</b><div><strong>Compact editorial</strong><span>Recommended · balanced and familiar</span></div></div>
+      <div class="preview option-a">
+        <div class="head-copy">
+          <div><span class="mock-eyebrow">Lab Notes</span><h2>Research notes,<br />clearly archived.</h2></div>
+          <p>{description}</p>
+        </div>
+        <nav aria-label="Option A research topics">{fields.map((field, index) => <a class:list={{ active: index === 0 }} href="#">{field}</a>)}</nav>
+      </div>
+    </section>
+
+    <section class="study">
+      <div class="study-label"><b>B</b><div><strong>Centered journal</strong><span>Calm and publication-like</span></div></div>
+      <div class="preview option-b">
+        <span class="mock-eyebrow">Lab Notes</span>
+        <h2>Research notes,<br />clearly archived.</h2>
+        <p>{description}</p>
+        <nav aria-label="Option B research topics">{fields.map((field, index) => <a class:list={{ active: index === 0 }} href="#">{field}</a>)}</nav>
+      </div>
+    </section>
+
+    <section class="study">
+      <div class="study-label"><b>C</b><div><strong>Research index</strong><span>Distinctive and information-led</span></div></div>
+      <div class="preview option-c">
+        <div class="index-note"><span class="mock-eyebrow">Lab Notes</span><p>{description}</p></div>
+        <h2>Research notes,<br />clearly archived.</h2>
+        <nav aria-label="Option C research topics">{fields.map((field, index) => <a class:list={{ active: index === 0 }} href="#">{field}</a>)}</nav>
+      </div>
+    </section>
+  </div>
+
+  <style>
+    .lab-intro{max-width:760px;margin:4px auto 42px;text-align:center}.lab-intro>span{color:var(--color-accent);font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase}.lab-intro h1{margin:.35rem 0 .25rem;font-size:clamp(1.7rem,3vw,2.35rem);letter-spacing:-.035em}.lab-intro p{margin:0;color:var(--color-text-secondary)}
+    .studies{display:grid;gap:42px}.study{display:grid;grid-template-columns:190px minmax(0,1fr);gap:20px;align-items:start}.study-label{display:flex;gap:12px;align-items:flex-start;padding-top:16px}.study-label>b{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;color:var(--color-text-inverse);background:var(--color-accent)}.study-label div{display:flex;flex-direction:column}.study-label strong{font-size:.9rem}.study-label span{color:var(--color-text-secondary);font-size:.74rem;line-height:1.45}
+    .preview{min-height:330px;overflow:hidden;border:1px solid var(--color-border);border-radius:var(--radius-md);background:var(--color-bg);box-shadow:var(--shadow-sm)}.preview h2{color:var(--color-text-primary);letter-spacing:-.055em}.preview p{color:var(--color-text-secondary)}.mock-eyebrow{display:inline-block;color:var(--color-accent);font-size:.72rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase}.mock-eyebrow::before{content:"> ";color:var(--color-text-secondary)}.preview nav{display:flex;gap:5px;overflow-x:auto}.preview nav a{flex:0 0 auto;padding:8px 12px;border-radius:var(--radius-sm);color:var(--color-text-secondary);font-size:.8rem}.preview nav a.active{color:var(--color-text-primary);background:var(--color-accent-soft)}
+    .option-a{display:flex;flex-direction:column;justify-content:center;padding:clamp(30px,5vw,58px)}.option-a .head-copy{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(260px,.7fr);gap:48px;align-items:end;padding-bottom:28px}.option-a h2{max-width:15ch;margin:.45rem 0 0;font-size:clamp(2rem,4.3vw,3.35rem);line-height:1}.option-a p{max-width:39ch;margin:0;font-size:.96rem}.option-a nav{padding-top:14px;border-top:1px solid var(--color-divider)}
+    .option-b{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:44px;text-align:center}.option-b h2{margin:.55rem 0 .8rem;font-size:clamp(2rem,4vw,3.2rem);line-height:1.02}.option-b p{max-width:57ch;margin:0 auto 26px;font-size:.94rem}.option-b nav{justify-content:center;width:100%;padding-top:15px;border-top:1px solid var(--color-divider)}
+    .option-c{display:grid;grid-template-columns:minmax(210px,.55fr) minmax(0,1.35fr);grid-template-rows:1fr auto;gap:24px 52px;padding:48px 52px}.option-c .index-note{align-self:center;padding-right:28px;border-right:1px solid var(--color-divider)}.option-c .index-note p{max-width:28ch;margin:1rem 0 0;font-size:.88rem}.option-c h2{align-self:center;max-width:16ch;margin:0;font-size:clamp(2rem,4.1vw,3.3rem);line-height:1.02}.option-c nav{grid-column:1/-1;padding-top:15px;border-top:1px solid var(--color-divider)}
+    @media(max-width:820px){.study{grid-template-columns:1fr}.study-label{padding-top:0}.option-a .head-copy,.option-c{grid-template-columns:1fr;gap:22px}.option-a .head-copy{align-items:start}.option-c{grid-template-rows:auto;padding:34px 28px}.option-c .index-note{padding:0 0 20px;border-right:0;border-bottom:1px solid var(--color-divider)}.option-c nav{grid-column:auto}.preview{min-height:0}}
+    @media(max-width:520px){.preview{border-radius:var(--radius-sm)}.option-a,.option-b{padding:30px 22px}.option-a h2,.option-b h2,.option-c h2{font-size:2rem}.option-b{align-items:flex-start;text-align:left}.option-b nav{justify-content:flex-start}}
+  </style>
+</BaseLayout>
