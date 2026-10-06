@@ -3,14 +3,14 @@ title: "[Study Record] 파이토치 첫 걸음"
 slug: "study-record"
 generated: true
 status: "completed"
-domain:
+domain: 
   - "Deep Learning"
 type: "learning-note"
-researchFields:
+researchFields: 
   - "ML"
 featured: false
 date: "2026-07-25"
-otherSources:
+otherSources: 
   - "https://cs231n.github.io/"
 notion: "https://app.notion.com/p/Study-Record-3aa14b84a0f2800bae5afceaa73a20e5"
 ---

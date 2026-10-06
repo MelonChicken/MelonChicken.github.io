@@ -3,21 +3,21 @@ title: "[Research Note] Decoding Animal Actions: How Machines Learn Behaviour"
 slug: "research-note-decoding-animal-actions-how-machines-learn-behaviour"
 generated: true
 status: "completed"
-domain:
+domain: 
   - "Computer Vision"
   - "Animal Behavior"
   - "Deep Learning"
   - "Pose Estimation"
   - "Video Understanding"
-relatedNotes:
+relatedNotes: 
   - "computer-vision-deeplabcut-practice"
 summary: "동물 행동학의 전통적 분석에서 딥러닝 기반 자동 분석으로의 전환을 다룬다. Pose Estimation, Object Tracking, Behaviour Classification을 통해 행동을 정량화하고, 예측·설명 가능한 AI로 확장되는 흐름을 탐구한다."
 type: "learning-note"
-researchFields:
+researchFields: 
   - "Video Understanding"
   - "Computer Vision"
 featured: false
-methods:
+methods: 
   - "Pose Estimation"
   - "Keypoint Detection"
   - "Tracking"

@@ -6,14 +6,14 @@ status: "work-in-progress"
 summary: "라즈베리파이 기반 동물 행동 관찰 반응형 에이전트"
 date: "2026-04-05"
 group: "product"
-tracks:
+tracks: 
   - "behavior-recognition"
-stack:
+stack: 
   - "llama"
   - "Jupyter Notebook"
   - "Ollama"
   - "Python"
-roles:
+roles: 
   - "🛠️ ML Engineer"
   - "📚 Full-stack"
 output: "📷 CV"

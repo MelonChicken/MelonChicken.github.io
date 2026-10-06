@@ -6,13 +6,13 @@ status: "idea"
 summary: "연구 브리핑 Markdown에서 논문 후보를 추출하고, 외부 학술 자료를 교차검증하여 최근 1~2년의 유사 연구 대비 위치와 연구 가치를 평가한 뒤, 이번 주에 읽을 논문 1편을 선정하도록 돕는 웹 서비스"
 date: "2025-08-28"
 group: "product"
-stack:
+stack: 
   - "Google AI Studio"
   - "Gemini API"
   - "Vanila JS"
   - "node.js"
   - "TypeScript"
-roles:
+roles: 
   - "👤 Project Management"
 output: "🌐 Web"
 notion: "https://app.notion.com/p/Research-Paper-Arena-3b314b84a0f2808c9fdbfca72b18f68d"

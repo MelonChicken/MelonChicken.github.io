@@ -3,18 +3,18 @@ title: "[Reading Note] Masked Autoencoders Are Scalable Vision Learners"
 slug: "reading-note-masked-autoencoders-are-scalable-vision-learners"
 generated: true
 status: "completed"
-domain:
+domain: 
   - "Computer Vision"
   - "Self-supervised Learning"
-relatedNotes:
+relatedNotes: 
   - "reading-note-videomae-masked-autoencoders-are-data-efficient-learners-for-self-supervised-video-pre-training"
 summary: "High-ratio random masking과 asymmetric encoder-decoder를 통해 대규모 ViT를 효율적으로 self-supervised pre-training하고, 강한 transferable visual representation을 학습하는 MAE를 제안했다."
 type: "paper-review"
-researchFields:
+researchFields: 
   - "Self-supervised Learning"
   - "Computer Vision"
 featured: true
-methods:
+methods: 
   - "Classification"
   - "Encoder–Decoder Architecture"
   - "Masked Autoencoder"

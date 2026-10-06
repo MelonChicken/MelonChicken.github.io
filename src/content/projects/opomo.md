@@ -6,12 +6,12 @@ status: "archived"
 summary: "인생네컷을 찍을때 매번 포즈가 고민이다 → 포즈를 수집&추천해주자"
 date: "2022-10-20"
 group: "product"
-stack:
+stack: 
   - "Vanila JS"
   - "Sass"
   - "Firebase"
   - "CSS"
-roles:
+roles: 
   - "🖥️ Front End"
   - "💾 Back End"
 output: "🌐 Web"

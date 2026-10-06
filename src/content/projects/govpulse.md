@@ -6,10 +6,10 @@ status: "completed"
 summary: "현재 정부 서버 중 복구된 서버를 시각적으로 볼 수 있을까 → request response를 활용해보자!"
 date: "2025-09-29"
 group: "product"
-stack:
+stack: 
   - "FastAPI"
   - "Python"
-roles:
+roles: 
   - "💾 Back End"
 output: "🌐 Web"
 repo: "https://github.com/MelonChicken/GovPulse"

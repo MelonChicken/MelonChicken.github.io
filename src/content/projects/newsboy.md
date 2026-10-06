@@ -6,10 +6,10 @@ status: "archived"
 summary: "최근 인터넷 커뮤니티의 동향을 한눈에 보고 싶다 - 크롤링+워드클라우드"
 date: "2024-06-20"
 group: "ml"
-stack:
+stack: 
   - "Python"
   - "NLP"
-roles:
+roles: 
   - "💾 Back End"
   - "👤 Project Management"
 output: "🧠 ML"

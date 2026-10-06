@@ -6,10 +6,10 @@ status: "archived"
 summary: "TODO앱, 네이버 캘린더, 카카오 캘린더.. 일정 볼 곳이 너무 많아!→ 한눈에 보고 싶어"
 date: "2025-08-31"
 group: "product"
-stack:
+stack: 
   - "Flutter"
   - "FastAPI"
-roles:
+roles: 
   - "📚 Full-stack"
   - "👤 Project Management"
 output: "📱 App"

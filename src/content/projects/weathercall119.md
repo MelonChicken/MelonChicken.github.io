@@ -6,11 +6,11 @@ status: "archived"
 summary: "기상데이터를 활용한 119 신고수 예측"
 date: "2025-05-20"
 group: "ml"
-stack:
+stack: 
   - "Python"
   - "scikit-learn"
   - "Pandas"
-roles:
+roles: 
   - "🔢 Data Analyst Modeling"
   - "🛠️ ML Engineer"
 output: "🧠 ML"

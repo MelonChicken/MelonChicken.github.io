@@ -6,13 +6,13 @@ status: "archived"
 summary: "벡터 기반 검색과 그래프 기반 검색을 결합한 하이브리드 검색 구조가, 단일 검색 방식보다 더 정확하고 관련도 높은 응답을 생성할 수 있는가"
 date: "2026-03-01"
 group: "ml"
-stack:
+stack: 
   - "llama"
   - "Python"
   - "Ollama"
   - "OpenAI API"
   - "RAG"
-roles:
+roles: 
   - "💾 Back End"
   - "🛠️ ML Engineer"
   - "🔢 Data Analyst Modeling"

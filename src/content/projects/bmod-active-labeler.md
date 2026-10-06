@@ -6,11 +6,11 @@ status: "work-in-progress"
 summary: "Gemini 기반 Human-in-the-loop 오리 행동 비디오 라벨링 도구"
 date: "2026-07-06"
 group: "product"
-stack:
+stack: 
   - "CSS"
   - "Gemini API"
   - "TypeScript"
-roles:
+roles: 
   - "📚 Full-stack"
 output: "🌐 Web"
 notion: "https://app.notion.com/p/BMOD-Active-Labeler-39514b84a0f28038bc9ee82efefd934e"

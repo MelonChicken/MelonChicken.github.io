@@ -6,12 +6,12 @@ status: "archived"
 summary: "Virtual Learning Environment (VLE) 에서 수집하는 학생 데이터를 토대로 학습 어려움이 있는 학생을 조기 탐지"
 date: "2026-05-06"
 group: "ml"
-stack:
+stack: 
   - "Jupyter Notebook"
   - "Python"
   - "Pandas"
   - "scikit-learn"
-roles:
+roles: 
   - "🔢 Data Analyst Modeling"
   - "🛠️ ML Engineer"
 output: "🧠 ML"

@@ -3,16 +3,16 @@ title: "[Reading Note] Self-Supervised Learning from Images with a Joint-Embeddi
 slug: "reading-note-self-supervised-learning-from-images-with-a-joint-embedding-predictive-architecture"
 generated: true
 status: "archived"
-domain:
+domain: 
   - "Self-supervised Learning"
   - "Representation Learning"
 summary: "I-JEPA는 pixel reconstruction이나 hand-crafted augmentation invariance에 의존하지 않고, 보이는 context로부터 가려진 영역의 abstract representation을 예측함으로써 high-level semantic representation을 효율적으로 학습하는 self-supervised learning framework이다."
 type: "paper-review"
-researchFields:
+researchFields: 
   - "Self-supervised Learning"
   - "Computer Vision"
 featured: true
-methods:
+methods: 
   - "Joint-Embedding Predictive Architecture (JEPA)"
 date: "2026-09-09"
 readTime: 20

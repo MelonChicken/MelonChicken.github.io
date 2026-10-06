@@ -3,15 +3,15 @@ title: "[Reading Note] An Image is Worth 16×16 Words: Transformers for Image Re
 slug: "reading-note-an-image-is-worth-1616-words-transformers-for-image-recognition-at-scale"
 generated: true
 status: "completed"
-domain:
+domain: 
   - "Computer Vision"
   - "Transformer"
 summary: "원래 Transformer의 구조를 최대한 가져온다. 이미지를 작은 패치들로 나누고 이 패치들에 대해 선형적인 임베딩 시퀀스를 Transformer 입력값으로 제공한다. patches를 일종의 tokens로 바라보는 것."
 type: "paper-review"
-researchFields:
+researchFields: 
   - "Computer Vision"
 featured: true
-methods:
+methods: 
   - "Multi-Head Attention"
   - "Fine-Tuning"
   - "Semi-supervised Learning"

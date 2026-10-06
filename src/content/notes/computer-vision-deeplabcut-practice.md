@@ -3,19 +3,19 @@ title: "[Computer Vision] DeepLabCut Practice"
 slug: "computer-vision-deeplabcut-practice"
 generated: true
 status: "completed"
-domain:
+domain: 
   - "Computer Vision"
   - "Pose Estimation"
-relatedNotes:
+relatedNotes: 
   - "research-note-decoding-animal-actions-how-machines-learn-behaviour"
 type: "experiment-log"
-researchFields:
+researchFields: 
   - "Computer Vision"
 featured: true
-methods:
+methods: 
   - "DeepLabCut"
 date: "2025-11-06"
-otherSources:
+otherSources: 
   - "https://colab.research.google.com/github/DeepLabCut/DeepLabCut/blob/master/examples/COLAB/COLAB_DEMO_SuperAnimal.ipynb"
 notion: "https://app.notion.com/p/Computer-Vision-DeepLabCut-Practice-39c14b84a0f280f99087f8bf9ac53535"
 ---

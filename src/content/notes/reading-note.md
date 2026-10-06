@@ -3,14 +3,14 @@ title: "[Reading Note] 목걸이형 센서를 이용한 머신러닝 기반 가�
 slug: "reading-note"
 generated: true
 status: "completed"
-domain:
+domain: 
   - "Animal Behavior"
   - "Sensor"
 type: "paper-review"
-researchFields:
+researchFields: 
   - "ML"
 featured: false
-methods:
+methods: 
   - "Wearable Devices"
 date: "2026-03-22"
 readTime: 5

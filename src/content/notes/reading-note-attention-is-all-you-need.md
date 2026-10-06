@@ -3,21 +3,21 @@ title: "[Reading Note] Attention Is All You Need"
 slug: "reading-note-attention-is-all-you-need"
 generated: true
 status: "completed"
-domain:
+domain: 
   - "Transformer"
   - "Self-Attention"
   - "Sequence Transduction"
 type: "paper-review"
-researchFields:
+researchFields: 
   - "ML"
 featured: true
-methods:
+methods: 
   - "Scaled Dot-Product Attention"
   - "Multi-Head Attention"
   - "Encoder–Decoder Architecture"
 date: "2026-07-28"
 paperUrl: "https://proceedings.neurips.cc/paper_files/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf"
-otherSources:
+otherSources: 
   - "https://www.youtube.com/watch?v=_Z3rXeJahMs"
 notion: "https://app.notion.com/p/Reading-Note-Attention-Is-All-You-Need-3ab14b84a0f280fe9dd7e272ad4c8470"
 ---

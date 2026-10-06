@@ -3,21 +3,21 @@ title: "[Reading Note] VideoMAE: Masked Autoencoders are Data-Efficient Learners
 slug: "reading-note-videomae-masked-autoencoders-are-data-efficient-learners-for-self-supervised-video-pre-training"
 generated: true
 status: "completed"
-domain:
+domain: 
   - "Self-supervised Learning"
-relatedNotes:
+relatedNotes: 
   - "reading-note-masked-autoencoders-are-scalable-vision-learners"
 summary: "VideoMAE는 plain ViT에 high-ratio tube masking을 적용해 비디오 reconstruction task를 어렵게 만들고, 작은 데이터셋에서도 강한 video representation을 학습할 수 있음을 보였으며, SSVP에서는 데이터 양보다 target domain과의 일치도가 더 중요할 수 있음을 제시했다."
 type: "paper-review"
-researchFields:
+researchFields: 
   - "Video Understanding"
   - "Self-supervised Learning"
 featured: true
-methods:
+methods: 
   - "Masked Autoencoder"
 date: "2026-08-18"
 paperUrl: "https://proceedings.neurips.cc/paper_files/paper/2022/hash/416f9cb3276121c42eebb86352a4354a-Abstract-Conference.html"
-otherSources:
+otherSources: 
   - "https://neurips.cc/media/neurips-2022/Slides/54362.pdf"
 notion: "https://app.notion.com/p/Reading-Note-VideoMAE-Masked-Autoencoders-are-Data-Efficient-Learners-for-Self-Supervised-Video-Pr-3c014b84a0f28078a228f9dcd1a5ce1c"
 ---

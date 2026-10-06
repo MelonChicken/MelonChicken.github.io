@@ -3,18 +3,18 @@ title: "[Reading Note] (1) Concept of VLA: Integration Vision, Language, Action"
 slug: "reading-note-1-concept-of-vla-integration-vision-language-action"
 generated: true
 status: "completed"
-domain:
+domain: 
   - "Computer Vision"
   - "VLM"
   - "VLA"
-relatedNotes:
+relatedNotes: 
   - "ai-bmod-1"
 summary: "Vision-Language-Action Models 논문을 읽으며, VLA가 왜 등장했고, 기존 Vision-Language Model과 무엇이 다른거"
 type: "paper-review"
-researchFields:
+researchFields: 
   - "Computer Vision"
 featured: true
-methods:
+methods: 
   - "Tokenization"
 date: "2026-05-18"
 relatedProject: "be-more-duck-vision-language-embodied-agent"

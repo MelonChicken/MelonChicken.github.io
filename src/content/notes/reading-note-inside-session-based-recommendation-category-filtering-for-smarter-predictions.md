@@ -3,11 +3,11 @@ title: "[Reading Note] Inside Session-Based Recommendation: Category Filtering f
 slug: "reading-note-inside-session-based-recommendation-category-filtering-for-smarter-predictions"
 generated: true
 status: "completed"
-domain:
+domain: 
   - "Recommendation"
 summary: "세션 기반 추천 시스템(SBRs)의 한계인 데이터 품질 저하와 학습 비효율 문제를 해결하기 위해, 논문은 카테고리 기반 데이터 필터링 기법을 제안한다."
 type: "paper-review"
-researchFields:
+researchFields: 
   - "ML"
 featured: false
 date: "2025-10-19"

@@ -3,13 +3,13 @@ title: "[Research Note] When Matrices Go Infinite (1/2) : Mathematical Intuition
 slug: "research-note-when-matrices-go-infinite-12-mathematical-intuition"
 generated: true
 status: "completed"
-domain:
+domain: 
   - "Linear Algebra"
-relatedNotes:
+relatedNotes: 
   - "research-note-when-matrices-go-infinite-22-ml-perspective"
 summary: "Section 1: Mathematical Intuition: 무한 행렬의 기본 이론을 소개하고, 이를 바나흐 공간 (Banach space)에서 작용하는 선형 유계 연산자 (linear bounded operators)로 해석하는 글"
 type: "learning-note"
-researchFields:
+researchFields: 
   - "ML"
 featured: false
 date: "2025-09-27"

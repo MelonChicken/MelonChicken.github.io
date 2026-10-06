@@ -3,17 +3,17 @@ title: "[Reading Note] Two-Stream Convolutional Networks for Action Recognition 
 slug: "reading-note-two-stream-convolutional-networks-for-action-recognition-in-videos"
 generated: true
 status: "completed"
-domain:
+domain: 
   - "Action Recognition"
   - "Video Understanding"
   - "Computer Vision"
 summary: "정지 프레임의 외형 정보를 학습하는 공간 스트림과 다중 프레임 optical flow의 움직임 정보를 학습하는 시간 스트림을 분리한 뒤, 두 예측을 후기 융합하여 비디오 행동을 인식하는 Two-Stream ConvNet을 제안한다."
 type: "paper-review"
-researchFields:
+researchFields: 
   - "Video Understanding"
   - "Computer Vision"
 featured: true
-methods:
+methods: 
   - "Two-Stream ConvNet"
   - "Spatial Stream"
   - "Temporal Stream"
@@ -21,7 +21,7 @@ methods:
 date: "2026-07-23"
 relatedProject: "be-more-duck-vision-language-embodied-agent"
 paperUrl: "https://proceedings.neurips.cc/paper_files/paper/2014/hash/ca007296a63f7d1721a2399d56363022-Abstract.html"
-otherSources:
+otherSources: 
   - "https://www.kaggle.com/datasets/easonlll/hmdb51"
   - "https://www.robots.ox.ac.uk/~vgg/software/two_stream_action/"
 notion: "https://app.notion.com/p/Reading-Note-Two-Stream-Convolutional-Networks-for-Action-Recognition-in-Videos-3a114b84a0f280dfae46c7177832a6ba"

@@ -3,15 +3,15 @@ title: "[Reading Note] Non-deterministic한 LLM 모델은 어떻게 평가할까
 slug: "reading-note-non-deterministic-llm"
 generated: true
 status: "completed"
-domain:
+domain: 
   - "LLM"
   - "Machine Learning"
 summary: "이 글은 동일한 입력에서도 출력이 달라지는 LLM의 비결정성이 기존 accuracy 중심 평가로는 충분히 설명되지 않는 문제를 다룬다. 논문을 바탕으로 출력 일관성을 측정하는 TAR@N 지표를 소개한다."
 type: "paper-review"
-researchFields:
+researchFields: 
   - "ML"
 featured: false
-methods:
+methods: 
   - "AI Evaluation"
   - "LLM"
 date: "2025-12-18"

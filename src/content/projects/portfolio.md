@@ -6,10 +6,10 @@ status: "completed"
 summary: "나의 역량을 한번에 보여줄 수 있는 것이 필요하다"
 date: "2025-08-28"
 group: "product"
-stack:
+stack: 
   - "CSS"
   - "Vanila JS"
-roles:
+roles: 
   - "🖥️ Front End"
 output: "🌐 Web"
 repo: "https://github.com/MelonChicken/MelonChicken.github.io"

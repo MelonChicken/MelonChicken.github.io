@@ -5,16 +5,16 @@ generated: true
 status: "idea"
 date: "2026-03-10"
 group: "ml"
-tracks:
+tracks: 
   - "annotation-efficient-learning"
   - "behavior-recognition"
-stack:
+stack: 
   - "Python"
   - "scikit-learn"
   - "Pandas"
   - "NumPy"
   - "Jupyter Notebook"
-roles:
+roles: 
   - "🛠️ ML Engineer"
   - "🔢 Data Analyst Modeling"
 output: "🧠 ML"

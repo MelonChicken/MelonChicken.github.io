@@ -5,11 +5,11 @@ generated: true
 status: "completed"
 summary: "GitHub과 itch.io가 주최하는 게임잼 Game Off 2025를 소개하며, 테마 ‘WAVES’의 다양한 해석과 게임 아이디어, 개발 엔진 선택의 자유, GitHub 협업 경험의 의미를 다룬 글입니다."
 type: "learning-note"
-researchFields:
+researchFields: 
   - "ML"
 featured: false
 date: "2025-11-09"
-otherSources:
+otherSources: 
   - "https://itch.io/jam/game-off-2025"
 notion: "https://app.notion.com/p/Tech-Insight-Game-Off-2025-Wave-3a114b84a0f280509e11d90540282998"
 ---

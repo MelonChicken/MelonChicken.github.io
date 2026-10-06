@@ -3,13 +3,13 @@ title: "[Research Note] When Matrices Go Infinite (2/2) : ML Perspective"
 slug: "research-note-when-matrices-go-infinite-22-ml-perspective"
 generated: true
 status: "completed"
-domain:
+domain: 
   - "Linear Algebra"
-relatedNotes:
+relatedNotes: 
   - "research-note-when-matrices-go-infinite-12-mathematical-intuition"
 summary: "Section 2: ML Perspective: 커널 함수를 활용해 특징 상호작용 공간을 무한 차원으로 확장하고, RBF 커널 기반 InfiNet 구조로 효율적 학습을 구현하는 글"
 type: "learning-note"
-researchFields:
+researchFields: 
   - "ML"
 featured: true
 date: "2025-10-05"

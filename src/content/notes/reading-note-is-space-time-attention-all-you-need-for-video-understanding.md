@@ -3,17 +3,17 @@ title: "[Reading Note] Is Space-Time Attention All You Need for Video Understand
 slug: "reading-note-is-space-time-attention-all-you-need-for-video-understanding"
 generated: true
 status: "completed"
-domain:
+domain: 
   - "Video Action Recognition"
   - "Video Understanding"
   - "Vision Transformer"
 summary: "TimeSformer는 ViT를 video domain으로 확장하여 spatial·temporal attention을 분리한 Divided Space-Time Attention으로 효율적인 convolution-free video recognition을 구현하고, 긴 temporal context까지 확장 가능함을 보인 모델이다."
 type: "paper-review"
-researchFields:
+researchFields: 
   - "Video Understanding"
   - "Computer Vision"
 featured: true
-methods:
+methods: 
   - "AutoML"
   - "Algorithms"
   - "Long-Term Video Modeling"
@@ -21,7 +21,7 @@ methods:
   - "Vision Transformer"
 date: "2026-08-08"
 paperUrl: "https://proceedings.mlr.press/v139/bertasius21a/bertasius21a.pdf"
-otherSources:
+otherSources: 
   - "https://icml.cc/virtual/2021/poster/8941"
 notion: "https://app.notion.com/p/Reading-Note-Is-Space-Time-Attention-All-You-Need-for-Video-Understanding-3b614b84a0f280ae9206ddfb991238d0"
 ---

@@ -3,17 +3,17 @@ title: "[Reading Note] AI Agents vs. Agentic AI"
 slug: "reading-note-ai-agents-vs-agentic-ai"
 generated: true
 status: "completed"
-domain:
+domain: 
   - "AI Agent"
   - "Agentic AI"
 summary: "AI Agent와 Agentic AI의 개념적 차이를 중심으로, 각 개념의 구조·특징·한계점을 논문 기반으로 정리하고, 기술적·조직적 관점에서 Agentic AI의 확장 가능성을 탐구한 글"
 type: "paper-review"
-researchFields:
+researchFields: 
   - "ML"
 featured: false
 date: "2025-10-12"
 paperUrl: "https://arxiv.org/abs/2505.10468"
-otherSources:
+otherSources: 
   - "https://trends.google.com/trends/explore?date=today%205-y&q=AI%20Agent%2CAgentic%20AI&hl=ko"
   - "https://trends.google.com/trends/explore?date=today"
 notion: "https://app.notion.com/p/Reading-Note-AI-Agents-vs-Agentic-AI-39f14b84a0f280fabe46df27ca7413f0"

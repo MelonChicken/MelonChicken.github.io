@@ -3,13 +3,13 @@ title: "[Reading Note] Learning Transferable Visual Models From Natural Language
 slug: "reading-note-learning-transferable-visual-models-from-natural-language-supervision"
 generated: true
 status: "idea"
-domain:
+domain: 
   - "Vision-Language Learning"
 type: "paper-review"
-researchFields:
+researchFields: 
   - "Computer Vision"
 featured: false
-methods:
+methods: 
   - "Contrastive Learning"
   - "Multimodal"
   - "Zero-Shot Learning"
@@ -17,7 +17,7 @@ methods:
 date: "2026-09-01"
 readTime: 10
 paperUrl: "https://icml.cc/virtual/2021/oral/9194"
-otherSources:
+otherSources: 
   - "https://www.youtube.com/watch?v=b543xivGRnI"
   - "https://www.youtube.com/watch?v=T9XSU0pKX2E"
 notion: "https://app.notion.com/p/Reading-Note-Learning-Transferable-Visual-Models-From-Natural-Language-Supervision-3ce14b84a0f280a3953fd5b3bcfd7b08"

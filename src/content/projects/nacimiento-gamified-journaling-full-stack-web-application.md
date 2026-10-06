@@ -6,7 +6,7 @@ status: "archived"
 summary: "나의 일상을 기록하는데 동기부여가 필요하다 → 게임처럼 일기를 써보자"
 date: "2026-05-13"
 group: "product"
-stack:
+stack: 
   - "CSS"
   - "React"
   - "node.js"
@@ -15,7 +15,7 @@ stack:
   - "Render"
   - "SQLite"
   - "JWT"
-roles:
+roles: 
   - "💾 Back End"
   - "📜 Design"
 output: "📱 App"

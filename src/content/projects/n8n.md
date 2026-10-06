@@ -6,10 +6,10 @@ status: "archived"
 summary: "최근 숏폼 트렌드와 AI 자동화의 유행을 내가 활용할 수 있을까? → 쇼츠를 자동화해 생성하여 숏폼 컨텐츠 제작을 해보자"
 date: "2025-12-29"
 group: "product"
-stack:
+stack: 
   - "n8n"
   - "Python"
-roles:
+roles: 
   - "👤 Project Management"
 output: "🌐 Web"
 demo: "https://youtube.com/shorts/_VqqkbtrrhE?si=pFnyXZdopOa9_A1M"

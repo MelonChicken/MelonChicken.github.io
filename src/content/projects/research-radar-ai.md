@@ -6,14 +6,14 @@ status: "archived"
 summary: "컨설팅 리서치를 기회로 바꾸는 자동 탐색 시스템"
 date: "2026-01-18"
 group: "product"
-stack:
+stack: 
   - "FastAPI"
   - "Python"
   - "OpenAI API"
   - "NLP"
   - "Vanila JS"
   - "CSS"
-roles:
+roles: 
   - "👤 Project Management"
   - "📚 Full-stack"
   - "💾 Back End"

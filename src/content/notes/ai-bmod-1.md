@@ -3,17 +3,17 @@ title: "오리를 관찰하는 AI를 만들고 있습니다 — BMOD 개발기 #
 slug: "ai-bmod-1"
 generated: true
 status: "completed"
-domain:
+domain: 
   - "Computer Vision"
   - "Animal Behavior"
   - "Machine Learning"
-relatedNotes:
+relatedNotes: 
   - "reading-note-1-concept-of-vla-integration-vision-language-action"
 type: "implementation-note"
-researchFields:
+researchFields: 
   - "Computer Vision"
 featured: false
-methods:
+methods: 
   - "VLM-assisted Labeling"
 date: "2026-05-15"
 relatedProject: "be-more-duck-vision-language-embodied-agent"

@@ -3,14 +3,14 @@ title: "[Reading Note] The Birth of Deep CNNs: Why AlexNet Worked"
 slug: "reading-note-the-birth-of-deep-cnns-why-alexnet-worked"
 generated: true
 status: "completed"
-domain:
+domain: 
   - "Computer Vision"
   - "Machine Learning"
   - "CNN"
   - "Deep Learning"
 summary: "딥러닝 역사에서 전환점으로 평가받는 AlexNet 논문을 읽으며,이 모델이 왜 “작동했는가”를 정리하기 위해 작성"
 type: "paper-review"
-researchFields:
+researchFields: 
   - "Computer Vision"
 featured: false
 date: "2026-01-05"
