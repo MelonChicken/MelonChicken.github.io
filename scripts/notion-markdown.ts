@@ -1,11 +1,11 @@
-import { NotionToMarkdown } from 'notion-to-md';
+import { NotionMarkdownAdapter } from './notion-markdown-adapter';
 import { downloadNotionAsset } from './notion-assets';
 import { notion, type AnyNotionObject } from './notion-client';
 
 const mediaTypes = ['image', 'file', 'pdf', 'video', 'audio'] as const;
 
 export async function notionPageToMarkdown(pageId: string, slug: string) {
-  const n2m = new NotionToMarkdown({
+  const n2m = new NotionMarkdownAdapter({
     notionClient: notion,
     config: {
       parseChildPages: false,
