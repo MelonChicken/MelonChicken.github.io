@@ -34,84 +34,64 @@ notion: "https://app.notion.com/p/Reading-Note-Learning-Transferable-Visual-Mode
 | Status          | 작성 상태       | 1개       |
 | Related Project | 연결된 프로젝트    | 0~2개     |
 
-
 ## Paper Information
 
-> **Title:** Learning Transferable Visual Models From Natural Language Supervision
+> <strong>Title:</strong> Learning Transferable Visual Models From Natural Language Supervision
 >
-> **Authors:** Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, Gretchen Krueger, Ilya Sutskever
+> <strong>Authors:</strong> Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, Gretchen Krueger, Ilya Sutskever
 >
+> <strong>Affiliation:</strong> OpenAI
 >
-> **Affiliation:** OpenAI
+> <strong>arXiv ID:</strong> 2103.00020
 >
+> <strong>Topic:</strong> Vision-Language Learning, Contrastive Learning, Multimodal Learning, Zero-Shot Learning, Transfer Learning
 >
-> **arXiv ID:** 2103.00020
+> <strong>Venue:</strong> ICML 2021 (Proceedings of the 38th International Conference on Machine Learning, PMLR Vol. 139)
 >
->
-> **Topic:** Vision-Language Learning, Contrastive Learning, Multimodal Learning, Zero-Shot Learning, Transfer Learning
->
->
-> **Venue:** ICML 2021 (Proceedings of the 38th International Conference on Machine Learning, PMLR Vol. 139)
->
->
-> **Pages:** 8748–8763
->
->
+> <strong>Pages:</strong> 8748–8763
 
 ## 1. One-line Summary
 
-
-CLIP은 **대규모 image-text pair를 contrastive learning으로 학습해, 자연어를 통해 새로운 visual concept를 zero-shot으로 인식할 수 있게 만든 vision-language model**입니다.
-
+CLIP은 <strong>대규모 image-text pair를 contrastive learning으로 학습해, 자연어를 통해 새로운 visual concept를 zero-shot으로 인식할 수 있게 만든 vision-language model</strong>입니다.
 
 ## 2. Problem
 
-> State-of-the-art computer vision systems are trained to predict a **fixed set of predetermined object categories**. This restricted form of supervision limits their generality and usability since additional labeled data is needed to specify any other visual concept.
+> State-of-the-art computer vision systems are trained to predict a <span class="notion-color-blue"><strong>fixed set of predetermined object categories</strong></span>. This restricted form of supervision limits their generality and usability since additional labeled data is needed to specify any other visual concept.
 
-기존 vision model은 ImageNet처럼 **미리 정해진 class label**을 예측하도록 학습됩니다. 그래서 새로운 개념이나 task가 생기면 다시 labeled dataset을 만들고 fine-tuning해야 합니다.
-
+기존 vision model은 ImageNet처럼 <strong>미리 정해진 class label</strong>을 예측하도록 학습됩니다. 그래서 새로운 개념이나 task가 생기면 다시 labeled dataset을 만들고 fine-tuning해야 합니다.
 
 CLIP은 이 문제를
 
-
-**“class label 대신 자연어 자체를 supervision으로 쓰자”**
-
+<strong>“class label 대신 자연어 자체를 supervision으로 쓰자”</strong>
 
 라는 방향으로 해결합니다.
 
-
 ## 3. Method
-
 
 CLIP은 약 4억 개의 image-text pair를 사용합니다.
 
 - Image Encoder: ResNet 또는 ViT
+
 - Text Encoder: Transformer
+
 - 목표: 실제로 짝이 맞는 image-text embedding은 가깝게, 틀린 pair는 멀게 학습
 
 즉 caption을 직접 생성하는 것이 아니라,
 
-
 Which text matches this image?를 맞히는 contrastive task를 사용합니다.
-
 
 ## 4. Key Idea
 
-
 ![Notion image](/notion-assets/reading-note-learning-transferable-visual-models-from-natural-language-supervision/3d614b84a0f2805d802aef4535530729.png)
-
 
 ![Notion image](/notion-assets/reading-note-learning-transferable-visual-models-from-natural-language-supervision/3d614b84a0f2801d8b98f9956468f2a7.png)
 
-
 Source: Original Document
 
+<code>l2&#95;normalize</code> : <strong>이미지 encoder와 텍스트 encoder가 처음에는 서로 다른 형태의 feature를 만들기 때문에, 둘을 직접 비교할 수 없어서 같은 좌표계로 옮기는 과정 (차원이 다르므로 먼저 둘 다 W가 표현가능한 차원으로 옮긴다.)</strong>
 
-`l2_normalize` : **이미지 encoder와 텍스트 encoder가 처음에는 서로 다른 형태의 feature를 만들기 때문에, 둘을 직접 비교할 수 없어서 같은 좌표계로 옮기는 과정 (차원이 다르므로 먼저 둘 다 W가 표현가능한 차원으로 옮긴다.)**
-
-
-> 💡 scaled pairwise cosine similarities 구하는 과정
-> > Cosine Similarity는 두 벡터가 **방향상 얼마나 비슷한지**를 측정
+> 💡 <span class="notion-color-red_background">scaled pairwise cosine similarities 구하는 과정</span>
+> > Cosine Similarity는 두 벡터가 <strong>방향상 얼마나 비슷한지</strong>를 측정
 >
 > $\text{cosine similarity}(a,b)=\frac{a\cdot b}{\|a\|\|b\|}$
 >
@@ -129,31 +109,28 @@ Source: Original Document
 >
 > - −1: 반대 방향 → 매우 다름
 >
-> 가 됩니다. 즉 **정규화된 image embedding과 text embedding의 dot product만 계산하면 cosine similarity가 됩니다.**
-
+> 가 됩니다. 즉 <strong>정규화된 image embedding과 text embedding의 dot product만 계산하면 cosine similarity가 됩니다.</strong>
 
 학습을 통해 이 256차원 공간에서 (W의 차원이 256 차원이라고 할때)
 
+dog image와 <code>"a dog"</code>는 가까워지고, dog image와 <code>"a car"</code>는 멀어지고 $W_i$, $W_t$, 그리고 두 encoder 자체가 같이 조정된다. &#42; 다시 말해 W는 정답 image-text pair의 similarity가 높아지도록 <strong>학습 과정에서 같이 업데이트되는 parameter </strong>
 
-dog image와 `"a dog"`는 가까워지고, dog image와 `"a car"`는 멀어지고 $W_i$, $W_t$, 그리고 두 encoder 자체가 같이 조정된다. * 다시 말해 W는 정답 image-text pair의 similarity가 높아지도록 **학습 과정에서 같이 업데이트되는 parameter**
-
-
-> 💡 cross entropy란 무엇인가?
-> > **Entropy**
+> 💡 <span class="notion-color-red_background">cross entropy란 무엇인가?</span>
+> > <strong>Entropy</strong>
 >
-> : **확률분포가 얼마나 불확실한지**를 나타내는 값
+> : <strong>확률분포가 얼마나 불확실한지</strong>를 나타내는 값
 >
-> 확률분포 ***이때 분포라고 하지만 그냥 각 클래스(사건)에 대한 확률들을 벡터로 표현한 것이다.**  $p$에 대해 엔트로피는
+> 확률분포 <span class="notion-color-blue"><strong>&#42;이때 분포라고 하지만 그냥 각 클래스(사건)에 대한 확률들을 벡터로 표현한 것이다. </strong></span> $p$에 대해 엔트로피는
 >
 > $H(p)=−∑_ip_ilogp_i$
 >
-> Entropy는 **하나의 분포 자체의 불확실성**을 봅니다.
+> Entropy는 <strong>하나의 분포 자체의 불확실성</strong>을 봅니다.
 >
 > $H(p, q)=-\sum_i p_i\log q_i$
 >
-> 반면 Cross Entropy는 **정답 분포** $p$**를 예측 분포** $q$**로 표현했을 때 얼마나 잘 맞는지**
+> 반면 Cross Entropy는 <span class="notion-color-blue"><strong>정답 분포 </strong></span>$p$<span class="notion-color-blue"><strong>를 예측 분포 </strong></span>$q$<span class="notion-color-blue"><strong>로 표현했을 때 얼마나 잘 맞는지</strong></span>
 >
-> > **Cross Entropy**
+> > <strong>Cross Entropy</strong>
 >
 > 정답 분포를 $y$, 모델의 예측 확률 분포를 $\hat{y}$라고 하면,
 >
@@ -174,27 +151,30 @@ dog image와 `"a dog"`는 가까워지고, dog image와 `"a car"`는 멀어지�
 > - 왜 log인가?
 >
 > - 정답 분포?
+>
+> <p class="notion-empty" aria-hidden="true"></p>
 
-> simple pre-training task of predicting **which caption goes with which image is an efficient and scalable way to learn SOTA image representations** from scratch on a dataset of 400 million (image, text) pairs collected from the internet. After pre-training, natural language is used to reference learned visual concepts (or describe new ones) enabling zero-shot transfer of the model to downstream tasks.
+<p class="notion-empty" aria-hidden="true"></p>
+
+> simple pre-training task of predicting <span class="notion-color-blue"><strong>which caption goes with which image is an efficient and scalable way to learn SOTA image representations </strong></span>from scratch on a dataset of 400 million (image, text) pairs collected from the internet. After pre-training, natural language is used to reference learned visual concepts (or describe new ones) enabling zero-shot transfer of the model to downstream tasks.
 
 이 논문의 핵심은 단순히 multimodal model을 만든 것이 아니라,
 
-> **Natural language can act as an open-ended supervision space.**
+> <strong>Natural language can act as an open-ended supervision space.</strong>
 
-기존 label은 `dog`, `cat`, `car`처럼 class space가 고정되어 있지만, 자연어는 새로운 concept를 거의 제한 없이 표현할 수 있습니다.
-
+기존 label은 <code>dog</code>, <code>cat</code>, <code>car</code>처럼 class space가 고정되어 있지만, 자연어는 새로운 concept를 거의 제한 없이 표현할 수 있습니다.
 
 그래서 학습 후에는 새로운 dataset에 대해 별도의 classifier를 학습하지 않고
 
-- `"a photo of a dog"`
-- `"a photo of a cat"`
-- `"a photo of a car"`
+- <code>"a photo of a dog"</code>
+
+- <code>"a photo of a cat"</code>
+
+- <code>"a photo of a car"</code>
 
 같은 text embedding과 image embedding의 similarity만 비교해서 classification을 수행할 수 있습니다.
 
-
 ⇒ 크롤링을 통해 수집한 인터넷 이미지와 caption을 활용하여 이미지와 언어간의 연관성을 학습한다. 이렇게 학습한건 Zero-shot에서도 경쟁력있는 성능을 보여준다.
-
 
 ## 5. Result
 
@@ -202,26 +182,20 @@ dog image와 `"a dog"`는 가까워지고, dog image와 `"a car"`는 멀어지�
 
 ![Notion image](/notion-assets/reading-note-learning-transferable-visual-models-from-natural-language-supervision/3d614b84a0f280e39d22f91dedd9165c.png)
 
-
 Source: Original Document
-
 
 CLIP은 dataset-specific fine-tuning 없이도 여러 benchmark에서 의미 있는 zero-shot 성능을 보였습니다.
 
-
 ![Notion image](/notion-assets/reading-note-learning-transferable-visual-models-from-natural-language-supervision/3d614b84a0f28048a287ea389825e57d.png)
-
 
 Source: Original Document
 
+특히 ImageNet에서는 <strong>zero-shot CLIP이 supervised ResNet-50과 비슷한 수준의 accuracy</strong>를 보였습니다.
 
-특히 ImageNet에서는 **zero-shot CLIP이 supervised ResNet-50과 비슷한 수준의 accuracy**를 보였습니다.
-
-
-> 💡 zero-shot은 무엇인가?
-> > **Zero-shot**은 downstream task의 정답 라벨이 붙은 training example을 **하나도 사용하지 않고** 새로운 task를 수행하는 설정이다.
+> 💡 <span class="notion-color-red_background">zero-shot은 무엇인가?</span>
+> > <strong>Zero-shot</strong>은 downstream task의 정답 라벨이 붙은 training example을 <strong>하나도 사용하지 않고</strong> 새로운 task를 수행하는 설정이다.
 >
-> **CLIP에서의 Zero-shot**
+> <strong>CLIP에서의 Zero-shot</strong>
 >
 > CLIP은 ImageNet을 평가할 때 ImageNet training set으로 classifier를 다시 학습하지 않는다.
 >
@@ -243,77 +217,76 @@ Source: Original Document
 >
 > ---
 >
-> **Why Zero-shot Matters in CLIP**
+> <strong>Why Zero-shot Matters in CLIP</strong>
 >
-> 1. **CLIP의 핵심 목표 자체가 Zero-shot Transfer**
->
-> ---
->
-> 1. **기존 Supervised Learning과의 차이를 보여줌**
+> 1. <strong>CLIP의 핵심 목표 자체가 Zero-shot Transfer</strong>
 >
 > ---
 >
-> 1. **Generalization을 평가하기 좋은 조건**
+> 1. <strong>기존 Supervised Learning과의 차이를 보여줌</strong>
 >
 > ---
 >
-> > **CLIP에서 zero-shot은 단순한 평가 방식이 아니라, 자연어 supervision으로 학습한 모델이 새로운 task를** **별도의 학습 없이 수행할 수 있는지를 검증하는 핵심 조건이다.**
+> 1. <strong>Generalization을 평가하기 좋은 조건</strong>
 >
-> 즉 저자들이 보고 싶은 것은 단순히 **“좋은 feature를 학습했는가?”**가 아니라 **“새로운 task를 language로 정의하고 바로 수행할 수 있는가?”**이다.
-
+> ---
+>
+> > <strong>CLIP에서 zero-shot은 단순한 평가 방식이 아니라, 자연어 supervision으로 학습한 모델이 새로운 task를 </strong><span class="notion-color-blue"><strong>별도의 학습 없이 수행할 수 있는지를 검증</strong></span><strong>하는 핵심 조건이다.</strong>
+>
+> 즉 저자들이 보고 싶은 것은 단순히 <strong>“좋은 feature를 학습했는가?”</strong>가 아니라 <strong>“새로운 task를 language로 정의하고 바로 수행할 수 있는가?”</strong>이다.
 
 또한 object recognition뿐 아니라
 
 - OCR
+
 - fine-grained recognition
+
 - geo-localization
+
 - action recognition
 
 등 다양한 task로 전이되었습니다.
 
+CLIP 이전의 vision에서는 보통 <code>Image→Fixed Label</code> 이 기본 구조였습니다.
 
-CLIP 이전의 vision에서는 보통 `Image→Fixed Label` 이 기본 구조였습니다.
-
-
-CLIP 이후에는 `Image↔Language` 라는 관점이 본격적으로 확립되었고, 이후 BLIP, ALIGN, Flamingo, LLaVA 같은 vision-language model의 중요한 기반이 되었습니다.
+CLIP 이후에는 <code>Image↔Language</code> 라는 관점이 본격적으로 확립되었고, 이후 BLIP, ALIGN, Flamingo, LLaVA 같은 vision-language model의 중요한 기반이 되었습니다.
 
 1. Natural Language as Supervision
 
-    Label space를 자연어 공간으로 확장 고정. class label 대신 자연어를 supervision으로 사용함으로써 open-ended visual concept를 학습합니다.
+   Label space를 자연어 공간으로 확장 고정. class label 대신 자연어를 supervision으로 사용함으로써 open-ended visual concept를 학습합니다.
 
 2. Contrastive Image-Text Alignment
 
-    Image와 Text를 같은 embedding space에 정렬. caption generation이 아니라 image-text matching을 통해 효율적으로 학습합니다.
-
+   Image와 Text를 같은 embedding space에 정렬. caption generation이 아니라 image-text matching을 통해 효율적으로 학습합니다.
 
 3. Zero-shot Classifier
 
-
-    Text Encoder가 classifier를 생성. class description을 text embedding으로 만들고 image embedding과 비교하여 새로운 task를 별도 training 없이 수행합니다.
+Text Encoder가 classifier를 생성. class description을 text embedding으로 만들고 image embedding과 비교하여 새로운 task를 별도 training 없이 수행합니다.
 
 > Action을 token화하면 vision, language와 동일한 Transformer 표현 체계 안에서 다룰 수 있다. 하지만 action은 단순 semantic concept가 아니라 environment를 변화시키는 control signal이므로, alignment만으로는 부족하고 sequential prediction과 embodiment grounding이 필요하다.
 
-## 6. Limitation
+<p class="notion-empty" aria-hidden="true"></p>
 
+## 6. Limitation
 
 CLIP도 완전히 범용적인 것은 아닙니다.
 
 - prompt 표현에 따라 성능이 변함
 
-    ![Notion image](/notion-assets/reading-note-learning-transferable-visual-models-from-natural-language-supervision/3d614b84a0f280bd98c1d922a2dba201.png)
+  ![Notion image](/notion-assets/reading-note-learning-transferable-visual-models-from-natural-language-supervision/3d614b84a0f280bd98c1d922a2dba201.png)
 
-
-    Source: Original
+  Source: Original
 
 - fine-grained하거나 특수한 task에서는 supervised model보다 약함
+
 - web-scale 데이터의 bias를 그대로 학습할 수 있음
+
 - zero-shot 성능을 높이려면 매우 큰 데이터와 compute가 필요함
+
 - text로 표현하기 어려운 visual task에는 한계가 있음
 
 ## 7. Connection to My Research
 
-
 ## 8. What I Can Apply
-
 
 ## 9. Next Step

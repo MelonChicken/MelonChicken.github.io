@@ -22,9 +22,9 @@ problem: "최근 숏폼 트렌드와 AI 자동화의 유행을 내가 활용할 
 
 Untitled
 
-
 ![Notion image](/notion-assets/n8n/2e714b84a0f28026ac7dd23cb030976f.png)
 
+<p class="notion-empty" aria-hidden="true"></p>
 
 # 쇼츠 자동화 – A to Z까지 AI로
 
@@ -32,160 +32,220 @@ Untitled
 
 [embed](https://socialblade.com/youtube/handle/5secondsdog)
 
-
 ---
-
 
 ## 🎯 Executive Summary
 
-- **문제**: 반려견 품종 정보를 영상으로 만드는 과정은 반복 작업이 많고(기획/스크립트/영상소스), 일정한 품질을 유지하기 어렵다.
-- **해결**: n8n 워크플로우에서
-    1. 품종 입력(배열) → 2) LLM이 구조화된 품종 설명(JSON) 생성 → 3) Seedream-4로 대표 이미지 생성 → 4) Seedance-1-pro로 이미지 기반 5초 영상 생성(I2V) → 5) 결과물을 Drive에 저장(이미지/영상) 까지 자동화한다.
-- **현재 상태(Progress)**:
-    - Seedream-4 이미지 생성 성공 ✅
-    - Seedance-1-pro 영상 생성 성공 ✅
-    - n8n HTTP Request에서 **JSON valid 오류** / Replicate **429 rate limit(throttle)** 이슈를 경험하고 구조를 정리함 ✅
-    - 다음 단계: **Drive에 이미지+비디오 자동 업로드**, 이후 **틱톡 업로드 플로우 설계**
-- **다음 단계**:
-    - 1주 내: Google Drive 업로드 자동화(이미지+영상 2개 파일) 완성
-    - 2~3주: “한 품종당 N개 변형 생성(시드/프롬프트)” + 큐/레이트리밋 대응 안정화
-    - 1~2개월: 틱톡 업로드(수동/반자동/완전자동 중 선택)까지 운영 가능한 형태로 정리
+- <strong>문제</strong>: 반려견 품종 정보를 영상으로 만드는 과정은 반복 작업이 많고(기획/스크립트/영상소스), 일정한 품질을 유지하기 어렵다.
+
+- <strong>해결</strong>: n8n 워크플로우에서
+
+  1. 품종 입력(배열) → 2) LLM이 구조화된 품종 설명(JSON) 생성 → 3) Seedream-4로 대표 이미지 생성 → 4) Seedance-1-pro로 이미지 기반 5초 영상 생성(I2V) → 5) 결과물을 Drive에 저장(이미지/영상) 까지 자동화한다.
+
+- <strong>현재 상태(Progress)</strong>:
+
+  - Seedream-4 이미지 생성 성공 ✅
+
+  - Seedance-1-pro 영상 생성 성공 ✅
+
+  - n8n HTTP Request에서 <strong>JSON valid 오류</strong> / Replicate <strong>429 rate limit(throttle)</strong> 이슈를 경험하고 구조를 정리함 ✅
+
+  - 다음 단계: <strong>Drive에 이미지+비디오 자동 업로드</strong>, 이후 <strong>틱톡 업로드 플로우 설계</strong>
+
+- <strong>다음 단계</strong>:
+
+  - 1주 내: Google Drive 업로드 자동화(이미지+영상 2개 파일) 완성
+
+  - 2~3주: “한 품종당 N개 변형 생성(시드/프롬프트)” + 큐/레이트리밋 대응 안정화
+
+  - 1~2개월: 틱톡 업로드(수동/반자동/완전자동 중 선택)까지 운영 가능한 형태로 정리
 
 ---
-
 
 ## 1. 배경·목표
 
-- **사용자/페르소나**: 반려견에 관심 있는 일반 쇼츠 시청자(틱톡/유튜브 쇼츠)
-- **성공 기준(KPI)**
-    - 자동 생성 파이프라인이 끊기지 않고 돌아갈 것(실패율 낮음)
-    - 제작 단가를 통제할 것(생성 횟수·해상도·길이로 관리)
-    - 조회수/저장/팔로우 전환율 등 기본 지표 추적 가능
-- **범위(Out of scope, 현재 기준)**
-    - 실제 촬영 기반 영상, 고난도 모션캡쳐/3D
-    - 완전 자동 틱톡 업로드(계정/정책/검수 이슈로 단계적으로 접근)
+- <strong>사용자/페르소나</strong>: 반려견에 관심 있는 일반 쇼츠 시청자(틱톡/유튜브 쇼츠)
+
+- <strong>성공 기준(KPI)</strong>
+
+  - 자동 생성 파이프라인이 끊기지 않고 돌아갈 것(실패율 낮음)
+
+  - 제작 단가를 통제할 것(생성 횟수·해상도·길이로 관리)
+
+  - 조회수/저장/팔로우 전환율 등 기본 지표 추적 가능
+
+- <strong>범위(Out of scope, 현재 기준)</strong>
+
+  - 실제 촬영 기반 영상, 고난도 모션캡쳐/3D
+
+  - 완전 자동 틱톡 업로드(계정/정책/검수 이슈로 단계적으로 접근)
 
 ---
-
 
 ## 2. 역할·스택·기간
 
-- **실행 단계**
-    - 자동화 설계 및 트러블슈팅(레이트리밋/아이템 흐름/JSON) 50%
-    - 프롬프트/구조화 출력 설계(품종 JSON + 영상 프롬프트) 30%
-    - 저장/배포/운영(Drive 정리, 업로드 프로세스) 20%
-- **스택(현재 구현 기준)**
-    - **n8n (Self-hosted)**
-    - **Replicate API**
-        - bytedance/seedream-4 (이미지 생성)
-        - bytedance/seedance-1-pro (I2V 영상 생성)
-    - OpenAI(LLM) + Structured Output Parser (품종 JSON 및 프롬프트 템플릿 생성)
-    - (추후 고려 스택) FFmpeg(후처리), TTS(나레이션) — 아직 미적용
-- **기간(업데이트)**
-    - 프로토타입(이미지→영상 생성) 완료 ✅
-    - 저장/업로드 파트 1주
-    - 운영형 개선(루프 N개 생성/후처리/TTS) 1~2개월
+- <strong>실행 단계</strong>
+
+  - 자동화 설계 및 트러블슈팅(레이트리밋/아이템 흐름/JSON) 50%
+
+  - 프롬프트/구조화 출력 설계(품종 JSON + 영상 프롬프트) 30%
+
+  - 저장/배포/운영(Drive 정리, 업로드 프로세스) 20%
+
+- <strong>스택(현재 구현 기준)</strong>
+
+  - <strong>n8n (Self-hosted)</strong>
+
+  - <strong>Replicate API</strong>
+
+    - bytedance/seedream-4 (이미지 생성)
+
+    - bytedance/seedance-1-pro (I2V 영상 생성)
+
+  - OpenAI(LLM) + Structured Output Parser (품종 JSON 및 프롬프트 템플릿 생성)
+
+  - (추후 고려 스택) FFmpeg(후처리), TTS(나레이션) — 아직 미적용
+
+- <strong>기간(업데이트)</strong>
+
+  - 프로토타입(이미지→영상 생성) 완료 ✅
+
+  - 저장/업로드 파트 1주
+
+  - 운영형 개선(루프 N개 생성/후처리/TTS) 1~2개월
 
 ---
 
+## 3. 데모 &amp; 링크
 
-## 3. 데모 & 링크
+- <strong>Demo</strong>: n8n 워크플로우는 현재 로컬/서버에서 실행 가능
 
-- **Demo**: n8n 워크플로우는 현재 로컬/서버에서 실행 가능
-- **문서**: 워크플로우 흐름/노드 설정/에러 대응(429, JSON) 문서화 예정
-- **시연영상**: 생성 결과물 확보 후 업로드용 버전으로 편집/공유
+- <strong>문서</strong>: 워크플로우 흐름/노드 설정/에러 대응(429, JSON) 문서화 예정
+
+- <strong>시연영상</strong>: 생성 결과물 확보 후 업로드용 버전으로 편집/공유
 
 ---
-
 
 ## 4. 아키텍처 요약 (현재 워크플로우 기준)
-
 
 ### 4.1 데이터 흐름
 
 1. 품종 리스트 입력(Set/Edit Fields)
+
 2. Split Out으로 품종별 item 생성
+
 3. (선택) Loop Over Items로 batch 제어
-4. AI Agent + Structured Parser로 **품종 JSON** 생성
+
+4. AI Agent + Structured Parser로 <strong>품종 JSON</strong> 생성
+
 5. Build image prompt / Generate video prompt (템플릿 기반)
+
 6. Replicate Seedream-4 → 대표 이미지 생성
+
 7. Replicate Seedance-1-pro → 이미지 기반 5초 영상 생성(I2V)
-8. Save Image / Save Video → **Google Drive 업로드(진행 중)**
+
+8. Save Image / Save Video → <strong>Google Drive 업로드(진행 중)</strong>
+
 9. 최종 목표: Drive 저장본을 틱톡 업로드(수동→반자동→자동 중 선택)
 
 ### 4.2 운영 이슈(실제 경험 반영)
 
-- Replicate **429 throttle** 발생: 크레딧/요청 빈도에 따라 burst 제한이 걸림
-- n8n HTTP Request에서 “**JSON parameter needs to be valid JSON**” 빈번:
-    - 문자열 escape/따옴표/표현식 삽입 방식에서 문제 발생
-    - 해결 방향: JSON Mode에서 **expression은 값 자리에서만**, `JSON.stringify` 남용 최소화
+- Replicate <strong>429 throttle</strong> 발생: 크레딧/요청 빈도에 따라 burst 제한이 걸림
+
+- n8n HTTP Request에서 “<strong>JSON parameter needs to be valid JSON</strong>” 빈번:
+
+  - 문자열 escape/따옴표/표현식 삽입 방식에서 문제 발생
+
+  - 해결 방향: JSON Mode에서 <strong>expression은 값 자리에서만</strong>, <code>JSON.stringify</code> 남용 최소화
 
 ---
-
 
 ## 5. 핵심 기능(현재 구현 + 다음 확장)
 
-1. **품종 정보 구조화(JSON)**
-    - LLM 출력이 바로 프롬프트 템플릿에 주입되도록 설계
-2. **I2V 영상 생성(핵심)**
-    - Seedream-4에서 안정적인 대표 이미지를 만든 후
-    - Seedance-1-pro로 5초 영상 생성(모션/카메라 안정성 파라미터 활용)
-3. **저장(Drive) & 업로드 준비**
-    - 이미지/영상 파일명 규칙화, 폴더 구조(품종/날짜/버전) 정리
-4. (다음) **후처리/자막/TTS**
-    - TikTok 퍼포먼스가 중요한 단계에서 추가
+1. <strong>품종 정보 구조화(JSON)</strong>
+
+   - LLM 출력이 바로 프롬프트 템플릿에 주입되도록 설계
+
+2. <strong>I2V 영상 생성(핵심)</strong>
+
+   - Seedream-4에서 안정적인 대표 이미지를 만든 후
+
+   - Seedance-1-pro로 5초 영상 생성(모션/카메라 안정성 파라미터 활용)
+
+3. <strong>저장(Drive) &amp; 업로드 준비</strong>
+
+   - 이미지/영상 파일명 규칙화, 폴더 구조(품종/날짜/버전) 정리
+
+4. (다음) <strong>후처리/자막/TTS</strong>
+
+   - TikTok 퍼포먼스가 중요한 단계에서 추가
 
 ---
-
 
 ## 6. 기술 결정(ADR 요약 – 업데이트)
 
-- **결론(현재 기준)**: “바로 T2V”가 아니라 **I2V 파이프라인(Seedream-4 → Seedance-1-pro)** 로 결정
-    - 이유: 이미지에서 캐릭터/스타일을 먼저 고정하면 영상 결과의 일관성이 좋아짐
-- **리스크 및 완화**
-    - **레이트리밋(429)**: 워크플로우 내 Wait/큐/요청 간격, batch 제어로 완화
-    - **루프에서 item이 1개만 흐르는 문제**: Loop 노드 연결/아이템 변환(Merge/Append) 구조 점검
-    - **JSON 오류**: n8n JSON body 구성 규칙을 표준화(템플릿화)해서 재발 방지
+- <strong>결론(현재 기준)</strong>: “바로 T2V”가 아니라 <strong>I2V 파이프라인(Seedream-4 → Seedance-1-pro)</strong> 로 결정
+
+  - 이유: 이미지에서 캐릭터/스타일을 먼저 고정하면 영상 결과의 일관성이 좋아짐
+
+- <strong>리스크 및 완화</strong>
+
+  - <strong>레이트리밋(429)</strong>: 워크플로우 내 Wait/큐/요청 간격, batch 제어로 완화
+
+  - <strong>루프에서 item이 1개만 흐르는 문제</strong>: Loop 노드 연결/아이템 변환(Merge/Append) 구조 점검
+
+  - <strong>JSON 오류</strong>: n8n JSON body 구성 규칙을 표준화(템플릿화)해서 재발 방지
 
 ---
-
 
 # 계획(현 단계 반영)
 
-1. **품종 목록(3~5개)로 운영 테스트 ✅**
-    - 생성 성공률/비용/시간 측정
-2. **Drive 저장 먼저 완성(이미지+비디오 동시 업로드)**
-    - 권장: Merge(append)로 2 items 만든 뒤 Drive Upload 1개로 처리
-3. **N개 변형 생성(시드/모션 강도/프롬프트 변형) 설계**
-    - “한 품종당 1개” → “한 품종당 3~5개 후보”로 전환해 품질 선택 가능하게
-4. **틱톡 업로드 전략 결정**
-    - 1단계: Drive에서 다운로드 → 수동 업로드(캡션/해시태그 실험)
-    - 2단계: 반자동 (업로드 직전까지 자동 + 사람이 게시)
-    - 3단계: 완전자동 (정책/인증/리스크 관리 후)
-5. **후처리 (자막/TTS)는 KPI가 보일 때 투입**
-    - 초반엔 “생성→저장→업로드 루프”를 먼저 안정화
+1. <strong>품종 목록(3~5개)로 운영 테스트 ✅</strong>
+
+   - 생성 성공률/비용/시간 측정
+
+2. <strong>Drive 저장 먼저 완성(이미지+비디오 동시 업로드)</strong>
+
+   - 권장: Merge(append)로 2 items 만든 뒤 Drive Upload 1개로 처리
+
+3. <strong>N개 변형 생성(시드/모션 강도/프롬프트 변형) 설계</strong>
+
+   - “한 품종당 1개” → “한 품종당 3~5개 후보”로 전환해 품질 선택 가능하게
+
+4. <strong>틱톡 업로드 전략 결정</strong>
+
+   - 1단계: Drive에서 다운로드 → 수동 업로드(캡션/해시태그 실험)
+
+   - 2단계: 반자동 (업로드 직전까지 자동 + 사람이 게시)
+
+   - 3단계: 완전자동 (정책/인증/리스크 관리 후)
+
+5. <strong>후처리 (자막/TTS)는 KPI가 보일 때 투입</strong>
+
+   - 초반엔 “생성→저장→업로드 루프”를 먼저 안정화
+
+<p class="notion-empty" aria-hidden="true"></p>
 
 # Version 1.0-SNAPSHOT
 
-
 ## 2025-12-29
-
 
 ![Notion image](/notion-assets/n8n/2d714b84a0f280ea91f3e1a29f243469.png)
 
-
 ---
 
-
-[컨텐츠 가격 책정]
-
+&#91;컨텐츠 가격 책정&#93;
 
 5초짜리 영상 한편당
 
-- $0.03 : Image 생성 (bytedance/seedream-4)
-- $0.30 : Video 생성(bytedance/seedance-1-pro)
-- $0.01 이하 : ChatGPT API
+- &#36;0.03 : Image 생성 (bytedance/seedream-4)
+
+- &#36;0.30 : Video 생성(bytedance/seedance-1-pro)
+
+- &#36;0.01 이하 : ChatGPT API
 
 총 0.34 달러 (488원)
 
 - 한 달 약 15000원 지출
+
+<p class="notion-empty" aria-hidden="true"></p>
